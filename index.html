@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <title>BCTI - Advanced Exam Maker (Smart Counter & Option Control)</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+    <style>
+        /* আপনার অরিজিনাল সিএসএস হুবহু রাখা হলো */
+        :root { --primary: #1a237e; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); margin: 0; display: flex; height: 100vh; overflow: hidden; }
+        .sidebar { width: 450px; background: #fff; border-right: 2px solid #ddd; display: flex; flex-direction: column; }
+        .tab-btn-group { display: flex; background: #eee; }
+        .tab-btn { flex: 1; padding: 12px; border: none; cursor: pointer; font-weight: bold; background: #eee; font-size: 13px; }
+        .tab-btn.active { background: #fff; border-bottom: 2px solid var(--primary); color: var(--primary); }
+        .panel { padding: 15px; flex: 1; overflow-y: auto; display: none; box-sizing: border-box; }
+        .panel.active { display: block; }
+        .admin-only { display: none; }
+        .admin-active .admin-only { display: block; }
+        .input-group { margin-bottom: 10px; }
+        .input-group label { display: block; font-weight: bold; margin-bottom: 4px; font-size: 13px; }
+        .input-group input, textarea, select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        
+        .preview-area { flex: 1; background: #525659; display: flex; justify-content: center; padding: 20px; overflow-y: auto; }
+        .exam-paper { width: 210mm; min-height: 297mm; background: white; box-sizing: border-box; box-shadow: 0 0 15px rgba(0,0,0,0.5); position: relative; }
+        
+        .header { text-align: center; margin-bottom: 10px; border-bottom: 2px solid #000; padding-bottom: 8px; }
+        .header h1 { margin: 0; font-weight: bold; line-height: 1.2; }
+        .header h2 { margin: 2px 0; font-weight: bold; }
+        .header-info { margin: 2px 0; font-weight: bold; }
+
+        .smart-counter-dashboard { background: var(--primary); color: white; padding: 12px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .counter-stats { display: flex; justify-content: space-around; align-items: center; text-align: center; }
+        .stat-item h4 { margin: 0; font-size: 10px; text-transform: uppercase; opacity: 0.8; }
+        .stat-item .val { font-size: 24px; font-weight: bold; display: block; }
+        .stat-item input { width: 50px; background: rgba(255,255,255,0.2); border: 1px solid white; color: white; text-align: center; border-radius: 4px; font-size: 18px; font-weight: bold; }
+        .progress-line { width: 100%; background: rgba(255,255,255,0.1); height: 6px; border-radius: 10px; margin-top: 10px; overflow: hidden; }
+        #fillBar { width: 0%; height: 100%; background: #4caf50; transition: 0.4s; }
+
+        .restriction-box { background: #e8f5e9; border: 1px solid #c8e6c9; padding: 12px; border-radius: 8px; margin-bottom: 15px; }
+        .restriction-box h4 { margin: 0 0 5px 0; color: #2e7d32; font-size: 14px; }
+        .restriction-box input { border: 1px solid #a5d6a7 !important; background: #fff !important; }
+
+        #outSetLine { position: absolute; top: 20px; right: 20px; border: 2px solid #000; padding: 4px 12px; font-weight: bold; font-size: 18px; display: none; }
+        .marks-info { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 5px; border-bottom: 1px solid #ddd; padding-bottom: 3px; }
+        .instruction { text-align: center; font-style: italic; font-weight: bold; margin-bottom: 15px; text-decoration: underline; }
+        .question-container { column-gap: 40px; margin-top: 5px; column-rule: 1px solid #000; }
+        .cq-box, .normal-q { break-inside: avoid; margin-bottom: 20px; display: block; }
+        .sub-q { display: flex; justify-content: space-between; margin-bottom: 2px; }
+        .mcq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 5px; padding-left: 20px; }
+        #ansSheetArea { margin-top: 30px; border-top: 2px dashed #333; padding-top: 20px; break-before: page; }
+        .ans-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px; }
+        .ans-box { border: 1px solid #ccc; padding: 5px; font-size: 14px; border-radius: 4px; }
+        .btn-action { border: none; padding: 12px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 5px; }
+        .btn-mini { padding: 4px 10px; border: none; border-radius: 3px; color: white; cursor: pointer; font-size: 11px; margin-right: 5px; }
+        .lock-status { padding: 10px; background: #1a237e; color: white; display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
+        
+        .q-card { transition: 0.2s; border: 1px solid #eee; margin-bottom: 8px; border-radius: 8px; cursor: pointer; background: #fff; padding: 10px; width: 100%; box-sizing: border-box; overflow-wrap: break-word; }
+        .q-card:hover { background: #f9f9f9 !important; }
+        .q-card-body { white-space: pre-wrap; font-size: 13px; color: #333; margin: 8px 0; line-height: 1.4; word-break: break-word; }
+        
+        .q-card-options { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; font-size: 11px; color: #555; background: #f1f8e9; padding: 6px; border-radius: 4px; margin-top: 5px; border: 1px solid #dcedc8; box-sizing: border-box; }
+        .q-card-options div { word-break: break-all; }
+
+        .board-tag { color: #d32f2f; font-weight: bold; font-size: 11px; margin-left: 5px; }
+        .magic-tools { background: #e3f2fd; padding: 10px; border-radius: 5px; margin-bottom: 10px; border: 1px solid #bbdefb; }
+        #cropperModal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); }
+        .modal-content { background: #fff; width: 90%; max-width: 600px; margin: 50px auto; padding: 20px; border-radius: 8px; text-align: center; }
+        #cropImageWrap { max-height: 400px; margin-bottom: 20px; overflow: hidden; }
+        #cropImageWrap img { max-width: 100%; }
+        @media print { .sidebar { display: none; } .preview-area { padding: 0; background: white; } .exam-paper { box-shadow: none; width: 100%; border: none; margin: 0; } @page { size: A4; margin: 0; } .question-container { column-rule: 1px solid #000; } #ansSheetArea.hidden-print { display: none !important; } #outSetLine { display: block !important; border: 2px solid #000 !important; } }
+    </style>
+</head>
+<body onload="checkLicense()">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
+<div id="cropperModal">
+    <div class="modal-content">
+        <h3>ছবি ক্রপ করুন</h3>
+        <div id="cropImageWrap"><img id="cropImage" src=""></div>
+        <button class="btn-action" style="background:var(--primary); color:white; width:auto; padding:10px 30px;" onclick="finishCrop()">ক্রপ সম্পন্ন করুন</button>
+        <button class="btn-action" style="background:#777; color:white; width:auto; padding:10px 30px;" onclick="closeCropper()">বাতিল</button>
+    </div>
+</div>
+
+<div class="sidebar" id="sidebarMain">
+    <div class="lock-status">
+        <span id="lockText">🔒 মোড: <b id="currentModeDisplay">সাধারণ</b></span>
+        <label style="cursor: pointer;"><input type="checkbox" id="adminToggle" onchange="toggleAdmin()"> এডমিন</label>
+    </div>
+
+    <div class="tab-btn-group">
+        <button class="tab-btn active" onclick="openTab('select')">বাছাই</button>
+        <button class="tab-btn" onclick="openTab('bank')">ব্যাংক</button>
+        <button class="tab-btn" onclick="openTab('sets')">সেটিংস</button>
+    </div>
+
+    <div id="select" class="panel active">
+        <div class="smart-counter-dashboard">
+            <div class="counter-stats">
+                <div class="stat-item"><h4>লাগবে</h4><input type="number" id="targetCount" value="10" oninput="updateCounter()"></div>
+                <div style="width: 1px; height: 35px; background: rgba(255,255,255,0.2);"></div>
+                <div class="stat-item"><h4>সিলেক্টেড</h4><span id="liveCount" class="val" style="color: #ffeb3b;">0</span></div>
+            </div>
+            <div class="progress-line"><div id="fillBar"></div></div>
+            <div id="counterStatus" style="font-size: 11px; text-align: center; margin-top: 6px;">প্রস্তুত</div>
+        </div>
+
+        <div class="magic-tools">
+            <label style="font-size: 12px; font-weight: bold;">🎲 অটো জেনারেটর</label>
+            <div style="display: flex; gap: 5px; margin-top: 5px;">
+                <input type="number" id="randomCount" placeholder="কয়টি?" style="width: 70px; padding: 5px;">
+                <button onclick="autoSelectRandom()" style="flex:1; background:#673ab7; color:white; border:none; border-radius:4px; cursor:pointer;">প্রশ্ন বাছাই করো</button>
+            </div>
+            <button onclick="shuffleSelectedQuestions()" style="width:100%; margin-top:5px; background:#ff9800; color:white; border:none; border-radius:4px; padding:8px; cursor:pointer; font-weight:bold;">🔀 প্রশ্ন উলট-পালট করো</button>
+        </div>
+
+        <div id="filterGroup" style="background: #f0f0f0; padding: 10px; border-radius: 5px; margin-bottom: 10px; border:1px solid #ddd;">
+            <div class="admin-only restriction-box">
+                <h4>🔒 সাবজেক্ট রেস্ট্রিকশন</h4>
+                <input type="text" id="lockBox" placeholder="উদা: বাংলা, ইংরেজি" oninput="saveData(); updateSubFilter()" class="input-group" style="margin-bottom:0;">
+                <small style="font-size:10px; color:#666;">কমা দিয়ে বিষয়গুলো লিখুন</small>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 5px;">
+                <select id="fClass" onchange="renderSelectionList()" style="padding:8px; border-radius:4px;">
+                    <option value="">সব শ্রেণি</option>
+                    <option value="HSC">HSC</option>
+                    <option value="দশম">দশম</option>
+  <option value="নবম">নবম</option>
+  <option value="অষ্টম">অষ্টম</option>
+  <option value="সপ্তম">সপ্তম</option>
+  <option value="ষষ্ঠ">ষষ্ঠ</option>
+  <option value="পঞ্চম">পঞ্চম</option>
+  <option value="চতুর্থ">চতুর্থ</option>
+  <option value="তৃতীয়">তৃতীয়</option>
+  <option value="দ্বিতীয়">দ্বিতীয়</option>
+  <option value="প্রথম">প্রথম</option>
+                </select>
+                <select id="fDiv" onchange="renderSelectionList()" style="padding:8px; border-radius:4px;">
+                    <option value="">সব বিভাগ</option>
+ 			<option value="সাধারণ">সাধারণ</option>
+                    <option value="বিজ্ঞান">বিজ্ঞান</option>
+                    <option value="মানবিক">মানবিক</option>
+                    <option value="ব্যবসায় শিক্ষা">ব্যবসায় শিক্ষা</option>
+                </select>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 5px;">
+                <select id="fSub" onchange="updateChapterFilter(); renderSelectionList()" style="padding:8px; border-radius:4px;"></select>
+                <select id="fChap" onchange="renderSelectionList()" style="padding:8px; border-radius:4px;">
+                    <option value="">সব অধ্যায়</option>
+                </select>
+            </div>
+            
+            <select id="fType" onchange="renderSelectionList()" style="width:100%; padding:8px; border-radius:4px;">
+                <option value="">সব ধরন</option>
+                <option value="normal">সাধারণ</option>
+                <option value="cq">সৃজনশীল</option>
+                <option value="mcq">MCQ</option>
+            </select>
+        </div>
+        <div id="selectionList"></div>
+        <button class="btn-action" style="background:#2e7d32; color:white; margin-top:15px;" onclick="window.print()">🖨️ প্রিন্ট / PDF</button>
+    </div>
+
+    <div id="bank" class="panel">
+        <div class="admin-only">
+            <h3>প্রশ্ন যোগ/এডিট</h3>
+            <input type="hidden" id="editIndex" value="-1">
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                <select id="qClassInput" class="input-group" style="margin-bottom:0;">
+                    <option value="">শ্রেণি নির্বাচন করুন</option>
+                    <option value="HSC">HSC</option>
+                    <option value="দশম">দশম</option>
+  <option value="নবম">নবম</option>
+  <option value="অষ্টম">অষ্টম</option>
+  <option value="সপ্তম">সপ্তম</option>
+  <option value="ষষ্ঠ">ষষ্ঠ</option>
+  <option value="পঞ্চম">পঞ্চম</option>
+  <option value="চতুর্থ">চতুর্থ</option>
+  <option value="তৃতীয়">তৃতীয়</option>
+  <option value="দ্বিতীয়">দ্বিতীয়</option>
+  <option value="প্রথম">প্রথম</option>
+                </select>
+                <select id="qDivInput" class="input-group" style="margin-bottom:0;">
+                    <option value="">বিভাগ নির্বাচন করুন</option>
+			<option value="সাধারণ">সাধারণ</option>
+                    <option value="বিজ্ঞান">বিজ্ঞান</option>
+                    <option value="মানবিক">মানবিক</option>
+                    <option value="ব্যবসায় শিক্ষা">ব্যবসায় শিক্ষা</option>
+                </select>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <input type="text" id="qSub" placeholder="বিষয়" class="input-group">
+                <input type="text" id="qChap" placeholder="অধ্যায়" class="input-group">
+            </div>
+            <select id="qType" onchange="toggleFields()" class="input-group">
+                <option value="normal">সাধারণ</option>
+                <option value="cq">সৃজনশীল</option>
+                <option value="mcq">MCQ</option>
+            </select>
+            <label id="showOptionsLabel" style="display:none; align-items:center; cursor:pointer; font-weight:bold; margin-bottom:10px; font-size: 13px; color: var(--primary);">
+                <input type="checkbox" id="showOptionsToggle" checked style="width:auto; margin-right:8px;"> অপশনগুলো দেখান
+            </label>
+            <textarea id="qBody" rows="3" placeholder="প্রশ্ন..." class="input-group"></textarea>
+            <input type="text" id="qAns" placeholder="সঠিক উত্তর" class="input-group">
+            <input type="text" id="qBoard" placeholder="বোর্ড ও সাল" class="input-group">
+            <div id="extraFields" style="display:none; background:#f5f5f5; padding:10px; border-radius:5px; margin-bottom:10px;">
+                <input type="text" id="qA" placeholder="ক" class="input-group">
+                <input type="text" id="qB" placeholder="খ" class="input-group">
+                <input type="text" id="qC" placeholder="গ" class="input-group">
+                <input type="text" id="qD" placeholder="ঘ" class="input-group">
+            </div>
+            <input type="file" id="qImg" accept="image/*" class="input-group" onchange="handleImage(event)">
+            <div id="imgPreview" style="margin: 5px 0;"></div>
+            <button class="btn-action" id="saveBtn" style="background:var(--primary); color:white;" onclick="addQuestion()">সংরক্ষণ করুন</button>
+            <button class="btn-action" style="background:#777; color:white; display:none;" id="cancelBtn" onclick="cancelEdit()">বাতিল</button>
+        </div>
+        <div class="admin-hide-msg" style="text-align:center; color:#999; margin-top:30px;"><p>⚠️ এডমিন পাসওয়ার্ড দিন।</p></div>
+    </div>
+
+    <div id="sets" class="panel">
+        <div style="background: #fff8e1; padding: 10px; border-radius: 5px; margin-bottom: 15px; border: 1px solid #ffe082;"><label style="display:flex; align-items:center; cursor:pointer; font-weight:bold;"><input type="checkbox" id="showAnsKey" checked onchange="sync()" style="width:auto; margin-right:10px;"> প্রিন্টে উত্তরপত্র রাখুন</label></div>
+        <h4 style="color:var(--primary); margin-top:0; border-bottom:1px solid #ddd;">⚙️ জেনারেল সেটিংস</h4>
+        <div class="input-group"><label>পরীক্ষার সেট</label><input type="text" id="hSet" placeholder="ক" oninput="sync()"></div>
+        <select id="qLang" onchange="sync()" class="input-group"><option value="bn">বাংলা</option><option value="en">ইংরেজি</option></select>
+        <div class="input-group"><label>প্রতিষ্ঠানের নাম</label><input type="text" id="h1" value="শেরখালী সরকারি মহিলা কলেজ" oninput="sync()"><input type="range" id="fsH1" min="16" max="40" value="26" oninput="sync()"></div>
+        <div class="input-group"><label>পরীক্ষার নাম</label><input type="text" id="h2" value="বার্ষিক পরীক্ষা-২০২৬" oninput="sync()"><input type="range" id="fsH2" min="14" max="30" value="20" oninput="sync()"></div>
+        <div class="input-group"><label>শ্রেণি ও বিষয়</label><input type="text" id="hClass" placeholder="একাদশ (মানবিক)" oninput="sync()"><input type="text" id="h3" oninput="sync()" style="margin-top:5px;"><input type="range" id="fsH3" min="12" max="22" value="16" oninput="sync()"></div>
+        <div style="display: flex; gap: 5px;"><div class="input-group"><label>সময়</label><input type="text" id="hTime" oninput="sync()"></div><div class="input-group"><label>মান</label><input type="text" id="hMarks" oninput="sync()"></div></div>
+        <div class="input-group"><label>নির্দেশিকা</label><input type="text" id="hInst" oninput="sync()"><input type="range" id="fsH4" min="10" max="20" value="14" oninput="sync()"></div>
+        <div class="input-group"><label>ফন্ট ও স্পেসিং</label><input type="number" id="fSize" value="16" oninput="sync()"><input type="range" id="lHeight" min="1.0" max="2.5" step="0.1" value="1.4" oninput="sync()"></div>
+        <div class="input-group"><label>কলাম</label><select id="colCount" onchange="sync()"><option value="2">২ কলাম</option><option value="1">১ কলাম</option></select></div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;"><input type="number" id="mTop" value="15" oninput="sync()"><input type="number" id="mBottom" value="15" oninput="sync()"><input type="number" id="mLeft" value="15" oninput="sync()"><input type="number" id="mRight" value="15" oninput="sync()"></div>
+        <button class="btn-action" style="background:#555; color:white; margin-top:20px;" onclick="exportJSON()">📥 ব্যাকআপ</button>
+        <button class="btn-action" style="background:#00796b; color:white;" onclick="document.getElementById('importFile').click()">📤 রিস্টোর</button>
+        <input type="file" id="importFile" style="display:none;" onchange="importJSON(event)">
+    </div>
+</div>
+
+<div class="preview-area">
+    <div id="examPaper" class="exam-paper">
+        <div id="outSetLine"></div>
+        <div class="header"><h1 id="outH1"></h1><h2 id="outH2"></h2><div id="outClassLine" class="header-info"></div><div id="outSubjectLine" class="header-info"></div></div>
+        <div class="marks-info"><span id="outTime"></span><span id="outMarks"></span></div>
+        <div id="outInst" class="instruction"></div>
+        <div id="finalPaper" class="question-container"></div>
+        <div id="ansSheetArea"><h3 style="text-align:center; border-bottom: 1px solid #000; margin-bottom:10px;">উত্তরমালা</h3><div id="ansGrid" class="ans-grid"></div></div>
+    </div>
+</div>
+
+<script>
+    let questionBank = [];
+    const DB_KEY = 'bcti_v25_final';
+    let currentImgData = "", cropper;
+    const MASTER_KEY = "BCTI-2026-PRO";
+
+    function checkLicense() { 
+        const savedKey = localStorage.getItem('bcti_app_license'); 
+        if (savedKey !== MASTER_KEY) { 
+            const userInput = prompt("License Key:"); 
+            if (userInput === MASTER_KEY) { localStorage.setItem('bcti_app_license', userInput); loadData(); } 
+            else { document.body.innerHTML = `<h1>Invalid Access</h1>`; } 
+        } else { loadData(); } 
+    }
+    
+    function updateCounter() {
+        const selected = questionBank.filter(q => q.selected).length;
+        const target = parseInt(document.getElementById('targetCount').value) || 0;
+        document.getElementById('liveCount').innerText = selected;
+        let percent = target > 0 ? (selected / target) * 100 : 0;
+        const bar = document.getElementById('fillBar');
+        const status = document.getElementById('counterStatus');
+        bar.style.width = (percent > 100 ? 100 : percent) + "%";
+        if(selected < target) { status.innerText = `আরও ${target - selected}টি প্রশ্ন লাগবে`; bar.style.background = "#ffeb3b"; } 
+        else if(selected == target) { status.innerText = "✅ লক্ষ্য পূরণ হয়েছে!"; bar.style.background = "#4caf50"; } 
+        else { status.innerText = `⚠️ ${selected - target}টি প্রশ্ন বেশি!`; bar.style.background = "#f44336"; }
+    }
+
+    // ফিল্টার ফাংশন আপডেট করা হয়েছে
+    function renderSelectionList() {
+        const isAdmin = document.getElementById('adminToggle').checked;
+        const subF = document.getElementById('fSub').value;
+        const classF = document.getElementById('fClass').value;
+        const divF = document.getElementById('fDiv').value;
+        const typeF = document.getElementById('fType').value;
+        const chapF = document.getElementById('fChap').value;
+
+        let filtered = questionBank.map((q, i) => ({...q, originalIndex: i})).filter(q => {
+            return (!subF || q.sub === subF) && 
+                   (!classF || q.qClass === classF) && 
+                   (!divF || q.qDiv === divF) && 
+                   (!typeF || q.type === typeF) &&
+                   (!chapF || q.chap === chapF);
+        });
+        
+        document.getElementById('selectionList').innerHTML = filtered.map(q => {
+            let optHtml = "";
+            if (q.type !== 'normal') {
+                optHtml = `
+                    <div class="q-card-options">
+                        <div><b>ক:</b> ${q.a || '-'}</div>
+                        <div><b>খ:</b> ${q.b || '-'}</div>
+                        <div><b>গ:</b> ${q.c || '-'}</div>
+                        <div><b>ঘ:</b> ${q.d || '-'}</div>
+                    </div>`;
+            }
+
+            return `
+            <div class="q-card" onclick="toggleQ(${q.originalIndex})" style="border-left: ${q.selected ? '6px solid var(--primary)' : '1px solid #eee'}">
+                <div style="display:flex; justify-content:space-between;"><small>${q.sub} | ${q.qClass || ''} | ${q.qDiv || ''}</small><span class="board-tag">${q.board || ''}</span></div>
+                <div class="q-card-body"><b>${q.originalIndex+1}.</b> ${q.body}</div>
+                ${optHtml}
+                <div style="margin-top:10px; display: ${isAdmin ? 'flex' : 'none'}; gap: 5px;">
+                    <button class="btn-mini" style="background:#1976d2; flex:1;" onclick="editQuestion(${q.originalIndex}, event)">📝 Edit</button>
+                    <button class="btn-mini" style="background:#d32f2f; flex:1;" onclick="deleteQuestion(${q.originalIndex}, event)">🗑️ Delete</button>
+                </div>
+            </div>`;
+        }).join('');
+        renderPaper(); updateCounter();
+    }
+
+    function toggleQ(i) { questionBank[i].selected = !questionBank[i].selected; saveData(); renderSelectionList(); }
+
+    function renderPaper() {
+    const selected = questionBank.filter(q => q.selected);
+    document.getElementById('finalPaper').innerHTML = selected.map((q, i) => {
+        const num = formatNum(i+1), img = q.img ? `<img src="${q.img}" style="max-width:100%; display:block; margin:5px auto;">` : '';
+        
+        // ইংরেজি সাবজেক্ট কিনা তা চেক করার লজিক
+        const isEnglish = q.sub.toLowerCase().includes("english") || q.sub.includes("ইংরেজি");
+        const labels = isEnglish ? ["a", "b", "c", "d"] : ["ক", "খ", "গ", "ঘ"];
+        
+        let opt = "";
+        if (q.type !== 'normal' && q.showOptions !== false) {
+            if (q.type === 'cq') opt = `
+                <div style="margin-top:5px; margin-left: 20px;">
+                    <div class="sub-q"><span>${labels[0]}. ${q.a}</span><span>১</span></div>
+                    <div class="sub-q"><span>${labels[1]}. ${q.b}</span><span>২</span></div>
+                    <div class="sub-q"><span>${labels[2]}. ${q.c}</span><span>৩</span></div>
+                    <div class="sub-q"><span>${labels[3]}. ${q.d}</span><span>৪</span></div>
+                </div>`;
+            else opt = `<div class="mcq-grid"><span>${labels[0]}. ${q.a}</span><span>${labels[1]}. ${q.b}</span><span>${labels[2]}. ${q.c}</span><span>${labels[3]}. ${q.d}</span></div>`;
+        }
+        return `
+        <div class="${q.type==='cq'?'cq-box':'normal-q'}">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                <div style="display:flex; gap:5px;"><b>${num}.</b> <div>${q.body}</div></div>
+                ${q.type === 'cq' ? '<b></b>' : ''}
+            </div>
+            ${img}${opt}
+        </div>`;
+    }).join('');
+    document.getElementById('ansGrid').innerHTML = selected.map((q, i) => `<div class="ans-box"><b>${formatNum(i+1)}.</b> ${q.ans || '...'}</div>`).join('');
+}
+
+    // প্রশ্ন সেভ ফাংশন আপডেট করা হয়েছে
+    function addQuestion() {
+        const editIdx = parseInt(document.getElementById('editIndex').value);
+        const q = { 
+            sub: document.getElementById('qSub').value, 
+            qClass: document.getElementById('qClassInput').value,
+            qDiv: document.getElementById('qDivInput').value,
+            chap: document.getElementById('qChap').value, 
+            type: document.getElementById('qType').value, 
+            body: document.getElementById('qBody').value, 
+            ans: document.getElementById('qAns').value, 
+            board: document.getElementById('qBoard').value, 
+            a: document.getElementById('qA').value, 
+            b: document.getElementById('qB').value, 
+            c: document.getElementById('qC').value, 
+            d: document.getElementById('qD').value, 
+            img: currentImgData, 
+            selected: false,
+            showOptions: document.getElementById('showOptionsToggle').checked
+        };
+        
+        if(editIdx > -1) { 
+            q.selected = questionBank[editIdx].selected;
+            questionBank[editIdx] = q; 
+            cancelEdit(); 
+        } else { 
+            questionBank.push(q); 
+        }
+        
+        saveData(); updateSubFilter(); renderSelectionList(); alert("সংরক্ষিত হয়েছে!");
+    }
+
+    function editQuestion(idx, e) {
+        e.stopPropagation();
+        const q = questionBank[idx];
+        document.getElementById('editIndex').value = idx;
+        document.getElementById('qSub').value = q.sub;
+        document.getElementById('qClassInput').value = q.qClass || "";
+        document.getElementById('qDivInput').value = q.qDiv || "";
+        document.getElementById('qChap').value = q.chap || "";
+        document.getElementById('qType').value = q.type;
+        document.getElementById('qBody').value = q.body;
+        document.getElementById('qA').value = q.a || "";
+        document.getElementById('qB').value = q.b || "";
+        document.getElementById('qC').value = q.c || "";
+        document.getElementById('qD').value = q.d || "";
+        document.getElementById('qAns').value = q.ans || "";
+        document.getElementById('qBoard').value = q.board || "";
+        document.getElementById('showOptionsToggle').checked = q.showOptions !== false;
+        currentImgData = q.img || "";
+        document.getElementById('imgPreview').innerHTML = currentImgData ? `<img src="${currentImgData}" style="width:100px;">` : "";
+        
+        toggleFields();
+        document.getElementById('saveBtn').innerText = "আপডেট করুন";
+        document.getElementById('cancelBtn').style.display = "block";
+        openTab('bank');
+    }
+
+    function deleteQuestion(idx, e) {
+        e.stopPropagation();
+        if(confirm("আপনি কি নিশ্চিতভাবে এই প্রশ্নটি মুছে ফেলতে চান?")) {
+            questionBank.splice(idx, 1);
+            saveData(); updateSubFilter(); renderSelectionList();
+        }
+    }
+
+    function cancelEdit() {
+        document.getElementById('editIndex').value = "-1";
+        document.getElementById('saveBtn').innerText = "সংরক্ষণ করুন";
+        document.getElementById('cancelBtn').style.display = "none";
+        document.querySelectorAll('#bank input, #bank textarea, #bank select').forEach(i => i.value = "");
+        document.getElementById('imgPreview').innerHTML = "";
+        currentImgData = "";
+    }
+
+    function sync() {
+        document.getElementById('outH1').innerText = document.getElementById('h1').value;
+        document.getElementById('outH2').innerText = document.getElementById('h2').value;
+        document.getElementById('outClassLine').innerText = document.getElementById('hClass').value ? "শ্রেণি: " + document.getElementById('hClass').value : "";
+        document.getElementById('outSubjectLine').innerText = document.getElementById('h3').value ? "বিষয়: " + document.getElementById('h3').value : "";
+        document.getElementById('outTime').innerText = document.getElementById('hTime').value ? "সময়: " + document.getElementById('hTime').value : "";
+        document.getElementById('outMarks').innerText = document.getElementById('hMarks').value ? "পূর্ণমান: " + document.getElementById('hMarks').value : "";
+        document.getElementById('outInst').innerText = document.getElementById('hInst').value;
+        const setVal = document.getElementById('hSet').value, outSet = document.getElementById('outSetLine');
+        if(setVal) { outSet.innerText = "সেট: " + setVal; outSet.style.display = "block"; } else { outSet.style.display = "none"; }
+        document.getElementById('outH1').style.fontSize = document.getElementById('fsH1').value + "px";
+        document.getElementById('outH2').style.fontSize = document.getElementById('fsH2').value + "px";
+        document.getElementById('outClassLine').style.fontSize = document.getElementById('fsH3').value + "px";
+        document.getElementById('outInst').style.fontSize = document.getElementById('fsH4').value + "px";
+        const fp = document.getElementById('finalPaper');
+        fp.style.lineHeight = document.getElementById('lHeight').value; fp.style.fontSize = document.getElementById('fSize').value + 'px'; fp.style.columnCount = document.getElementById('colCount').value;
+        document.getElementById('examPaper').style.padding = `${document.getElementById('mTop').value}mm ${document.getElementById('mRight').value}mm ${document.getElementById('mBottom').value}mm ${document.getElementById('mLeft').value}mm`;
+        document.getElementById('ansSheetArea').style.display = document.getElementById('showAnsKey').checked ? "block" : "none";
+        renderPaper(); saveData();
+    }
+
+    function updateSubFilter() {
+        const fSub = document.getElementById('fSub');
+        const lockText = document.getElementById('lockBox').value.trim();
+        const isAdmin = document.getElementById('adminToggle').checked;
+        let subs = [...new Set(questionBank.map(q => q.sub))];
+        if (lockText !== "" && !isAdmin) {
+            let allowed = lockText.split(',').map(s => s.trim().toLowerCase());
+            subs = subs.filter(s => allowed.includes(s.toLowerCase()));
+        }
+        fSub.innerHTML = '<option value="">সব বিষয়</option>' + subs.map(s => `<option value="${s}">${s}</option>`).join('');
+    }
+
+    function toggleAdmin() {
+        const cb = document.getElementById('adminToggle');
+        if (cb.checked) { if (prompt("পাসওয়ার্ড:") === "1234") { document.getElementById('sidebarMain').classList.add('admin-active'); document.getElementById('currentModeDisplay').innerText = "এডমিন"; } else cb.checked = false; }
+        else { document.getElementById('sidebarMain').classList.remove('admin-active'); document.getElementById('currentModeDisplay').innerText = "সাধারণ"; }
+        updateSubFilter(); renderSelectionList();
+    }
+
+    function saveData() {
+        const d = { 
+            sets: [document.getElementById('h1').value, document.getElementById('h2').value, document.getElementById('hClass').value, document.getElementById('h3').value, document.getElementById('hTime').value, document.getElementById('hMarks').value, document.getElementById('hInst').value, document.getElementById('targetCount').value, document.getElementById('hSet').value],
+            hSizes: [document.getElementById('fsH1').value, document.getElementById('fsH2').value, document.getElementById('fsH3').value, document.getElementById('fsH4').value],
+            margins: [document.getElementById('mTop').value, document.getElementById('mBottom').value, document.getElementById('mLeft').value, document.getElementById('mRight').value],
+            fSize: document.getElementById('fSize').value, lHeight: document.getElementById('lHeight').value, cols: document.getElementById('colCount').value, lang: document.getElementById('qLang').value, 
+            qs: questionBank,
+            restrictedList: document.getElementById('lockBox').value 
+        };
+        localStorage.setItem(DB_KEY, JSON.stringify(d));
+    }
+
+    function loadData() {
+        const d = JSON.parse(localStorage.getItem(DB_KEY) || '{}');
+        if(d.qs) {
+            document.getElementById('h1').value = d.sets[0] || "শেরখালী সরকারি মহিলা কলেজ"; 
+            document.getElementById('h2').value = d.sets[1] || "বার্ষিক পরীক্ষা-২০২৬"; 
+            document.getElementById('hClass').value = d.sets[2] || "";
+            document.getElementById('targetCount').value = d.sets[7] || 10; document.getElementById('hSet').value = d.sets[8] || "";
+            document.getElementById('fsH1').value = d.hSizes[0] || 26; document.getElementById('fsH2').value = d.hSizes[1] || 20;
+            document.getElementById('lockBox').value = d.restrictedList || "";
+            questionBank = d.qs;
+        }
+        updateSubFilter(); sync(); renderSelectionList();
+    }
+
+    function formatNum(n) { return document.getElementById('qLang').value === 'bn' ? n.toString().split('').map(d => '০১২৩৪৫৬৭৮৯'[d] || d).join('') : n; }
+    function openTab(id) { document.querySelectorAll('.panel').forEach(p => p.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); document.getElementById(id).classList.add('active'); if(event) event.currentTarget.classList.add('active'); }
+    function toggleFields() { const type = document.getElementById('qType').value; document.getElementById('extraFields').style.display = (type === 'normal') ? 'none' : 'block'; document.getElementById('showOptionsLabel').style.display = (type === 'normal') ? 'none' : 'flex'; }
+    function handleImage(e) { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = function(ev) { document.getElementById('cropImage').src = ev.target.result; document.getElementById('cropperModal').style.display = 'block'; if (cropper) cropper.destroy(); setTimeout(() => { cropper = new Cropper(document.getElementById('cropImage'), { autoCropArea: 1, viewMode: 1 }); }, 100); }; reader.readAsDataURL(file); }
+    function finishCrop() { currentImgData = cropper.getCroppedCanvas({ maxWidth: 800 }).toDataURL('image/jpeg', 0.7); document.getElementById('imgPreview').innerHTML = `<img src="${currentImgData}" style="width:100px;">`; closeCropper(); }
+    function closeCropper() { document.getElementById('cropperModal').style.display = 'none'; }
+    function updateChapterFilter() {}
+    function autoSelectRandom() { 
+        let count = parseInt(document.getElementById('randomCount').value);
+        if(!count) return;
+        let pool = questionBank.filter(q => !q.selected);
+        for(let i=0; i<count && pool.length>0; i++){
+            let rIdx = Math.floor(Math.random() * pool.length);
+            pool[rIdx].selected = true;
+            pool.splice(rIdx, 1);
+        }
+        saveData(); renderSelectionList();
+    }
+    function shuffleSelectedQuestions() {
+        let selected = questionBank.filter(q => q.selected);
+        let others = questionBank.filter(q => !q.selected);
+        for (let i = selected.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [selected[i], selected[j]] = [selected[j], selected[i]];
+        }
+        questionBank = [...selected, ...others];
+        saveData(); renderSelectionList();
+    }
+    function exportJSON() { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([localStorage.getItem(DB_KEY)], {type: "application/json"})); a.download = "BCTI_Backup.json"; a.click(); }
+    function importJSON(e) { const r = new FileReader(); r.onload = (ev) => { localStorage.setItem(DB_KEY, ev.target.result); location.reload(); }; r.readAsText(e.target.files[0]); }
+</script>
+</body>
+</html>
