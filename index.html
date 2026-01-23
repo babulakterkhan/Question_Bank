@@ -23,10 +23,16 @@
         .preview-area { flex: 1; background: #525659; display: flex; justify-content: center; padding: 20px; overflow-y: auto; }
         .exam-paper { width: 210mm; min-height: 297mm; background: white; box-sizing: border-box; box-shadow: 0 0 15px rgba(0,0,0,0.5); position: relative; }
         
-        .header { text-align: center; margin-bottom: 10px; border-bottom: 2px solid #000; padding-bottom: 8px; }
-        .header h1 { margin: 0; font-weight: bold; line-height: 1.2; }
-        .header h2 { margin: 2px 0; font-weight: bold; }
-        .header-info { margin: 2px 0; font-weight: bold; }
+            /* শুধুমাত্র হেডার এবং দাগের অংশটুকু আপডেট করা হয়েছে */
+        .header { text-align: center; margin-bottom: 0px; padding-bottom: 0px; }
+        .header h1 { margin: 0; font-weight: bold; line-height: 1.4; }
+        .header h2 { margin: 0; font-weight: bold; line-height: 1.4; }
+        
+        .header-info { margin: 0; font-weight: bold; text-align: center; display: block; line-height: 1.4; }
+
+        /* বিষয় লাইনের নিচে মোটা কালো দাগ */
+        #outSubjectLine { border-bottom: 2.5px solid #000; padding-bottom: 5px; margin-bottom: 10px; text-align: center; }
+
 
         .smart-counter-dashboard { background: var(--primary); color: white; padding: 12px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .counter-stats { display: flex; justify-content: space-around; align-items: center; text-align: center; }
@@ -127,19 +133,19 @@
                     <option value="">সব শ্রেণি</option>
                     <option value="HSC">HSC</option>
                     <option value="দশম">দশম</option>
-  <option value="নবম">নবম</option>
-  <option value="অষ্টম">অষ্টম</option>
-  <option value="সপ্তম">সপ্তম</option>
-  <option value="ষষ্ঠ">ষষ্ঠ</option>
-  <option value="পঞ্চম">পঞ্চম</option>
-  <option value="চতুর্থ">চতুর্থ</option>
-  <option value="তৃতীয়">তৃতীয়</option>
-  <option value="দ্বিতীয়">দ্বিতীয়</option>
-  <option value="প্রথম">প্রথম</option>
+                    <option value="নবম">নবম</option>
+                    <option value="অষ্টম">অষ্টম</option>
+                    <option value="সপ্তম">সপ্তম</option>
+                    <option value="ষষ্ঠ">ষষ্ঠ</option>
+                    <option value="পঞ্চম">পঞ্চম</option>
+                    <option value="চতুর্থ">চতুর্থ</option>
+                    <option value="তৃতীয়">তৃতীয়</option>
+                    <option value="দ্বিতীয়">দ্বিতীয়</option>
+                    <option value="প্রথম">প্রথম</option>
                 </select>
                 <select id="fDiv" onchange="renderSelectionList()" style="padding:8px; border-radius:4px;">
                     <option value="">সব বিভাগ</option>
- 			<option value="সাধারণ">সাধারণ</option>
+                    <option value="সাধারণ">সাধারণ</option>
                     <option value="বিজ্ঞান">বিজ্ঞান</option>
                     <option value="মানবিক">মানবিক</option>
                     <option value="ব্যবসায় শিক্ষা">ব্যবসায় শিক্ষা</option>
@@ -174,19 +180,19 @@
                     <option value="">শ্রেণি নির্বাচন করুন</option>
                     <option value="HSC">HSC</option>
                     <option value="দশম">দশম</option>
-  <option value="নবম">নবম</option>
-  <option value="অষ্টম">অষ্টম</option>
-  <option value="সপ্তম">সপ্তম</option>
-  <option value="ষষ্ঠ">ষষ্ঠ</option>
-  <option value="পঞ্চম">পঞ্চম</option>
-  <option value="চতুর্থ">চতুর্থ</option>
-  <option value="তৃতীয়">তৃতীয়</option>
-  <option value="দ্বিতীয়">দ্বিতীয়</option>
-  <option value="প্রথম">প্রথম</option>
+                    <option value="নবম">নবম</option>
+                    <option value="অষ্টম">অষ্টম</option>
+                    <option value="সপ্তম">সপ্তম</option>
+                    <option value="ষষ্ঠ">ষষ্ঠ</option>
+                    <option value="পঞ্চম">পঞ্চম</option>
+                    <option value="চতুর্থ">চতুর্থ</option>
+                    <option value="তৃতীয়">তৃতীয়</option>
+                    <option value="দ্বিতীয়">দ্বিতীয়</option>
+                    <option value="প্রথম">প্রথম</option>
                 </select>
                 <select id="qDivInput" class="input-group" style="margin-bottom:0;">
                     <option value="">বিভাগ নির্বাচন করুন</option>
-			<option value="সাধারণ">সাধারণ</option>
+                    <option value="সাধারণ">সাধারণ</option>
                     <option value="বিজ্ঞান">বিজ্ঞান</option>
                     <option value="মানবিক">মানবিক</option>
                     <option value="ব্যবসায় শিক্ষা">ব্যবসায় শিক্ষা</option>
@@ -229,22 +235,33 @@
         <select id="qLang" onchange="sync()" class="input-group"><option value="bn">বাংলা</option><option value="en">ইংরেজি</option></select>
         <div class="input-group"><label>প্রতিষ্ঠানের নাম</label><input type="text" id="h1" value="শেরখালী সরকারি মহিলা কলেজ" oninput="sync()"><input type="range" id="fsH1" min="16" max="40" value="26" oninput="sync()"></div>
         <div class="input-group"><label>পরীক্ষার নাম</label><input type="text" id="h2" value="বার্ষিক পরীক্ষা-২০২৬" oninput="sync()"><input type="range" id="fsH2" min="14" max="30" value="20" oninput="sync()"></div>
-        <div class="input-group"><label>শ্রেণি ও বিষয়</label><input type="text" id="hClass" placeholder="একাদশ (মানবিক)" oninput="sync()"><input type="text" id="h3" oninput="sync()" style="margin-top:5px;"><input type="range" id="fsH3" min="12" max="22" value="16" oninput="sync()"></div>
+  
+        <div class="input-group"><label>শ্রেণি (আলাদা লাইন)</label><input type="text" id="hClass" placeholder="একাদশ (মানবিক)" oninput="sync()"></div>
+        <div class="input-group"><label>বিষয় (আলাদা লাইন)</label><input type="text" id="h3" oninput="sync()"></div>
+        <div class="input-group"><label>শ্রেণি ও বিষয়ের সাইজ</label><input type="range" id="fsH3" min="12" max="22" value="16" oninput="sync()"></div>
+
         <div style="display: flex; gap: 5px;"><div class="input-group"><label>সময়</label><input type="text" id="hTime" oninput="sync()"></div><div class="input-group"><label>মান</label><input type="text" id="hMarks" oninput="sync()"></div></div>
         <div class="input-group"><label>নির্দেশিকা</label><input type="text" id="hInst" oninput="sync()"><input type="range" id="fsH4" min="10" max="20" value="14" oninput="sync()"></div>
-        <div class="input-group"><label>ফন্ট ও স্পেসিং</label><input type="number" id="fSize" value="16" oninput="sync()"><input type="range" id="lHeight" min="1.0" max="2.5" step="0.1" value="1.4" oninput="sync()"></div>
+<div class="input-group">
+    <label style="color: blue;">প্রশ্নের গ্যাপ (Spacing)</label>
+    <input type="range" id="qGapSlider" min="0" max="80" value="20" oninput="sync()">
+</div>        
+<div class="input-group"><label>ফন্ট ও স্পেসিং</label><input type="number" id="fSize" value="16" oninput="sync()"><input type="range" id="lHeight" min="1.0" max="2.5" step="0.1" value="1.4" oninput="sync()"></div>
         <div class="input-group"><label>কলাম</label><select id="colCount" onchange="sync()"><option value="2">২ কলাম</option><option value="1">১ কলাম</option></select></div>
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;"><input type="number" id="mTop" value="15" oninput="sync()"><input type="number" id="mBottom" value="15" oninput="sync()"><input type="number" id="mLeft" value="15" oninput="sync()"><input type="number" id="mRight" value="15" oninput="sync()"></div>
         <button class="btn-action" style="background:#555; color:white; margin-top:20px;" onclick="exportJSON()">📥 ব্যাকআপ</button>
         <button class="btn-action" style="background:#00796b; color:white;" onclick="document.getElementById('importFile').click()">📤 রিস্টোর</button>
         <input type="file" id="importFile" style="display:none;" onchange="importJSON(event)">
+
     </div>
 </div>
 
 <div class="preview-area">
     <div id="examPaper" class="exam-paper">
         <div id="outSetLine"></div>
-        <div class="header"><h1 id="outH1"></h1><h2 id="outH2"></h2><div id="outClassLine" class="header-info"></div><div id="outSubjectLine" class="header-info"></div></div>
+        <div class="header"><h1 id="outH1"></h1><h2 id="outH2"></h2></div>
+        <div id="outClassLine" class="header-info"></div>
+        <div id="outSubjectLine" class="header-info" style="margin-bottom:10px;"></div>
         <div class="marks-info"><span id="outTime"></span><span id="outMarks"></span></div>
         <div id="outInst" class="instruction"></div>
         <div id="finalPaper" class="question-container"></div>
@@ -280,7 +297,6 @@
         else { status.innerText = `⚠️ ${selected - target}টি প্রশ্ন বেশি!`; bar.style.background = "#f44336"; }
     }
 
-    // ফিল্টার ফাংশন আপডেট করা হয়েছে
     function renderSelectionList() {
         const isAdmin = document.getElementById('adminToggle').checked;
         const subF = document.getElementById('fSub').value;
@@ -311,7 +327,7 @@
 
             return `
             <div class="q-card" onclick="toggleQ(${q.originalIndex})" style="border-left: ${q.selected ? '6px solid var(--primary)' : '1px solid #eee'}">
-                <div style="display:flex; justify-content:space-between;"><small>${q.sub} | ${q.qClass || ''} | ${q.qDiv || ''}</small><span class="board-tag">${q.board || ''}</span></div>
+                <div style="display:flex; justify-content:space-between;"><small>${q.sub} | ${q.chap || ''}</small><span class="board-tag">${q.board || ''}</span></div>
                 <div class="q-card-body"><b>${q.originalIndex+1}.</b> ${q.body}</div>
                 ${optHtml}
                 <div style="margin-top:10px; display: ${isAdmin ? 'flex' : 'none'}; gap: 5px;">
@@ -319,45 +335,44 @@
                     <button class="btn-mini" style="background:#d32f2f; flex:1;" onclick="deleteQuestion(${q.originalIndex}, event)">🗑️ Delete</button>
                 </div>
             </div>`;
-        }).join('');
+        }).join('');sync();
         renderPaper(); updateCounter();
     }
 
     function toggleQ(i) { questionBank[i].selected = !questionBank[i].selected; saveData(); renderSelectionList(); }
 
     function renderPaper() {
-    const selected = questionBank.filter(q => q.selected);
-    document.getElementById('finalPaper').innerHTML = selected.map((q, i) => {
-        const num = formatNum(i+1), img = q.img ? `<img src="${q.img}" style="max-width:100%; display:block; margin:5px auto;">` : '';
-        
-        // ইংরেজি সাবজেক্ট কিনা তা চেক করার লজিক
-        const isEnglish = q.sub.toLowerCase().includes("english") || q.sub.includes("ইংরেজি");
-        const labels = isEnglish ? ["a", "b", "c", "d"] : ["ক", "খ", "গ", "ঘ"];
-        
-        let opt = "";
-        if (q.type !== 'normal' && q.showOptions !== false) {
-            if (q.type === 'cq') opt = `
-                <div style="margin-top:5px; margin-left: 20px;">
-                    <div class="sub-q"><span>${labels[0]}. ${q.a}</span><span>১</span></div>
-                    <div class="sub-q"><span>${labels[1]}. ${q.b}</span><span>২</span></div>
-                    <div class="sub-q"><span>${labels[2]}. ${q.c}</span><span>৩</span></div>
-                    <div class="sub-q"><span>${labels[3]}. ${q.d}</span><span>৪</span></div>
-                </div>`;
-            else opt = `<div class="mcq-grid"><span>${labels[0]}. ${q.a}</span><span>${labels[1]}. ${q.b}</span><span>${labels[2]}. ${q.c}</span><span>${labels[3]}. ${q.d}</span></div>`;
-        }
-        return `
-        <div class="${q.type==='cq'?'cq-box':'normal-q'}">
-            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                <div style="display:flex; gap:5px;"><b>${num}.</b> <div>${q.body}</div></div>
-                ${q.type === 'cq' ? '<b></b>' : ''}
-            </div>
-            ${img}${opt}
-        </div>`;
-    }).join('');
-    document.getElementById('ansGrid').innerHTML = selected.map((q, i) => `<div class="ans-box"><b>${formatNum(i+1)}.</b> ${q.ans || '...'}</div>`).join('');
-}
+        const selected = questionBank.filter(q => q.selected);
+        document.getElementById('finalPaper').innerHTML = selected.map((q, i) => {
+            const num = formatNum(i+1), img = q.img ? `<img src="${q.img}" style="max-width:100%; display:block; margin:5px auto;">` : '';
+            const isEnglish = q.sub.toLowerCase().includes("english") || q.sub.includes("ইংরেজি");
+            const labels = isEnglish ? ["a", "b", "c", "d"] : ["ক", "খ", "গ", "ঘ"];
+            
+            // লাইন ব্রেক ফিক্স
+            const formattedBody = q.body.replace(/\n/g, '<br>');
 
-    // প্রশ্ন সেভ ফাংশন আপডেট করা হয়েছে
+            let opt = "";
+            if (q.type !== 'normal' && q.showOptions !== false) {
+                if (q.type === 'cq') opt = `
+                    <div style="margin-top:5px; margin-left: 20px;">
+                        <div class="sub-q"><span>${labels[0]}. ${q.a}</span><span>১</span></div>
+                        <div class="sub-q"><span>${labels[1]}. ${q.b}</span><span>২</span></div>
+                        <div class="sub-q"><span>${labels[2]}. ${q.c}</span><span>৩</span></div>
+                        <div class="sub-q"><span>${labels[3]}. ${q.d}</span><span>৪</span></div>
+                    </div>`;
+                else opt = `<div class="mcq-grid"><span>${labels[0]}. ${q.a}</span><span>${labels[1]}. ${q.b}</span><span>${labels[2]}. ${q.c}</span><span>${labels[3]}. ${q.d}</span></div>`;
+            }
+            return `
+            <div class="${q.type==='cq'?'cq-box':'normal-q'}">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <div style="display:flex; gap:5px;"><b>${num}.</b> <div>${formattedBody}</div></div>
+                </div>
+                ${img}${opt}
+            </div>`;
+        }).join('');
+        document.getElementById('ansGrid').innerHTML = selected.map((q, i) => `<div class="ans-box"><b>${formatNum(i+1)}.</b> ${q.ans || '...'}</div>`).join('');
+    }
+
     function addQuestion() {
         const editIdx = parseInt(document.getElementById('editIndex').value);
         const q = { 
@@ -386,7 +401,7 @@
             questionBank.push(q); 
         }
         
-        saveData(); updateSubFilter(); renderSelectionList(); alert("সংরক্ষিত হয়েছে!");
+        saveData(); updateSubFilter(); updateChapterFilter(); renderSelectionList(); alert("সংরক্ষিত হয়েছে!");
     }
 
     function editQuestion(idx, e) {
@@ -419,7 +434,7 @@
         e.stopPropagation();
         if(confirm("আপনি কি নিশ্চিতভাবে এই প্রশ্নটি মুছে ফেলতে চান?")) {
             questionBank.splice(idx, 1);
-            saveData(); updateSubFilter(); renderSelectionList();
+            saveData(); updateSubFilter(); updateChapterFilter(); renderSelectionList();
         }
     }
 
@@ -445,12 +460,16 @@
         document.getElementById('outH1').style.fontSize = document.getElementById('fsH1').value + "px";
         document.getElementById('outH2').style.fontSize = document.getElementById('fsH2').value + "px";
         document.getElementById('outClassLine').style.fontSize = document.getElementById('fsH3').value + "px";
+        document.getElementById('outSubjectLine').style.fontSize = document.getElementById('fsH3').value + "px";
         document.getElementById('outInst').style.fontSize = document.getElementById('fsH4').value + "px";
         const fp = document.getElementById('finalPaper');
         fp.style.lineHeight = document.getElementById('lHeight').value; fp.style.fontSize = document.getElementById('fSize').value + 'px'; fp.style.columnCount = document.getElementById('colCount').value;
         document.getElementById('examPaper').style.padding = `${document.getElementById('mTop').value}mm ${document.getElementById('mRight').value}mm ${document.getElementById('mBottom').value}mm ${document.getElementById('mLeft').value}mm`;
         document.getElementById('ansSheetArea').style.display = document.getElementById('showAnsKey').checked ? "block" : "none";
         renderPaper(); saveData();
+const gap = document.getElementById('qGapSlider').value;
+const questions = document.querySelectorAll('.normal-q');
+questions.forEach(q => q.style.marginBottom = gap + "px");
     }
 
     function updateSubFilter() {
@@ -463,6 +482,19 @@
             subs = subs.filter(s => allowed.includes(s.toLowerCase()));
         }
         fSub.innerHTML = '<option value="">সব বিষয়</option>' + subs.map(s => `<option value="${s}">${s}</option>`).join('');
+    }
+
+    // অধ্যায় ফিল্টার ঠিক করা হলো
+    function updateChapterFilter() {
+        const subF = document.getElementById('fSub').value;
+        const fChap = document.getElementById('fChap');
+        let chapters = [];
+        if(subF) {
+            chapters = [...new Set(questionBank.filter(q => q.sub === subF).map(q => q.chap))];
+        } else {
+            chapters = [...new Set(questionBank.map(q => q.chap))];
+        }
+        fChap.innerHTML = '<option value="">সব অধ্যায়</option>' + chapters.filter(c => c).map(c => `<option value="${c}">${c}</option>`).join('');
     }
 
     function toggleAdmin() {
@@ -490,12 +522,13 @@
             document.getElementById('h1').value = d.sets[0] || "শেরখালী সরকারি মহিলা কলেজ"; 
             document.getElementById('h2').value = d.sets[1] || "বার্ষিক পরীক্ষা-২০২৬"; 
             document.getElementById('hClass').value = d.sets[2] || "";
+            document.getElementById('h3').value = d.sets[3] || "";
             document.getElementById('targetCount').value = d.sets[7] || 10; document.getElementById('hSet').value = d.sets[8] || "";
             document.getElementById('fsH1').value = d.hSizes[0] || 26; document.getElementById('fsH2').value = d.hSizes[1] || 20;
             document.getElementById('lockBox').value = d.restrictedList || "";
             questionBank = d.qs;
         }
-        updateSubFilter(); sync(); renderSelectionList();
+        updateSubFilter(); updateChapterFilter(); sync(); renderSelectionList();
     }
 
     function formatNum(n) { return document.getElementById('qLang').value === 'bn' ? n.toString().split('').map(d => '০১২৩৪৫৬৭৮৯'[d] || d).join('') : n; }
@@ -504,7 +537,7 @@
     function handleImage(e) { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = function(ev) { document.getElementById('cropImage').src = ev.target.result; document.getElementById('cropperModal').style.display = 'block'; if (cropper) cropper.destroy(); setTimeout(() => { cropper = new Cropper(document.getElementById('cropImage'), { autoCropArea: 1, viewMode: 1 }); }, 100); }; reader.readAsDataURL(file); }
     function finishCrop() { currentImgData = cropper.getCroppedCanvas({ maxWidth: 800 }).toDataURL('image/jpeg', 0.7); document.getElementById('imgPreview').innerHTML = `<img src="${currentImgData}" style="width:100px;">`; closeCropper(); }
     function closeCropper() { document.getElementById('cropperModal').style.display = 'none'; }
-    function updateChapterFilter() {}
+    
     function autoSelectRandom() { 
         let count = parseInt(document.getElementById('randomCount').value);
         if(!count) return;
