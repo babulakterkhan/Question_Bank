@@ -27,7 +27,7 @@
         .header h2 { margin: 0; font-weight: bold; line-height: 1.3; }
         
         .header-info { margin: 0; font-weight: bold; text-align: center; display: block; line-height: 1.3; }
-        #outSubjectLine { border-bottom: 2px solid #000; padding-bottom: 4px; margin-bottom: 8px; text-align: center; }
+        #outSubjectLine { padding-bottom: 4px; margin-bottom: 8px; text-align: center; }
 
         .smart-counter-dashboard { background: var(--primary); color: white; padding: 12px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .counter-stats { display: flex; justify-content: space-around; align-items: center; text-align: center; }
@@ -334,6 +334,12 @@
             /* Show only page number on subsequent pages */
             .output-page:not(:first-child) {
                 padding-top: 5mm !important;
+            }
+            /* Remove border from subject line in print mode */
+            #outSubjectLine { 
+                padding-bottom: 4px; 
+                margin-bottom: 8px; 
+                text-align: center; 
             }
         }
         
