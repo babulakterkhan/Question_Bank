@@ -19,8 +19,22 @@
         .input-group label { display: block; font-weight: bold; margin-bottom: 4px; font-size: 13px; }
         .input-group input, textarea, select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
         
-        .preview-area { flex: 1; background: #525659; display: flex; justify-content: center; padding: 20px; overflow-y: auto; }
-        .exam-paper { width: 210mm; min-height: 297mm; background: white; box-sizing: border-box; box-shadow: 0 0 15px rgba(0,0,0,0.5); position: relative; }
+        .preview-area { 
+            flex: 1; 
+            background: #ffffff !important; /* ✅ পুরো ব্যাকগ্রাউন্ড সাদা */
+            display: flex; 
+            justify-content: center; 
+            padding: 20px; 
+            overflow-y: auto; 
+        }
+        .exam-paper { 
+            width: 210mm; 
+            min-height: 297mm; 
+            background: white; 
+            box-sizing: border-box; 
+            box-shadow: 0 0 10px rgba(0,0,0,0.1); /* ✅ হালকা শ্যাডো */
+            position: relative; 
+        }
         
         .header { text-align: center; margin-bottom: 5px; padding-bottom: 5px; }
         .header h1 { margin: 0; font-weight: bold; line-height: 1.3; }
@@ -44,7 +58,7 @@
         #outSetLine { position: absolute; top: 15px; right: 15px; border: 2px solid #000; padding: 3px 10px; font-weight: bold; font-size: 16px; display: none; }
         .marks-info { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 4px; border-bottom: 1px solid #ddd; padding-bottom: 2px; font-size: 13px; }
         .instruction { text-align: center; font-style: italic; font-weight: bold; margin-bottom: 10px; text-decoration: underline; font-size: 13px; }
-        .question-container { column-gap: 35px; margin-top: 5px; column-rule: 1px solid #000; }
+        .question-container { column-gap: 35px; margin-top: 15px; column-rule: 1px solid #000; }
         .cq-box, .normal-q { break-inside: avoid; margin-bottom: 12px; display: block; }
         .sub-q { display: flex; justify-content: space-between; margin-bottom: 3px; font-size: 12px; }
         .mcq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 4px; padding-left: 18px; font-size: 12px; }
@@ -55,12 +69,48 @@
         .btn-mini { padding: 4px 10px; border: none; border-radius: 3px; color: white; cursor: pointer; font-size: 11px; margin-right: 5px; }
         .lock-status { padding: 10px; background: #1a237e; color: white; display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
         
-        .q-card { transition: 0.2s; border: 1px solid #eee; margin-bottom: 8px; border-radius: 8px; cursor: pointer; background: #fff; padding: 10px; width: 100%; box-sizing: border-box; overflow-wrap: break-word; }
+        .q-card { 
+            transition: 0.2s; 
+            border: 1px solid #eee; 
+            margin-bottom: 8px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            background: #fff; 
+            padding: 10px; 
+            width: 100%; 
+            box-sizing: border-box; 
+            overflow-wrap: break-word;
+            text-align: left !important; /* ✅ বাম এলাইনমেন্ট */
+        }
         .q-card:hover { background: #f9f9f9 !important; }
-        .q-card-body { white-space: pre-wrap; font-size: 13px; color: #333; margin: 8px 0; line-height: 1.4; word-break: break-word; }
+        .q-card-body { 
+            white-space: pre-wrap; 
+            font-size: 13px; 
+            color: #333; 
+            margin: 8px 0; 
+            line-height: 1.4; 
+            word-break: break-word;
+            text-align: left !important; /* ✅ বাম এলাইনমেন্ট */
+        }
         
-        .q-card-options { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; font-size: 11px; color: #555; background: #f1f8e9; padding: 6px; border-radius: 4px; margin-top: 5px; border: 1px solid #dcedc8; box-sizing: border-box; }
-        .q-card-options div { word-break: break-all; }
+        .q-card-options { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 4px; 
+            font-size: 11px; 
+            color: #555; 
+            background: #f1f8e9; 
+            padding: 6px; 
+            border-radius: 4px; 
+            margin-top: 5px; 
+            border: 1px solid #dcedc8; 
+            box-sizing: border-box;
+            text-align: left !important; /* ✅ বাম এলাইনমেন্ট */
+        }
+        .q-card-options div { 
+            word-break: break-all;
+            text-align: left !important; /* ✅ বাম এলাইনমেন্ট */
+        }
 
         .board-tag { color: #d32f2f; font-weight: bold; font-size: 11px; margin-left: 5px; }
         .magic-tools { background: #e3f2fd; padding: 10px; border-radius: 5px; margin-bottom: 10px; border: 1px solid #bbdefb; }
@@ -160,6 +210,7 @@
             box-sizing: border-box;
             position: relative;
             page-break-after: always;
+            background: white !important; /* ✅ আউটপুট পেজের ব্যাকগ্রাউন্ড সাদা */
         }
         .output-page.active {
             display: block;
@@ -280,19 +331,66 @@
             display: none;
         }
         
+        /* অধ্যায় হেডার স্টাইল */
+        .chapter-header {
+            background: #e8eaf6;
+            color: var(--primary);
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin: 15px 0 10px 0;
+            border-left: 4px solid var(--primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-align: left !important; /* ✅ বাম এলাইনমেন্ট */
+        }
+
+        .chapter-header strong {
+            font-size: 14px;
+            display: block;
+        }
+
+        .chapter-header small {
+            font-size: 11px;
+            color: #666;
+        }
+
+        /* অধ্যায়ের প্রশ্ন সিরিয়াল বৃত্ত */
+        .chapter-serial-circle {
+            background: var(--primary);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+        
         @media print { 
+            body {
+                background: white !important; /* ✅ প্রিন্টের সময় পুরো ব্যাকগ্রাউন্ড সাদা */
+            }
             .sidebar { display: none; } 
-            .preview-area { padding: 0; background: white; overflow: visible; } 
+            .preview-area { 
+                padding: 0; 
+                background: white !important; /* ✅ প্রিন্টের সময় পুরো ব্যাকগ্রাউন্ড সাদা */
+                overflow: visible; 
+            } 
             .exam-paper { 
-                box-shadow: none; 
+                box-shadow: none !important; 
                 width: 100%; 
                 border: none; 
                 margin: 0;
                 overflow: visible;
+                background: white !important;
             } 
             @page { 
                 size: A4; 
-                margin: 12mm 15mm 12mm 15mm;
+                margin: 6mm 6mm 6mm 6mm;
             } 
             .question-container { column-rule: 1px solid #000; column-gap: 30px; } 
             #ansSheetArea.hidden-print { display: none !important; } 
@@ -305,6 +403,7 @@
                 page-break-after: always;
                 margin: 0;
                 padding: 0;
+                background: white !important;
             }
             .output-page:last-child { page-break-after: auto; }
             .page-number { display: block !important; }
@@ -340,6 +439,10 @@
                 padding-bottom: 4px; 
                 margin-bottom: 8px; 
                 text-align: center; 
+            }
+            /* প্রশ্ন কন্টেইনারের উপরের স্পেস প্রিন্টেও রাখুন */
+            .question-container {
+                margin-top: 15px !important;
             }
         }
         
@@ -806,19 +909,32 @@
     }
 
     function renderSelectionList() {
+        // ✅ বাম এলাইনমেন্ট ফোর্স করুন
+        document.getElementById('selectionList').style.textAlign = 'left';
+        
         const isAdmin = document.getElementById('adminToggle').checked;
         const subF = document.getElementById('fSub').value;
         const classF = document.getElementById('fClass').value;
         const divF = document.getElementById('fDiv').value;
         const typeF = document.getElementById('fType').value;
         const chapF = document.getElementById('fChap').value;
-
+        
         let filtered = questionBank.map((q, i) => ({...q, originalIndex: i})).filter(q => {
             return (!subF || q.sub === subF) && 
                    (!classF || q.qClass === classF) && 
                    (!divF || q.qDiv === divF) && 
                    (!typeF || q.type === typeF) &&
                    (!chapF || q.chap === chapF);
+        });
+        
+        // ✅ অধ্যায়ভিত্তিক গ্রুপিং
+        const chapterGroups = {};
+        filtered.forEach(q => {
+            const chapter = q.chap || 'অধ্যায়হীন';
+            if (!chapterGroups[chapter]) {
+                chapterGroups[chapter] = [];
+            }
+            chapterGroups[chapter].push(q);
         });
         
         // Selection Pagination
@@ -831,29 +947,81 @@
         const endIndex = startIndex + selectionPerPage;
         const pagedQuestions = filtered.slice(startIndex, endIndex);
         
-        document.getElementById('selectionList').innerHTML = pagedQuestions.map(q => {
+        // ✅ অধ্যায়ের প্রশ্ন কাউন্টার
+        const chapterCounters = {};
+        
+        let outputHTML = '';
+        let currentChapter = null;
+        
+        pagedQuestions.forEach((q, localIndex) => {
+            const chapter = q.chap || 'অধ্যায়হীন';
+            
+            // ✅ নতুন অধ্যায় শুরু হলে হেডার যোগ করুন
+            if (chapter !== currentChapter) {
+                currentChapter = chapter;
+                
+                // এই অধ্যায়ে মোট কত প্রশ্ন আছে
+                const totalInChapter = filtered.filter(item => item.chap === chapter).length;
+                
+                outputHTML += `
+                    <div class="chapter-header">
+                        <div style="text-align: left;">
+                            <strong>📚 ${chapter}</strong>
+                            <small style="display: block;">মোট প্রশ্ন: ${totalInChapter}টি</small>
+                        </div>
+                        <div style="text-align: left;">
+                            <small>${q.sub} | ${q.type === 'cq' ? 'সৃজনশীল' : q.type === 'mcq' ? 'MCQ' : 'সাধারণ'}</small>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // ✅ এই অধ্যায়ের প্রশ্ন নম্বর ইনক্রিমেন্ট করুন
+            chapterCounters[chapter] = (chapterCounters[chapter] || 0) + 1;
+            const chapterSerialNumber = chapterCounters[chapter];
+            
             let optHtml = "";
             if (q.type !== 'normal') {
                 optHtml = `
                     <div class="q-card-options">
-                        <div><b>ক:</b> ${q.a || '-'}</div>
-                        <div><b>খ:</b> ${q.b || '-'}</div>
-                        <div><b>গ:</b> ${q.c || '-'}</div>
-                        <div><b>ঘ:</b> ${q.d || '-'}</div>
+                        <div style="text-align: left;"><b>ক:</b> ${q.a || '-'}</div>
+                        <div style="text-align: left;"><b>খ:</b> ${q.b || '-'}</div>
+                        <div style="text-align: left;"><b>গ:</b> ${q.c || '-'}</div>
+                        <div style="text-align: left;"><b>ঘ:</b> ${q.d || '-'}</div>
                     </div>`;
             }
-
-            return `
+            
+            outputHTML += `
             <div class="q-card" onclick="toggleQ(${q.originalIndex})" style="border-left: ${q.selected ? '6px solid var(--primary)' : '1px solid #eee'}">
-                <div style="display:flex; justify-content:space-between;"><small>${q.sub} | ${q.chap || ''}</small><span class="board-tag">${q.board || ''}</span></div>
-                <div class="q-card-body"><b>${q.originalIndex+1}.</b> ${q.body}</div>
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px; text-align: left;">
+                    <div class="chapter-serial-circle">
+                        ${chapterSerialNumber}
+                    </div>
+                    <div style="text-align: left;">
+                        <small style="font-size: 11px; color: #666;">
+                            ${q.sub} | ${q.qClass || ''} | ${q.board || ''}
+                        </small>
+                    </div>
+                </div>
+                
+                <div class="q-card-body" style="text-align: left;">
+                    <b>${chapterSerialNumber}.</b> ${q.body}
+                </div>
                 ${optHtml}
-                <div style="margin-top:10px; display: ${isAdmin ? 'flex' : 'none'}; gap: 5px;">
+                
+                <div style="margin-top:10px; display: ${isAdmin ? 'flex' : 'none'}; gap: 5px; text-align: left;">
                     <button class="btn-mini" style="background:#1976d2; flex:1;" onclick="editQuestion(${q.originalIndex}, event)">📝 Edit</button>
                     <button class="btn-mini" style="background:#d32f2f; flex:1;" onclick="deleteQuestion(${q.originalIndex}, event)">🗑️ Delete</button>
                 </div>
             </div>`;
-        }).join('');
+        });
+        
+        // ✅ যদি কোনো প্রশ্ন না থাকে
+        if (outputHTML === '') {
+            outputHTML = '<p style="text-align:center; color:#666; padding:20px;">কোন প্রশ্ন পাওয়া যায়নি।</p>';
+        }
+        
+        document.getElementById('selectionList').innerHTML = outputHTML;
         
         // Update Selection Pagination Controls
         updateSelectionPagination();
@@ -1001,10 +1169,17 @@
                 pageFooter = `<div class="page-number" style="font-size: 12px !important;">পৃষ্ঠা ${pageNum}/${totalOutputPages}</div>`;
             }
             
+            // ✅ পরিবর্তন: প্রশ্ন কন্টেইনারে margin-top যোগ করা হয়েছে
             pagesHTML += `
             <div id="output-page-${pageNum}" class="output-page ${pageNum === outputCurrentPage ? 'active' : ''}" style="font-size: ${document.getElementById('fSize').value}px !important;">
                 ${pageHeader}
-                <div class="question-container" style="column-count: ${document.getElementById('colCount').value}; font-size: ${document.getElementById('fSize').value}px !important; line-height: ${document.getElementById('lHeight').value} !important; column-gap: 35px;">
+                <div class="question-container" style="
+                    column-count: ${document.getElementById('colCount').value}; 
+                    font-size: ${document.getElementById('fSize').value}px !important; 
+                    line-height: ${document.getElementById('lHeight').value} !important; 
+                    column-gap: 35px;
+                    margin-top: 15px; /* ✅ প্রশ্নগুলো একটু নিচে নামানো হয়েছে */
+                ">
                     ${pageContent}
                 </div>
                 ${pageFooter}
