@@ -56,15 +56,15 @@
         .restriction-box input { border: 1px solid #a5d6a7 !important; background: #fff !important; }
 
         #outSetLine { position: absolute; top: 15px; right: 15px; border: 2px solid #000; padding: 3px 10px; font-weight: bold; font-size: 16px; display: none; }
-        .marks-info { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 4px; border-bottom: 1px solid #ddd; padding-bottom: 2px; font-size: 13px; }
-        .instruction { text-align: center; font-style: italic; font-weight: bold; margin-bottom: 10px; text-decoration: underline; font-size: 13px; }
+        .marks-info { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 4px; border-bottom: 1px solid #ddd; padding-bottom: 2px; }
+        .instruction { text-align: center; font-style: italic; font-weight: bold; margin-bottom: 10px; text-decoration: underline; }
         .question-container { column-gap: 35px; margin-top: 15px; column-rule: 1px solid #000; }
         .cq-box, .normal-q { break-inside: avoid; margin-bottom: 12px; display: block; }
-        .sub-q { display: flex; justify-content: space-between; margin-bottom: 3px; font-size: 12px; }
-        .mcq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 4px; padding-left: 18px; font-size: 12px; }
+        .sub-q { display: flex; justify-content: space-between; margin-bottom: 3px; }  /* font-size removed */
+        .mcq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 4px; padding-left: 18px; }  /* font-size removed */
         #ansSheetArea { margin-top: 25px; border-top: 2px dashed #333; padding-top: 15px; break-before: page; }
         .ans-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px; }
-        .ans-box { border: 1px solid #ccc; padding: 5px; font-size: 13px; border-radius: 3px; }
+        .ans-box { border: 1px solid #ccc; padding: 5px; border-radius: 3px; }
         .btn-action { border: none; padding: 12px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 5px; }
         .btn-mini { padding: 4px 10px; border: none; border-radius: 3px; color: white; cursor: pointer; font-size: 11px; margin-right: 5px; }
         .lock-status { padding: 10px; background: #1a237e; color: white; display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
@@ -85,7 +85,6 @@
         .q-card:hover { background: #f9f9f9 !important; }
         .q-card-body { 
             white-space: pre-wrap; 
-            font-size: 13px; 
             color: #333; 
             margin: 8px 0; 
             line-height: 1.4; 
@@ -97,7 +96,6 @@
             display: grid; 
             grid-template-columns: 1fr 1fr; 
             gap: 4px; 
-            font-size: 11px; 
             color: #555; 
             background: #f1f8e9; 
             padding: 6px; 
@@ -984,28 +982,33 @@
             if (q.type !== 'normal') {
                 optHtml = `
                     <div class="q-card-options">
-                        <div style="text-align: left;"><b>ক:</b> ${q.a || '-'}</div>
-                        <div style="text-align: left;"><b>খ:</b> ${q.b || '-'}</div>
-                        <div style="text-align: left;"><b>গ:</b> ${q.c || '-'}</div>
-                        <div style="text-align: left;"><b>ঘ:</b> ${q.d || '-'}</div>
+                        <div style="text-align: left; padding-left: 0;"><b>ক:</b> ${q.a || '-'}</div>
+                        <div style="text-align: left; padding-left: 0;"><b>খ:</b> ${q.b || '-'}</div>
+                        <div style="text-align: left; padding-left: 0;"><b>গ:</b> ${q.c || '-'}</div>
+                        <div style="text-align: left; padding-left: 0;"><b>ঘ:</b> ${q.d || '-'}</div>
                     </div>`;
             }
             
             outputHTML += `
             <div class="q-card" onclick="toggleQ(${q.originalIndex})" style="border-left: ${q.selected ? '6px solid var(--primary)' : '1px solid #eee'}">
-                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px; text-align: left;">
-                    <div class="chapter-serial-circle">
-                        ${chapterSerialNumber}
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div class="chapter-serial-circle">
+                            ${chapterSerialNumber}
+                        </div>
+                        <div style="text-align: left; font-size: 12px; color: #555;">
+                            <span style="font-weight: bold;">${q.sub}</span> 
+                            ${q.qClass ? `| ${q.qClass}` : ''}
+                        </div>
                     </div>
-                    <div style="text-align: left;">
-                        <small style="font-size: 11px; color: #666;">
-                            ${q.sub} | ${q.qClass || ''} | ${q.board || ''}
-                        </small>
-                    </div>
+                    ${q.board ? `<div class="board-tag" style="color: #d32f2f; font-weight: bold; font-size: 11px; background: #ffebee; padding: 2px 8px; border-radius: 3px; border: 1px solid #ffcdd2;">${q.board}</div>` : ''}
                 </div>
                 
-                <div class="q-card-body" style="text-align: left;">
-                    <b>${chapterSerialNumber}.</b> ${q.body}
+                <div class="q-card-body" style="text-align: left; padding-left: 0; margin-left: 0; padding-right: 0;">
+                    <div style="display: flex; align-items: flex-start; gap: 4px; text-align: left;">
+                        <b style="flex-shrink: 0;">${chapterSerialNumber}.</b>
+                        <div style="text-align: left; width: 100%;">${q.body}</div>
+                    </div>
                 </div>
                 ${optHtml}
                 
@@ -1111,6 +1114,10 @@
         // Create pages
         let pagesHTML = '';
         
+        // Get font size and line height from slider
+        const currentFontSize = document.getElementById('fSize').value;
+        const currentLineHeight = document.getElementById('lHeight').value;
+        
         for (let pageNum = 1; pageNum <= totalOutputPages; pageNum++) {
             const startIdx = (pageNum - 1) * outputPerPage;
             const endIdx = Math.min(startIdx + outputPerPage, selected.length);
@@ -1143,21 +1150,30 @@
 
                 let opt = "";
                 if (q.type !== 'normal' && q.showOptions !== false) {
-                    // Show full options (no truncation)
-                    if (q.type === 'cq') opt = `
-                        <div style="margin-top:4px; margin-left: 18px;">
-                            <div class="sub-q"><span>${labels[0]}. ${q.a || ''}</span><span>১</span></div>
-                            <div class="sub-q"><span>${labels[1]}. ${q.b || ''}</span><span>২</span></div>
-                            <div class="sub-q"><span>${labels[2]}. ${q.c || ''}</span><span>৩</span></div>
-                            <div class="sub-q"><span>${labels[3]}. ${q.d || ''}</span><span>৪</span></div>
+                    // Show full options (no truncation) with dynamic font size
+                    if (q.type === 'cq') {
+                        opt = `
+                        <div style="margin-top:4px; margin-left: 18px; font-size: ${currentFontSize}px !important; line-height: ${currentLineHeight} !important;">
+                            <div class="sub-q" style="font-size: ${currentFontSize}px !important; line-height: ${currentLineHeight} !important;"><span>${labels[0]}. ${q.a || ''}</span><span>১</span></div>
+                            <div class="sub-q" style="font-size: ${currentFontSize}px !important; line-height: ${currentLineHeight} !important;"><span>${labels[1]}. ${q.b || ''}</span><span>২</span></div>
+                            <div class="sub-q" style="font-size: ${currentFontSize}px !important; line-height: ${currentLineHeight} !important;"><span>${labels[2]}. ${q.c || ''}</span><span>৩</span></div>
+                            <div class="sub-q" style="font-size: ${currentFontSize}px !important; line-height: ${currentLineHeight} !important;"><span>${labels[3]}. ${q.d || ''}</span><span>৪</span></div>
                         </div>`;
-                    else opt = `<div class="mcq-grid"><span>${labels[0]}. ${q.a || ''}</span><span>${labels[1]}. ${q.b || ''}</span><span>${labels[2]}. ${q.c || ''}</span><span>${labels[3]}. ${q.d || ''}</span></div>`;
+                    } else {
+                        opt = `
+                        <div class="mcq-grid" style="font-size: ${currentFontSize}px !important; line-height: ${currentLineHeight} !important;">
+                            <span>${labels[0]}. ${q.a || ''}</span>
+                            <span>${labels[1]}. ${q.b || ''}</span>
+                            <span>${labels[2]}. ${q.c || ''}</span>
+                            <span>${labels[3]}. ${q.d || ''}</span>
+                        </div>`;
+                    }
                 }
                 
                 return `
-                <div class="${q.type==='cq'?'cq-box':'normal-q'}" style="font-size: ${document.getElementById('fSize').value}px !important; line-height: ${document.getElementById('lHeight').value} !important; margin-bottom: ${document.getElementById('qGapSlider').value}px !important;">
+                <div class="${q.type==='cq'?'cq-box':'normal-q'}" style="font-size: ${currentFontSize}px !important; line-height: ${currentLineHeight} !important; margin-bottom: ${document.getElementById('qGapSlider').value}px !important;">
                     <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                        <div style="display:flex; gap:4px;"><b style="font-size: ${document.getElementById('fSize').value}px !important;">${num}.</b> <div style="font-size: ${document.getElementById('fSize').value}px !important; flex: 1;">${formattedBody}</div></div>
+                        <div style="display:flex; gap:4px;"><b style="font-size: ${currentFontSize}px !important;">${num}.</b> <div style="font-size: ${currentFontSize}px !important; flex: 1;">${formattedBody}</div></div>
                     </div>
                     ${img}${opt}
                 </div>`;
@@ -1171,12 +1187,12 @@
             
             // ✅ পরিবর্তন: প্রশ্ন কন্টেইনারে margin-top যোগ করা হয়েছে
             pagesHTML += `
-            <div id="output-page-${pageNum}" class="output-page ${pageNum === outputCurrentPage ? 'active' : ''}" style="font-size: ${document.getElementById('fSize').value}px !important;">
+            <div id="output-page-${pageNum}" class="output-page ${pageNum === outputCurrentPage ? 'active' : ''}" style="font-size: ${currentFontSize}px !important;">
                 ${pageHeader}
                 <div class="question-container" style="
                     column-count: ${document.getElementById('colCount').value}; 
-                    font-size: ${document.getElementById('fSize').value}px !important; 
-                    line-height: ${document.getElementById('lHeight').value} !important; 
+                    font-size: ${currentFontSize}px !important; 
+                    line-height: ${currentLineHeight} !important; 
                     column-gap: 35px;
                     margin-top: 15px; /* ✅ প্রশ্নগুলো একটু নিচে নামানো হয়েছে */
                 ">
@@ -1189,9 +1205,9 @@
         
         document.getElementById('outputPagesContainer').innerHTML = pagesHTML;
         
-        // Update answer grid with all questions
+        // Update answer grid with all questions - with dynamic font size
         document.getElementById('ansGrid').innerHTML = selected.map((q, i) => 
-            `<div class="ans-box" style="font-size: ${document.getElementById('fSize').value}px !important;"><b>${formatNum(i+1)}.</b> ${q.ans || '...'}</div>`
+            `<div class="ans-box" style="font-size: ${currentFontSize}px !important; line-height: ${currentLineHeight} !important;"><b>${formatNum(i+1)}.</b> ${q.ans || '...'}</div>`
         ).join('');
         
         // Update main header elements for first page
