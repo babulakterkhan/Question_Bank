@@ -425,6 +425,29 @@
             font-weight: bold;
         }
         
+        /* Temporary Editor Styles */
+        .temp-edit-q-item:hover {
+            background: #e8f5e9 !important;
+            border-color: #4caf50 !important;
+        }
+
+        .temp-edit-q-item.active {
+            background: #e3f2fd !important;
+            border-color: var(--primary) !important;
+        }
+
+        #tempEditBtn {
+            background: #ff9800 !important;
+            color: white !important;
+            border: none !important;
+            padding: 12px !important;
+            border-radius: 5px !important;
+            cursor: pointer !important;
+            font-weight: bold !important;
+            width: 100% !important;
+            margin-top: 10px !important;
+        }
+        
         @media print { 
             body {
                 background: white !important;
@@ -556,6 +579,49 @@
         .print-preview-mode .print-page-break {
             display: block;
         }
+        
+        /* Duplicate warning style */
+        .duplicate-warning {
+            background: #fff3e0;
+            border: 2px solid #ff9800;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            text-align: left;
+        }
+        
+        .duplicate-warning h4 {
+            color: #e65100;
+            margin-top: 0;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .duplicate-warning-content {
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ffcc80;
+            margin: 10px 0;
+            font-size: 13px;
+        }
+        
+        .duplicate-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .duplicate-buttons button {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
     </style>
 
     <!-- MathJax Configuration for proper equation display -->
@@ -607,6 +673,13 @@
     </div>
 </div>
 
+<!-- Duplicate Warning Modal -->
+<div id="duplicateWarningModal" style="display:none; position:fixed; z-index:10000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.7);">
+    <div style="background:white; width:90%; max-width:500px; margin:50px auto; padding:20px; border-radius:10px; box-shadow:0 5px 15px rgba(0,0,0,0.3);">
+        <div id="duplicateWarningContent"></div>
+    </div>
+</div>
+
 <!-- Sidebar -->
 <div class="sidebar" id="sidebarMain">
     <div class="lock-status">
@@ -630,6 +703,12 @@
             </div>
             <div class="progress-line"><div id="fillBar"></div></div>
             <div id="counterStatus" style="font-size: 11px; text-align: center; margin-top: 6px;">প্রস্তুত</div>
+        </div>
+
+        <!-- সকল সিলেক্ট/ডিসেলেক্ট বাটন -->
+        <div style="margin-bottom: 15px; display: flex; gap: 5px;">
+            <button onclick="selectAllQuestions()" style="flex:1; background:#1a237e; color:white; border:none; border-radius:4px; padding:10px; cursor:pointer; font-weight:bold;">সব সিলেক্ট করুন</button>
+            <button onclick="deselectAllQuestions()" style="flex:1; background:#d32f2f; color:white; border:none; border-radius:4px; padding:10px; cursor:pointer; font-weight:bold;">সব ডিসেলেক্ট করুন</button>
         </div>
 
         <div class="magic-tools">
@@ -697,6 +776,9 @@
             <button onclick="changeSelectionPage(1)" id="selectionNextBtn">পরের →</button>
         </div>
         
+        <!-- Temporary Edit Button - This will be added dynamically -->
+        <button id="tempEditBtn" class="btn-action" style="background:#ff9800; color:white; margin-top:10px; display:none;" onclick="openTemporaryEditor()">🖊️ টেম্পোরারি এডিট</button>
+        
         <button class="btn-action" style="background:#2e7d32; color:white; margin-top:15px;" onclick="window.print()">🖨️ প্রিন্ট / PDF</button>
     </div>
 
@@ -731,10 +813,10 @@
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <input type="text" id="qSub" placeholder="বিষয়" class="input-group">
-                <input type="text" id="qChap" placeholder="অধ্যায়" class="input-group">
+                <input type="text" id="qSub" placeholder="বিষয়" class="input-group" oninput="checkDuplicateWhileTyping()">
+                <input type="text" id="qChap" placeholder="অধ্যায়" class="input-group" oninput="checkDuplicateWhileTyping()">
             </div>
-            <select id="qType" onchange="toggleFields()" class="input-group">
+            <select id="qType" onchange="toggleFields(); checkDuplicateWhileTyping()" class="input-group">
                 <option value="normal">সাধারণ</option>
                 <option value="cq">সৃজনশীল</option>
                 <option value="mcq">MCQ</option>
@@ -742,19 +824,42 @@
             <label id="showOptionsLabel" style="display:none; align-items:center; cursor:pointer; font-weight:bold; margin-bottom:10px; font-size: 13px; color: var(--primary);">
                 <input type="checkbox" id="showOptionsToggle" checked style="width:auto; margin-right:8px;"> অপশনগুলো দেখান
             </label>
-            <textarea id="qBody" rows="3" placeholder="প্রশ্ন..." class="input-group"></textarea>
-            <input type="text" id="qAns" placeholder="সঠিক উত্তর" class="input-group">
+            <textarea id="qBody" rows="3" placeholder="প্রশ্ন..." class="input-group" oninput="checkDuplicateWhileTyping()"></textarea>
+            <input type="text" id="qAns" placeholder="সঠিক উত্তর" class="input-group" oninput="checkDuplicateWhileTyping()">
             <input type="text" id="qBoard" placeholder="বোর্ড ও সাল" class="input-group">
             <div id="extraFields" style="display:none; background:#f5f5f5; padding:10px; border-radius:5px; margin-bottom:10px;">
-                <input type="text" id="qA" placeholder="ক" class="input-group">
-                <input type="text" id="qB" placeholder="খ" class="input-group">
-                <input type="text" id="qC" placeholder="গ" class="input-group">
-                <input type="text" id="qD" placeholder="ঘ" class="input-group">
+                <input type="text" id="qA" placeholder="ক" class="input-group" oninput="checkDuplicateWhileTyping()">
+                <input type="text" id="qB" placeholder="খ" class="input-group" oninput="checkDuplicateWhileTyping()">
+                <input type="text" id="qC" placeholder="গ" class="input-group" oninput="checkDuplicateWhileTyping()">
+                <input type="text" id="qD" placeholder="ঘ" class="input-group" oninput="checkDuplicateWhileTyping()">
             </div>
             <input type="file" id="qImg" accept="image/*" class="input-group" onchange="handleImage(event)">
             <div id="imgPreview" style="margin: 5px 0;"></div>
-            <button class="btn-action" id="saveBtn" style="background:var(--primary); color:white;" onclick="addQuestion()">সংরক্ষণ করুন</button>
+            
+            <!-- Duplicate Check Status -->
+            <div id="duplicateStatus" style="display:none; margin:10px 0; padding:10px; border-radius:5px; text-align:center; font-size:13px;"></div>
+            
+            <button class="btn-action" id="saveBtn" style="background:var(--primary); color:white;" onclick="addQuestionWithDuplicateCheck()">সংরক্ষণ করুন</button>
             <button class="btn-action" style="background:#777; color:white; display:none;" id="cancelBtn" onclick="cancelEdit()">বাতিল</button>
+            
+            <!-- Duplicate Management Section -->
+            <div style="margin-top: 20px; padding: 15px; background: #fff3e0; border-radius: 8px; border: 1px solid #ffb74d;">
+                <h4 style="color: #e65100; margin-top: 0; margin-bottom: 10px;">🔄 ডুপ্লিকেট ম্যানেজমেন্ট</h4>
+                
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <button class="btn-action" style="background: #ff9800; color: white;" onclick="findAndShowAllDuplicates()">
+                        🔍 সব ডুপ্লিকেট খুঁজুন
+                    </button>
+                    
+                    <button class="btn-action" style="background: #f44336; color: white;" onclick="removeAllDuplicates()">
+                        🗑️ সব ডুপ্লিকেট মুছুন
+                    </button>
+                    
+                    <div style="font-size: 12px; color: #666; text-align: center;">
+                        মোট প্রশ্ন: <span id="totalQuestionCount">0</span>টি
+                    </div>
+                </div>
+            </div>
             
             <!-- Equation Help Text -->
             <div style="background:#e3f2fd; padding:10px; border-radius:5px; margin-top:15px; font-size:12px;">
@@ -798,7 +903,6 @@
             <input type="text" id="h1" value="শেরখালী সরকারি মহিলা কলেজ" oninput="sync()">
             <div class="slider-container">
                 <input type="range" id="fsH1" min="14" max="40" value="20" oninput="updateSliderValue('fsH1', this.value + 'px'); updateHeaders(); sync()">
-                <!-- min="14" করা হয়েছে (আগে 16 ছিল) -->
                 <span class="slider-value" id="fsH1Value">20px</span>
             </div>
             <div class="slider-label">
@@ -812,7 +916,6 @@
             <input type="text" id="h2" value="বার্ষিক পরীক্ষা-২০২৬" oninput="sync()">
             <div class="slider-container">
                 <input type="range" id="fsH2" min="12" max="30" value="16" oninput="updateSliderValue('fsH2', this.value + 'px'); updateHeaders(); sync()">
-                <!-- min="12" করা হয়েছে (আগে 14 ছিল) -->
                 <span class="slider-value" id="fsH2Value">16px</span>
             </div>
             <div class="slider-label">
@@ -835,7 +938,6 @@
             <label>শ্রেণি ও বিষয়ের সাইজ</label>
             <div class="slider-container">
                 <input type="range" id="fsH3" min="10" max="22" value="13" oninput="updateSliderValue('fsH3', this.value + 'px'); updateHeaders(); sync()">
-                <!-- min="10" করা হয়েছে (আগে 12 ছিল) -->
                 <span class="slider-value" id="fsH3Value">13px</span>
             </div>
             <div class="slider-label">
@@ -1049,6 +1151,10 @@
     let outputPerPage = 30;
     let totalSelectionPages = 1;
     let totalOutputPages = 1;
+    
+    // Temporary Edits Storage
+    let temporaryEdits = new Map();
+    let currentEditingIndex = 0;
 
     function checkLicense() { 
         const savedKey = localStorage.getItem('bcti_app_license'); 
@@ -1059,10 +1165,773 @@
         } else { loadData(); } 
     }
     
+    // ==================== TEMPORARY EDIT FUNCTIONS ====================
+    
+    function openTemporaryEditor() {
+        const selectedQuestions = questionBank.filter(q => q.selected);
+        if (selectedQuestions.length === 0) {
+            alert("প্রথমে অন্তত একটি প্রশ্ন সিলেক্ট করুন!");
+            return;
+        }
+        
+        let editorHTML = `
+            <div id="temporaryEditorModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:10001; display:flex; justify-content:center; align-items:center;">
+                <div style="background:white; width:90%; max-width:800px; height:80%; border-radius:10px; padding:20px; display:flex; flex-direction:column;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                        <h3 style="margin:0; color:var(--primary);">🖊️ টেম্পোরারি এডিটর</h3>
+                        <button onclick="closeTemporaryEditor()" style="background:#f44336; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer; font-weight:bold;">✖ বন্ধ করুন</button>
+                    </div>
+                    
+                    <div style="display:flex; gap:15px; flex:1; overflow:hidden;">
+                        <!-- Left: Question List -->
+                        <div style="width:40%; border-right:1px solid #ddd; padding-right:15px; overflow-y:auto;">
+                            <h4 style="margin-top:0; color:#555;">সিলেক্টেড প্রশ্ন (${selectedQuestions.length}টি)</h4>
+                            <div id="tempEditQuestionList" style="display:flex; flex-direction:column; gap:8px;">
+                                ${selectedQuestions.map((q, index) => `
+                                    <div class="temp-edit-q-item" onclick="loadQuestionForEditing(${index})" 
+                                         style="padding:10px; border:1px solid #ddd; border-radius:5px; cursor:pointer; background:#f9f9f9;"
+                                         id="tempQItem${index}">
+                                        <strong style="color:var(--primary);">${index + 1}. ${q.sub}</strong>
+                                        <div style="font-size:12px; color:#666; margin-top:3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                                            ${q.body.substring(0, 50)}${q.body.length > 50 ? '...' : ''}
+                                        </div>
+                                        <div style="font-size:11px; color:#888; margin-top:5px;">
+                                            ${temporaryEdits.has(index) ? '<span style="color:#4caf50;">✓ এডিট করা</span>' : '<span style="color:#999;">এডিট করা হয়নি</span>'}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        
+                        <!-- Right: Editor -->
+                        <div style="width:60%; display:flex; flex-direction:column;">
+                            <div id="tempEditCurrentQuestionInfo" style="background:#e3f2fd; padding:10px; border-radius:5px; margin-bottom:10px;">
+                                <strong>প্রশ্ন #1</strong> এডিট করুন
+                            </div>
+                            
+                            <div style="flex:1; overflow-y:auto; margin-bottom:15px;">
+                                <div class="input-group">
+                                    <label>প্রশ্নের টেক্সট</label>
+                                    <textarea id="tempEditQuestionBody" rows="6" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:5px;" placeholder="প্রশ্নের টেক্সট এডিট করুন..."></textarea>
+                                </div>
+                                
+                                <div id="tempEditOptionsSection" style="display:none;">
+                                    <h4 style="margin-top:15px; margin-bottom:10px;">MCQ অপশনসমূহ</h4>
+                                    <div class="input-group">
+                                        <label>ক</label>
+                                        <input type="text" id="tempEditOptionA" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:5px;">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>খ</label>
+                                        <input type="text" id="tempEditOptionB" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:5px;">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>গ</label>
+                                        <input type="text" id="tempEditOptionC" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:5px;">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>ঘ</label>
+                                        <input type="text" id="tempEditOptionD" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:5px;">
+                                    </div>
+                                </div>
+                                
+                                <div class="input-group">
+                                    <label>উত্তর (যদি পরিবর্তন করতে চান)</label>
+                                    <input type="text" id="tempEditAnswer" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:5px;" placeholder="সঠিক উত্তর...">
+                                </div>
+                            </div>
+                            
+                            <div style="display:flex; gap:10px;">
+                                <button onclick="saveTemporaryEdit()" style="flex:1; background:var(--primary); color:white; border:none; padding:12px; border-radius:5px; cursor:pointer; font-weight:bold;">💾 এডিট সংরক্ষণ করুন</button>
+                                <button onclick="resetTemporaryEdit()" style="flex:1; background:#ff9800; color:white; border:none; padding:12px; border-radius:5px; cursor:pointer; font-weight:bold;">🔄 মূল টেক্সটে ফিরুন</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top:15px; padding-top:15px; border-top:1px solid #ddd; display:flex; justify-content:space-between;">
+                        <button onclick="applyTemporaryEditsToPreview()" style="background:#4caf50; color:white; border:none; padding:10px 20px; border-radius:5px; cursor:pointer; font-weight:bold;">👁️ প্রিভিউতে দেখুন</button>
+                        <button onclick="clearAllTemporaryEdits()" style="background:#f44336; color:white; border:none; padding:10px 20px; border-radius:5px; cursor:pointer; font-weight:bold;">🗑️ সব এডিট মুছুন</button>
+                        <button onclick="closeTemporaryEditorAndUpdate()" style="background:#2196f3; color:white; border:none; padding:10px 20px; border-radius:5px; cursor:pointer; font-weight:bold;">✅ সংরক্ষণ করুন ও প্রিন্ট করুন</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', editorHTML);
+        loadQuestionForEditing(0);
+    }
+    
+    function closeTemporaryEditor() {
+        const editor = document.getElementById('temporaryEditorModal');
+        if (editor) editor.remove();
+    }
+    
+    function closeTemporaryEditorAndUpdate() {
+        renderOutputPages(); // Update preview with temporary edits
+        closeTemporaryEditor();
+        alert("টেম্পোরারি এডিট সংরক্ষিত হয়েছে! এখন প্রিন্ট করুন।");
+    }
+    
+    function loadQuestionForEditing(index) {
+        currentEditingIndex = index;
+        const selectedQuestions = questionBank.filter(q => q.selected);
+        const question = selectedQuestions[index];
+        
+        // Update question list highlight
+        document.querySelectorAll('.temp-edit-q-item').forEach(item => {
+            item.style.background = '#f9f9f9';
+            item.style.borderColor = '#ddd';
+        });
+        const currentItem = document.getElementById(`tempQItem${index}`);
+        if (currentItem) {
+            currentItem.style.background = '#e3f2fd';
+            currentItem.style.borderColor = 'var(--primary)';
+        }
+        
+        // Update info
+        document.getElementById('tempEditCurrentQuestionInfo').innerHTML = `
+            <strong>প্রশ্ন #${index + 1}</strong> - ${question.sub} (${question.type === 'cq' ? 'সৃজনশীল' : question.type === 'mcq' ? 'MCQ' : 'সাধারণ'})
+            <br><small style="color:#666;">${question.chap ? 'অধ্যায়: ' + question.chap : ''}</small>
+        `;
+        
+        // Load original or edited content
+        let editedContent = temporaryEdits.get(index);
+        
+        document.getElementById('tempEditQuestionBody').value = editedContent ? editedContent.body : question.body;
+        document.getElementById('tempEditAnswer').value = editedContent ? editedContent.ans : question.ans || '';
+        
+        // Handle MCQ options
+        const optionsSection = document.getElementById('tempEditOptionsSection');
+        if (question.type === 'mcq' || question.type === 'cq') {
+            optionsSection.style.display = 'block';
+            document.getElementById('tempEditOptionA').value = editedContent ? editedContent.a : question.a || '';
+            document.getElementById('tempEditOptionB').value = editedContent ? editedContent.b : question.b || '';
+            document.getElementById('tempEditOptionC').value = editedContent ? editedContent.c : question.c || '';
+            document.getElementById('tempEditOptionD').value = editedContent ? editedContent.d : question.d || '';
+        } else {
+            optionsSection.style.display = 'none';
+        }
+    }
+    
+    function saveTemporaryEdit() {
+        const selectedQuestions = questionBank.filter(q => q.selected);
+        const originalQuestion = selectedQuestions[currentEditingIndex];
+        
+        const editedQuestion = {
+            body: document.getElementById('tempEditQuestionBody').value.trim(),
+            ans: document.getElementById('tempEditAnswer').value.trim(),
+            a: originalQuestion.type === 'mcq' || originalQuestion.type === 'cq' ? 
+               document.getElementById('tempEditOptionA').value.trim() : '',
+            b: originalQuestion.type === 'mcq' || originalQuestion.type === 'cq' ? 
+               document.getElementById('tempEditOptionB').value.trim() : '',
+            c: originalQuestion.type === 'mcq' || originalQuestion.type === 'cq' ? 
+               document.getElementById('tempEditOptionC').value.trim() : '',
+            d: originalQuestion.type === 'mcq' || originalQuestion.type === 'cq' ? 
+               document.getElementById('tempEditOptionD').value.trim() : '',
+            type: originalQuestion.type,
+            sub: originalQuestion.sub,
+            chap: originalQuestion.chap,
+            originalIndex: currentEditingIndex
+        };
+        
+        // Save to temporary edits map
+        temporaryEdits.set(currentEditingIndex, editedQuestion);
+        
+        // Update UI
+        const itemElement = document.getElementById(`tempQItem${currentEditingIndex}`);
+        if (itemElement) {
+            itemElement.innerHTML = `
+                <strong style="color:var(--primary);">${currentEditingIndex + 1}. ${originalQuestion.sub}</strong>
+                <div style="font-size:12px; color:#666; margin-top:3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                    ${editedQuestion.body.substring(0, 50)}${editedQuestion.body.length > 50 ? '...' : ''}
+                </div>
+                <div style="font-size:11px; color:#4caf50; margin-top:5px;">
+                    ✓ এডিট করা হয়েছে
+                </div>
+            `;
+        }
+        
+        alert(`প্রশ্ন #${currentEditingIndex + 1} এর এডিট সংরক্ষিত হয়েছে (অস্থায়ীভাবে)।`);
+    }
+    
+    function resetTemporaryEdit() {
+        temporaryEdits.delete(currentEditingIndex);
+        loadQuestionForEditing(currentEditingIndex);
+        alert(`প্রশ্ন #${currentEditingIndex + 1} মূল টেক্সটে ফিরে গেছে।`);
+    }
+    
+    function clearAllTemporaryEdits() {
+        if (temporaryEdits.size > 0 && confirm("সব টেম্পোরারি এডিট মুছে ফেলতে চান?")) {
+            temporaryEdits.clear();
+            loadQuestionForEditing(currentEditingIndex);
+            alert("সব টেম্পোরারি এডিট মুছে ফেলা হয়েছে।");
+        }
+    }
+    
+    function applyTemporaryEditsToPreview() {
+        renderOutputPages(); // This will use temporary edits
+        alert("এডিট করা সংস্করণ প্রিভিউতে দেখানো হচ্ছে। প্রিন্ট করতে পারেন।");
+    }
+    
+    // Modified renderOutputPages function to use temporary edits
+    const originalRenderOutputPages = renderOutputPages;
+    renderOutputPages = function() {
+        const selected = questionBank.filter(q => q.selected);
+        
+        if (selected.length === 0) {
+            return originalRenderOutputPages.call(this);
+        }
+        
+        // If there are temporary edits, create a modified copy
+        let questionsToRender = selected;
+        if (temporaryEdits.size > 0) {
+            questionsToRender = selected.map((q, index) => {
+                if (temporaryEdits.has(index)) {
+                    const edit = temporaryEdits.get(index);
+                    return {
+                        ...q,
+                        body: edit.body,
+                        ans: edit.ans || q.ans,
+                        a: edit.a || q.a,
+                        b: edit.b || q.b,
+                        c: edit.c || q.c,
+                        d: edit.d || q.d
+                    };
+                }
+                return q;
+            });
+        }
+        
+        // Temporarily replace selected questions with modified version
+        const originalSelected = [...selected];
+        
+        // Call the original function but with modified questions
+        const tempQuestionBank = questionBank.map(q => {
+            const isSelected = q.selected;
+            if (isSelected) {
+                const selectedIndex = originalSelected.indexOf(q);
+                if (selectedIndex !== -1 && temporaryEdits.has(selectedIndex)) {
+                    const edit = temporaryEdits.get(selectedIndex);
+                    return {
+                        ...q,
+                        body: edit.body,
+                        ans: edit.ans || q.ans,
+                        a: edit.a || q.a,
+                        b: edit.b || q.b,
+                        c: edit.c || q.c,
+                        d: edit.d || q.d
+                    };
+                }
+            }
+            return q;
+        });
+        
+        // Save original questionBank and temporarily replace it
+        const originalQuestionBank = [...questionBank];
+        questionBank = tempQuestionBank;
+        
+        // Call original render function
+        originalRenderOutputPages.call(this);
+        
+        // Restore original questionBank
+        questionBank = originalQuestionBank;
+    };
+    
+    // Add temporary edit button to selection panel
+    function addTemporaryEditButton() {
+        const selectionPanel = document.getElementById('select');
+        const printButton = selectionPanel.querySelector('.btn-action[style*="background:#2e7d32"]');
+        
+        if (printButton && !document.getElementById('tempEditBtn')) {
+            const tempEditBtn = document.createElement('button');
+            tempEditBtn.id = 'tempEditBtn';
+            tempEditBtn.className = 'btn-action';
+            tempEditBtn.style.cssText = 'background:#ff9800; color:white; margin-top:10px;';
+            tempEditBtn.innerHTML = '🖊️ টেম্পোরারি এডিট';
+            tempEditBtn.onclick = openTemporaryEditor;
+            
+            printButton.parentNode.insertBefore(tempEditBtn, printButton);
+        }
+        
+        // Show the button
+        if (document.getElementById('tempEditBtn')) {
+            document.getElementById('tempEditBtn').style.display = 'block';
+        }
+    }
+    
+    // Initialize the button when page loads
+    setTimeout(addTemporaryEditButton, 1000);
+    
+    // ==================== DUPLICATE PREVENTION FUNCTIONS ====================
+    
+    // প্রশ্নের টেক্সট নরমালাইজ করার ফাংশন (স্পেস, কেস ইগনোর করার জন্য)
+    function normalizeText(text) {
+        if (!text) return '';
+        return text
+            .trim()
+            .toLowerCase()
+            .replace(/\s+/g, ' ') // একাধিক স্পেসকে একটি স্পেসে
+            .replace(/[^\w\u0980-\u09FF\s$\(\)\[\]\{\}\+\-\*\/=<>!@#%^&|~`]/g, '') // বিশেষ ক্যারেক্টার সরানো
+            .replace(/\n/g, ' ') // নতুন লাইনকে স্পেসে
+            .replace(/\./g, '') // ডট সরানো
+            .replace(/,/g, '') // কমা সরানো
+            .replace(/;/g, '') // সেমিকোলন সরানো
+            .replace(/:/g, '') // কোলন সরানো
+            .replace(/\?/g, ''); // প্রশ্নবোধক চিহ্ন সরানো
+    }
+    
+    // হুবহু মিল খোঁজার ফাংশন
+    function findExactDuplicate(newQuestion) {
+        const newBodyNormalized = normalizeText(newQuestion.body);
+        
+        for (let i = 0; i < questionBank.length; i++) {
+            const existing = questionBank[i];
+            const existingBodyNormalized = normalizeText(existing.body);
+            
+            // 1. প্রথমে টেক্সট হুবহু মিলছে কিনা চেক
+            if (newBodyNormalized === existingBodyNormalized && newBodyNormalized !== '') {
+                return {
+                    found: true,
+                    type: 'exact_text',
+                    question: existing,
+                    index: i,
+                    confidence: 100
+                };
+            }
+            
+            // 2. MCQ/CQ প্রশ্নের জন্য অপশনগুলোও চেক
+            if (newQuestion.type === 'mcq' || newQuestion.type === 'cq') {
+                if (existing.type === newQuestion.type) {
+                    // অপশনগুলোর টেক্সট চেক
+                    const newANormalized = normalizeText(newQuestion.a);
+                    const newBNormalized = normalizeText(newQuestion.b);
+                    const newCNormalized = normalizeText(newQuestion.c);
+                    const newDNormalized = normalizeText(newQuestion.d);
+                    
+                    const existingANormalized = normalizeText(existing.a);
+                    const existingBNormalized = normalizeText(existing.b);
+                    const existingCNormalized = normalizeText(existing.c);
+                    const existingDNormalized = normalizeText(existing.d);
+                    
+                    // সব অপশন মিললে
+                    if (newANormalized === existingANormalized &&
+                        newBNormalized === existingBNormalized &&
+                        newCNormalized === existingCNormalized &&
+                        newDNormalized === existingDNormalized &&
+                        newBodyNormalized === existingBodyNormalized) {
+                        return {
+                            found: true,
+                            type: 'exact_mcq',
+                            question: existing,
+                            index: i,
+                            confidence: 100
+                        };
+                    }
+                }
+            }
+            
+            // 3. 90%+ মিল খোঁজা (সম্ভাব্য ডুপ্লিকেট)
+            if (newBodyNormalized.length > 20 && existingBodyNormalized.length > 20) {
+                const similarity = calculateSimilarity(newBodyNormalized, existingBodyNormalized);
+                if (similarity > 90) {
+                    return {
+                        found: true,
+                        type: 'similar',
+                        question: existing,
+                        index: i,
+                        confidence: similarity
+                    };
+                }
+            }
+        }
+        
+        return { found: false, type: 'none', question: null, index: -1, confidence: 0 };
+    }
+    
+    // টেক্সট সিমিলারিটি ক্যালকুলেট করার ফাংশন
+    function calculateSimilarity(str1, str2) {
+        if (str1 === str2) return 100;
+        
+        const longer = str1.length > str2.length ? str1 : str2;
+        const shorter = str1.length > str2.length ? str2 : str1;
+        
+        if (longer.length === 0) return 100;
+        
+        // সহজ সিমিলারিটি ক্যালকুলেশন
+        let matches = 0;
+        for (let i = 0; i < shorter.length; i++) {
+            if (longer.includes(shorter[i])) {
+                matches++;
+            }
+        }
+        
+        return Math.round((matches / longer.length) * 100);
+    }
+    
+    // ডুপ্লিকেট ওয়ার্নিং শো করার ফাংশন
+    function showDuplicateWarning(duplicateInfo, newQuestion, callback) {
+        const modal = document.getElementById('duplicateWarningModal');
+        const content = document.getElementById('duplicateWarningContent');
+        
+        let warningHTML = `
+            <div class="duplicate-warning">
+                <h4>⚠️ ডুপ্লিকেট প্রশ্ন পাওয়া গেছে!</h4>
+                
+                <div class="duplicate-warning-content">
+                    <p><strong>নতুন প্রশ্ন:</strong></p>
+                    <p>${newQuestion.body.substring(0, 150)}${newQuestion.body.length > 150 ? '...' : ''}</p>
+                    
+                    <p style="margin-top:10px;"><strong>বিদ্যমান প্রশ্ন (#${duplicateInfo.index + 1}):</strong></p>
+                    <p>${duplicateInfo.question.body.substring(0, 150)}${duplicateInfo.question.body.length > 150 ? '...' : ''}</p>
+                    
+                    <p style="margin-top:10px; color:#d32f2f;">
+                        <strong>মিলের হার:</strong> ${duplicateInfo.confidence}%<br>
+                        <strong>ধরন:</strong> ${duplicateInfo.type === 'exact_text' ? 'হুবহু টেক্সট মিল' : 
+                                             duplicateInfo.type === 'exact_mcq' ? 'হুবহু MCQ মিল' : 'অনুরূপ প্রশ্ন'}
+                    </p>
+                </div>
+                
+                <div class="duplicate-buttons">
+                    <button onclick="hideDuplicateWarning(); callback(false)" style="background:#4caf50; color:white;">
+                        বাতিল করুন (সংরক্ষণ করবেন না)
+                    </button>
+                    <button onclick="hideDuplicateWarning(); callback(true)" style="background:#f44336; color:white;">
+                        তবুও সংরক্ষণ করুন
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        content.innerHTML = warningHTML;
+        modal.style.display = 'block';
+    }
+    
+    function hideDuplicateWarning() {
+        document.getElementById('duplicateWarningModal').style.display = 'none';
+    }
+    
+    // ডুপ্লিকেট চেক করে সংরক্ষণের ফাংশন
+    function addQuestionWithDuplicateCheck() {
+        const editIdx = parseInt(document.getElementById('editIndex').value);
+        
+        // এডিট মোডে থাকলে সরাসরি সংরক্ষণ করুন
+        if (editIdx > -1) {
+            addQuestion();
+            return;
+        }
+        
+        const newQuestion = getQuestionFromForm();
+        
+        // ভ্যালিডেশন চেক
+        if (!newQuestion.sub || !newQuestion.body) {
+            alert("বিষয় এবং প্রশ্ন ফিল্ড অবশ্যই পূরণ করতে হবে!");
+            return;
+        }
+        
+        // ডুপ্লিকেট চেক
+        const duplicateInfo = findExactDuplicate(newQuestion);
+        
+        if (duplicateInfo.found && duplicateInfo.confidence >= 90) {
+            // ডুপ্লিকেট পাওয়া গেছে - ওয়ার্নিং শো করুন
+            showDuplicateWarning(duplicateInfo, newQuestion, function(shouldSave) {
+                if (shouldSave) {
+                    // তবুও সংরক্ষণ করতে চাইলে
+                    questionBank.push(newQuestion);
+                    saveData();
+                    updateSubFilter();
+                    updateChapterFilter();
+                    updateQuestionCount();
+                    selectionCurrentPage = 1;
+                    renderSelectionList();
+                    alert("প্রশ্ন সংরক্ষিত হয়েছে (ডুপ্লিকেট থাকা সত্ত্বেও)।");
+                    clearForm();
+                }
+            });
+        } else {
+            // ডুপ্লিকেট না থাকলে সরাসরি সংরক্ষণ করুন
+            questionBank.push(newQuestion);
+            saveData();
+            updateSubFilter();
+            updateChapterFilter();
+            updateQuestionCount();
+            selectionCurrentPage = 1;
+            renderSelectionList();
+            alert("প্রশ্ন সংরক্ষিত হয়েছে।");
+            clearForm();
+        }
+    }
+    
+    // ফর্ম থেকে প্রশ্ন ডেটা পাওয়ার ফাংশন
+    function getQuestionFromForm() {
+        return { 
+            sub: document.getElementById('qSub').value.trim(), 
+            qClass: document.getElementById('qClassInput').value,
+            qDiv: document.getElementById('qDivInput').value,
+            chap: document.getElementById('qChap').value.trim(), 
+            type: document.getElementById('qType').value, 
+            body: document.getElementById('qBody').value.trim(), 
+            ans: document.getElementById('qAns').value.trim(), 
+            board: document.getElementById('qBoard').value.trim(), 
+            a: document.getElementById('qA').value.trim(), 
+            b: document.getElementById('qB').value.trim(), 
+            c: document.getElementById('qC').value.trim(), 
+            d: document.getElementById('qD').value.trim(), 
+            img: currentImgData, 
+            selected: false,
+            showOptions: document.getElementById('showOptionsToggle').checked
+        };
+    }
+    
+    // ফর্ম ক্লিয়ার করার ফাংশন
+    function clearForm() {
+        document.getElementById('qSub').value = '';
+        document.getElementById('qChap').value = '';
+        document.getElementById('qBody').value = '';
+        document.getElementById('qAns').value = '';
+        document.getElementById('qBoard').value = '';
+        document.getElementById('qA').value = '';
+        document.getElementById('qB').value = '';
+        document.getElementById('qC').value = '';
+        document.getElementById('qD').value = '';
+        document.getElementById('imgPreview').innerHTML = '';
+        currentImgData = '';
+        document.getElementById('duplicateStatus').style.display = 'none';
+    }
+    
+    // টাইপ করার সময় ডুপ্লিকেট চেক করার ফাংশন
+    function checkDuplicateWhileTyping() {
+        const duplicateStatus = document.getElementById('duplicateStatus');
+        const question = getQuestionFromForm();
+        
+        if (!question.body || question.body.trim().length < 10) {
+            duplicateStatus.style.display = 'none';
+            return;
+        }
+        
+        const duplicateInfo = findExactDuplicate(question);
+        
+        if (duplicateInfo.found) {
+            duplicateStatus.style.display = 'block';
+            if (duplicateInfo.confidence === 100) {
+                duplicateStatus.innerHTML = `
+                    <div style="background:#ffebee; color:#c62828; padding:8px; border-radius:4px; border:1px solid #ef9a9a;">
+                        ⚠️ <strong>হুবহু মিলছে!</strong> এই প্রশ্নটি ইতিমধ্যে ডাটাবেসে আছে (#${duplicateInfo.index + 1})।
+                    </div>
+                `;
+                document.getElementById('saveBtn').style.background = '#f44336';
+            } else if (duplicateInfo.confidence >= 90) {
+                duplicateStatus.innerHTML = `
+                    <div style="background:#fff3e0; color:#e65100; padding:8px; border-radius:4px; border:1px solid #ffcc80;">
+                        ⚠️ <strong>অনুরূপ প্রশ্ন!</strong> ${duplicateInfo.confidence}% মিলছে বিদ্যমান প্রশ্নের সাথে (#${duplicateInfo.index + 1})।
+                    </div>
+                `;
+                document.getElementById('saveBtn').style.background = '#ff9800';
+            }
+        } else {
+            duplicateStatus.style.display = 'none';
+            document.getElementById('saveBtn').style.background = 'var(--primary)';
+        }
+    }
+    
+    // সব ডুপ্লিকেট খুঁজে দেখানোর ফাংশন
+    function findAndShowAllDuplicates() {
+        const duplicates = [];
+        const seen = new Set();
+        
+        for (let i = 0; i < questionBank.length; i++) {
+            for (let j = i + 1; j < questionBank.length; j++) {
+                const q1 = questionBank[i];
+                const q2 = questionBank[j];
+                
+                const q1Normalized = normalizeText(q1.body);
+                const q2Normalized = normalizeText(q2.body);
+                
+                // হুবহু মিল খোঁজা
+                if (q1Normalized === q2Normalized && q1Normalized !== '') {
+                    const pairId = `${Math.min(i, j)}-${Math.max(i, j)}`;
+                    if (!seen.has(pairId)) {
+                        seen.add(pairId);
+                        duplicates.push({
+                            index1: i,
+                            question1: q1,
+                            index2: j,
+                            question2: q2,
+                            type: 'exact'
+                        });
+                    }
+                }
+            }
+        }
+        
+        if (duplicates.length === 0) {
+            alert("কোন ডুপ্লিকেট প্রশ্ন পাওয়া যায়নি।");
+            return;
+        }
+        
+        let message = `মোট ${duplicates.length} জোড়া ডুপ্লিকেট প্রশ্ন পাওয়া গেছে:\n\n`;
+        
+        duplicates.forEach((dup, idx) => {
+            message += `${idx + 1}. প্রশ্ন #${dup.index1 + 1} এবং প্রশ্ন #${dup.index2 + 1}\n`;
+            message += `   বিষয়: ${dup.question1.sub} | অধ্যায়: ${dup.question1.chap}\n`;
+            message += `   প্রশ্ন: ${dup.question1.body.substring(0, 80)}...\n\n`;
+        });
+        
+        message += "\nসব ডুপ্লিকেট মুছে ফেলতে 'সব ডুপ্লিকেট মুছুন' বাটনে ক্লিক করুন।";
+        
+        if (confirm(`${duplicates.length} জোড়া ডুপ্লিকেট পাওয়া গেছে। বিস্তারিত দেখতে OK চাপুন।`)) {
+            alert(message);
+        }
+    }
+    
+    // সব ডুপ্লিকেট মুছে ফেলার ফাংশন
+    function removeAllDuplicates() {
+        if (!confirm("আপনি কি নিশ্চিতভাবে সব ডুপ্লিকেট প্রশ্ন মুছে ফেলতে চান?\n\nশুধু একটি কপি রাখা হবে।")) {
+            return;
+        }
+        
+        const uniqueQuestions = [];
+        const seen = new Set();
+        let removedCount = 0;
+        
+        questionBank.forEach((q, index) => {
+            const normalizedBody = normalizeText(q.body);
+            const questionKey = `${q.sub}|${q.chap}|${normalizedBody}`;
+            
+            if (!seen.has(questionKey)) {
+                seen.add(questionKey);
+                uniqueQuestions.push(q);
+            } else {
+                removedCount++;
+            }
+        });
+        
+        questionBank = uniqueQuestions;
+        saveData();
+        updateSubFilter();
+        updateChapterFilter();
+        updateQuestionCount();
+        renderSelectionList();
+        
+        alert(`${removedCount}টি ডুপ্লিকেট প্রশ্ন মুছে ফেলা হয়েছে। ${uniqueQuestions.length}টি অনন্য প্রশ্ন রেখে দেওয়া হয়েছে।`);
+    }
+    
+    // ইম্পোর্টের সময় ডুপ্লিকেট চেক
+    function importJSON(e) { 
+        const r = new FileReader(); 
+        r.onload = (ev) => { 
+            const importedData = JSON.parse(ev.target.result);
+            
+            if (!importedData.qs || !Array.isArray(importedData.qs)) {
+                alert("ফাইল ফর্ম্যাট সঠিক নয়!");
+                return;
+            }
+            
+            let newQuestions = importedData.qs;
+            let duplicates = 0;
+            let added = 0;
+            const seen = new Set();
+            
+            // প্রথমে বিদ্যমান প্রশ্নগুলোর জন্য seen সেট তৈরি করুন
+            questionBank.forEach(q => {
+                const normalizedBody = normalizeText(q.body);
+                const questionKey = `${q.sub}|${q.chap}|${normalizedBody}`;
+                seen.add(questionKey);
+            });
+            
+            // প্রতিটি ইম্পোর্টেড প্রশ্ন চেক করুন
+            newQuestions.forEach(newQ => {
+                const normalizedBody = normalizeText(newQ.body);
+                const questionKey = `${newQ.sub}|${newQ.chap}|${normalizedBody}`;
+                
+                if (seen.has(questionKey)) {
+                    duplicates++;
+                } else {
+                    seen.add(questionKey);
+                    questionBank.push(newQ);
+                    added++;
+                }
+            });
+            
+            if (duplicates > 0) {
+                alert(`${added}টি নতুন প্রশ্ন যোগ হয়েছে। ${duplicates}টি ডুপ্লিকেট প্রশ্ন বাদ দেওয়া হয়েছে।`);
+            } else {
+                alert(`${added}টি নতুন প্রশ্ন সফলভাবে ইম্পোর্ট হয়েছে।`);
+            }
+            
+            saveData();
+            updateQuestionCount();
+            location.reload();
+        }; 
+        r.readAsText(e.target.files[0]); 
+    }
+    
+    // মোট প্রশ্ন কাউন্ট আপডেট করার ফাংশন
+    function updateQuestionCount() {
+        document.getElementById('totalQuestionCount').textContent = questionBank.length;
+    }
+    
+    // ==================== END DUPLICATE FUNCTIONS ====================
+    
+    function selectAllQuestions() {
+        // বর্তমান ফিল্টার অনুযায়ী দেখানো প্রশ্নগুলো সিলেক্ট করুন
+        const subF = document.getElementById('fSub').value;
+        const classF = document.getElementById('fClass').value;
+        const divF = document.getElementById('fDiv').value;
+        const typeF = document.getElementById('fType').value;
+        const chapF = document.getElementById('fChap').value;
+        
+        questionBank.forEach((q, i) => {
+            // শুধুমাত্র ফিল্টার করা প্রশ্ন সিলেক্ট করুন
+            const matchesFilter = (!subF || q.sub === subF) && 
+                                 (!classF || q.qClass === classF) && 
+                                 (!divF || q.qDiv === divF) && 
+                                 (!typeF || q.type === typeF) &&
+                                 (!chapF || q.chap === chapF);
+            
+            if (matchesFilter) {
+                q.selected = true;
+            }
+        });
+        
+        saveData();
+        renderSelectionList();
+        alert("সকল ফিল্টার করা প্রশ্ন সিলেক্ট করা হয়েছে!");
+    }
+
+    function deselectAllQuestions() {
+        // বর্তমান ফিল্টার অনুযায়ী দেখানো প্রশ্নগুলো ডিসেলেক্ট করুন
+        const subF = document.getElementById('fSub').value;
+        const classF = document.getElementById('fClass').value;
+        const divF = document.getElementById('fDiv').value;
+        const typeF = document.getElementById('fType').value;
+        const chapF = document.getElementById('fChap').value;
+        
+        questionBank.forEach((q, i) => {
+            // শুধুমাত্র ফিল্টার করা প্রশ্ন ডিসেলেক্ট করুন
+            const matchesFilter = (!subF || q.sub === subF) && 
+                                 (!classF || q.qClass === classF) && 
+                                 (!divF || q.qDiv === divF) && 
+                                 (!typeF || q.type === typeF) &&
+                                 (!chapF || q.chap === chapF);
+            
+            if (matchesFilter) {
+                q.selected = false;
+            }
+        });
+        
+        saveData();
+        renderSelectionList();
+        alert("সকল ফিল্টার করা প্রশ্ন ডিসেলেক্ট করা হয়েছে!");
+    }
+    
     function processMathInText(text) {
         if (!text) return '';
         
-        let processed = text.replace(/\n/g, '<br>');
+        // প্রথমে সব বোল্ড ট্যাগ সরিয়ে ফেলুন
+        let processed = text.replace(/<b>/gi, '').replace(/<\/b>/gi, '');
+        processed = processed.replace(/<strong>/gi, '').replace(/<\/strong>/gi, '');
+        
+        processed = processed.replace(/\n/g, '<br>');
         
         processed = processed.replace(/\$\$(.*?)\$\$/g, function(match, equation) {
             return `<div class="equation-container">\\[${equation}\\]</div>`;
@@ -1073,7 +1942,7 @@
         processed = processed.replace(/\\\[/g, '\\[').replace(/\\\]/g, '\\]');
         
         if (text.includes('ক:') || text.includes('খ:') || text.includes('গ:') || text.includes('ঘ:')) {
-            processed = processed.replace(/(ক|খ|গ|ঘ):/g, '<div class="mcq-option-equation"><b>$1:</b> ');
+            processed = processed.replace(/(ক|খ|গ|ঘ):/g, '<div class="mcq-option-equation"><span>$1:</span> ');
             processed = processed + '</div>';
         }
         
@@ -1360,16 +2229,27 @@
                 const isEnglish = q.sub.toLowerCase().includes("english") || q.sub.includes("ইংরেজি");
                 const labels = isEnglish ? ["a", "b", "c", "d"] : ["ক", "খ", "গ", "ঘ"];
                 
-                const formattedBody = processMathInText(q.body);
+                // প্রশ্নের টেক্সট থেকে <b>, <strong> ট্যাগ সরিয়ে ফেলুন
+                let cleanBody = q.body;
+                cleanBody = cleanBody.replace(/<b>/gi, '').replace(/<\/b>/gi, '');
+                cleanBody = cleanBody.replace(/<strong>/gi, '').replace(/<\/strong>/gi, '');
+                
+                const formattedBody = processMathInText(cleanBody);
 
                 let opt = "";
                 if (q.type !== 'normal' && q.showOptions !== false) {
                     if (q.type === 'cq') {
+                        // অপশনগুলোর বোল্ড ট্যাগও সরিয়ে ফেলুন
+                        const cleanA = (q.a || '').replace(/<b>/gi, '').replace(/<\/b>/gi, '').replace(/<strong>/gi, '').replace(/<\/strong>/gi, '');
+                        const cleanB = (q.b || '').replace(/<b>/gi, '').replace(/<\/b>/gi, '').replace(/<strong>/gi, '').replace(/<\/strong>/gi, '');
+                        const cleanC = (q.c || '').replace(/<b>/gi, '').replace(/<\/b>/gi, '').replace(/<strong>/gi, '').replace(/<\/strong>/gi, '');
+                        const cleanD = (q.d || '').replace(/<b>/gi, '').replace(/<\/b>/gi, '').replace(/<strong>/gi, '').replace(/<\/strong>/gi, '');
+                        
                         const options = [
-                            { label: labels[0], value: q.a || '', mark: '১' },
-                            { label: labels[1], value: q.b || '', mark: '২' },
-                            { label: labels[2], value: q.c || '', mark: '৩' },
-                            { label: labels[3], value: q.d || '', mark: '৪' }
+                            { label: labels[0], value: cleanA || '', mark: '১' },
+                            { label: labels[1], value: cleanB || '', mark: '২' },
+                            { label: labels[2], value: cleanC || '', mark: '৩' },
+                            { label: labels[3], value: cleanD || '', mark: '৪' }
                         ];
                         
                         opt = `
@@ -1377,7 +2257,7 @@
                             ${options.map(opt => `
                                 <div class="sub-q" style="font-size: ${currentFontSize}px !important; line-height: ${currentLineHeight} !important; margin-bottom: 8px; display: flex; align-items: flex-start; justify-content: space-between;">
                                     <div style="display: flex; align-items: flex-start; flex: 1;">
-                                        <b style="margin-right: 5px; flex-shrink: 0;">${opt.label}.</b>
+                                        <span style="margin-right: 5px; flex-shrink: 0;">${opt.label}.</span>
                                         <div style="flex: 1; text-align: left;">${processMathInText(opt.value)}</div>
                                     </div>
                                     <span style="margin-left: 10px; flex-shrink: 0;">${opt.mark}</span>
@@ -1385,18 +2265,24 @@
                             `).join('')}
                         </div>`;
                     } else {
+                        // MCQ অপশনগুলোর বোল্ড ট্যাগও সরিয়ে ফেলুন
+                        const cleanA = (q.a || '').replace(/<b>/gi, '').replace(/<\/b>/gi, '').replace(/<strong>/gi, '').replace(/<\/strong>/gi, '');
+                        const cleanB = (q.b || '').replace(/<b>/gi, '').replace(/<\/b>/gi, '').replace(/<strong>/gi, '').replace(/<\/strong>/gi, '');
+                        const cleanC = (q.c || '').replace(/<b>/gi, '').replace(/<\/b>/gi, '').replace(/<strong>/gi, '').replace(/<\/strong>/gi, '');
+                        const cleanD = (q.d || '').replace(/<b>/gi, '').replace(/<\/b>/gi, '').replace(/<strong>/gi, '').replace(/<\/strong>/gi, '');
+                        
                         const options = [
-                            { label: labels[0], value: q.a || '' },
-                            { label: labels[1], value: q.b || '' },
-                            { label: labels[2], value: q.c || '' },
-                            { label: labels[3], value: q.d || '' }
+                            { label: labels[0], value: cleanA || '' },
+                            { label: labels[1], value: cleanB || '' },
+                            { label: labels[2], value: cleanC || '' },
+                            { label: labels[3], value: cleanD || '' }
                         ];
                         
                         opt = `
                         <div class="mcq-grid" style="font-size: ${currentFontSize}px !important; line-height: ${currentLineHeight} !important; margin-top: 8px;">
                             ${options.map(opt => `
                                 <div style="display: flex; align-items: flex-start; text-align: left; margin-bottom: 4px;">
-                                    <b style="margin-right: 5px; flex-shrink: 0;">${opt.label}.</b>
+                                    <span style="margin-right: 5px; flex-shrink: 0;">${opt.label}.</span>
                                     <div style="flex: 1;">${processMathInText(opt.value)}</div>
                                 </div>
                             `).join('')}
@@ -1407,7 +2293,7 @@
                 return `
                 <div class="${q.type==='cq'?'cq-box':'normal-q'}" style="font-size: ${currentFontSize}px !important; line-height: ${currentLineHeight} !important; margin-bottom: ${document.getElementById('qGapSlider').value}px !important;">
                     <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                        <div style="display:flex; gap:4px; width: 100%;"><b style="font-size: ${currentFontSize}px !important; flex-shrink: 0;">${num}.</b> <div style="font-size: ${currentFontSize}px !important; flex: 1; text-align: left;">${formattedBody}</div></div>
+                        <div style="display:flex; gap:4px; width: 100%;"><span style="font-size: ${currentFontSize}px !important; flex-shrink: 0;">${num}.</span> <div style="font-size: ${currentFontSize}px !important; flex: 1; text-align: left;">${formattedBody}</div></div>
                     </div>
                     ${img}${opt}
                 </div>`;
@@ -1439,10 +2325,11 @@
         
         document.getElementById('outputPagesContainer').innerHTML = pagesHTML;
         
-        // Update answer grid
-        document.getElementById('ansGrid').innerHTML = selected.map((q, i) => 
-            `<div class="ans-box" style="font-size: ${currentFontSize}px !important; line-height: ${currentLineHeight} !important; text-align: center;"><b>${formatNum(i+1)}.</b> ${q.ans || '...'}</div>`
-        ).join('');
+        // Update answer grid (এখানেও বোল্ড সরিয়ে ফেলুন)
+        document.getElementById('ansGrid').innerHTML = selected.map((q, i) => {
+            const cleanAns = (q.ans || '...').replace(/<b>/gi, '').replace(/<\/b>/gi, '').replace(/<strong>/gi, '').replace(/<\/strong>/gi, '');
+            return `<div class="ans-box" style="font-size: ${currentFontSize}px !important; line-height: ${currentLineHeight} !important; text-align: center;"><span>${formatNum(i+1)}.</span> ${cleanAns}</div>`;
+        }).join('');
         
         // Update main header elements for first page
         updateHeaders();
@@ -1536,37 +2423,21 @@
         }
     }
 
+    // পুরাতন addQuestion ফাংশন (এডিটের জন্য)
     function addQuestion() {
         const editIdx = parseInt(document.getElementById('editIndex').value);
-        const q = { 
-            sub: document.getElementById('qSub').value, 
-            qClass: document.getElementById('qClassInput').value,
-            qDiv: document.getElementById('qDivInput').value,
-            chap: document.getElementById('qChap').value, 
-            type: document.getElementById('qType').value, 
-            body: document.getElementById('qBody').value, 
-            ans: document.getElementById('qAns').value, 
-            board: document.getElementById('qBoard').value, 
-            a: document.getElementById('qA').value, 
-            b: document.getElementById('qB').value, 
-            c: document.getElementById('qC').value, 
-            d: document.getElementById('qD').value, 
-            img: currentImgData, 
-            selected: false,
-            showOptions: document.getElementById('showOptionsToggle').checked
-        };
+        const q = getQuestionFromForm();
         
         if(editIdx > -1) { 
             q.selected = questionBank[editIdx].selected;
             questionBank[editIdx] = q; 
             cancelEdit(); 
-        } else { 
-            questionBank.push(q); 
         }
         
         saveData(); 
         updateSubFilter(); 
         updateChapterFilter(); 
+        updateQuestionCount();
         selectionCurrentPage = 1;
         renderSelectionList(); 
         alert("সংরক্ষিত হয়েছে!");
@@ -1605,6 +2476,7 @@
             saveData(); 
             updateSubFilter(); 
             updateChapterFilter(); 
+            updateQuestionCount();
             selectionCurrentPage = 1;
             renderSelectionList();
         }
@@ -1617,6 +2489,8 @@
         document.querySelectorAll('#bank input, #bank textarea, #bank select').forEach(i => i.value = "");
         document.getElementById('imgPreview').innerHTML = "";
         currentImgData = "";
+        document.getElementById('duplicateStatus').style.display = 'none';
+        document.getElementById('saveBtn').style.background = 'var(--primary)';
     }
 
     function sync() {
@@ -1698,9 +2572,9 @@
             document.getElementById('h3').value = d.sets[3] || "";
             document.getElementById('targetCount').value = d.sets[7] || 10; 
             document.getElementById('hSet').value = d.sets[8] || "";
-            document.getElementById('fsH1').value = d.hSizes[0] || 20; // আগে 24 ছিল
-            document.getElementById('fsH2').value = d.hSizes[1] || 16; // আগে 19 ছিল
-            document.getElementById('fsH3').value = d.hSizes[2] || 13; // আগে 15 ছিল
+            document.getElementById('fsH1').value = d.hSizes[0] || 20;
+            document.getElementById('fsH2').value = d.hSizes[1] || 16;
+            document.getElementById('fsH3').value = d.hSizes[2] || 13;
             document.getElementById('fsH4').value = d.hSizes[3] || 13;
             document.getElementById('lockBox').value = d.restrictedList || "";
             questionBank = d.qs;
@@ -1746,8 +2620,12 @@
         
         updateSubFilter(); 
         updateChapterFilter(); 
+        updateQuestionCount();
         sync(); 
         renderSelectionList();
+        
+        // Show temporary edit button
+        addTemporaryEditButton();
     }
 
     function formatNum(n) { 
@@ -1825,19 +2703,504 @@
         a.click(); 
     }
     
-    function importJSON(e) { 
-        const r = new FileReader(); 
-        r.onload = (ev) => { 
-            localStorage.setItem(DB_KEY, ev.target.result); 
-            location.reload(); 
-        }; 
-        r.readAsText(e.target.files[0]); 
-    }
-    
     // Initialize on load
     document.addEventListener('DOMContentLoaded', function() {
         checkLicense();
     });
+
+// ==================== SMART SEARCH FEATURE ====================
+
+function initializeSmartSearch() {
+    // Add search box to selection panel
+    const filterGroup = document.getElementById('filterGroup');
+    if (filterGroup && !document.getElementById('smartSearchBox')) {
+        const searchHTML = `
+            <div style="margin-bottom:10px;">
+                <div style="display:flex; gap:5px; margin-bottom:5px;">
+                    <input type="text" id="smartSearchBox" placeholder="🔍 প্রশ্ন, বিষয়, অধ্যায় বা কীওয়ার্ড লিখুন..." 
+                           style="flex:1; padding:10px; border:1px solid #ccc; border-radius:5px; font-size:13px;"
+                           oninput="performSmartSearch()">
+                    <button onclick="clearSmartSearch()" style="background:#f44336; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer; font-weight:bold;">✖</button>
+                </div>
+                <div style="font-size:11px; color:#666; display:flex; justify-content:space-between;">
+                    <span>স্মার্ট সার্চ: প্রশ্ন টেক্সট, বিষয়, অধ্যায়, বোর্ড, টাইপ</span>
+                    <button onclick="showSearchTips()" style="background:none; border:none; color:var(--primary); cursor:pointer; font-size:11px;">সার্চ টিপস</button>
+                </div>
+            </div>
+        `;
+        
+        filterGroup.insertAdjacentHTML('afterbegin', searchHTML);
+        
+        // Add search filters
+        const searchFiltersHTML = `
+            <div id="searchFilters" style="display:none; background:#e3f2fd; padding:10px; border-radius:5px; margin-top:10px; border:1px solid #bbdefb;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <strong style="color:var(--primary); font-size:13px;">🔍 উন্নত সার্চ ফিল্টার</strong>
+                    <button onclick="toggleSearchFilters()" style="background:none; border:none; color:#666; cursor:pointer; font-size:12px;">▲</button>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                    <div>
+                        <label style="font-size:12px; font-weight:bold; display:block; margin-bottom:3px;">সার্চ ফিল্ড:</label>
+                        <select id="searchField" style="width:100%; padding:5px; border:1px solid #ccc; border-radius:3px; font-size:12px;">
+                            <option value="all">সব ফিল্ড</option>
+                            <option value="body">প্রশ্ন টেক্সট</option>
+                            <option value="sub">বিষয়</option>
+                            <option value="chap">অধ্যায়</option>
+                            <option value="board">বোর্ড/সাল</option>
+                            <option value="ans">উত্তর</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="font-size:12px; font-weight:bold; display:block; margin-bottom:3px;">ম্যাচ টাইপ:</label>
+                        <select id="matchType" style="width:100%; padding:5px; border:1px solid #ccc; border-radius:3px; font-size:12px;">
+                            <option value="contains">যেকোনো অংশে আছে</option>
+                            <option value="exact">হুবহু মিল</option>
+                            <option value="start">শুরুতে আছে</option>
+                            <option value="end">শেষে আছে</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="margin-top:8px;">
+                    <label style="font-size:12px; display:flex; align-items:center; cursor:pointer;">
+                        <input type="checkbox" id="caseSensitive" style="margin-right:5px;"> 
+                        কেস সেন্সিটিভ
+                    </label>
+                    <label style="font-size:12px; display:flex; align-items:center; cursor:pointer;">
+                        <input type="checkbox" id="searchSelectedOnly" style="margin-right:5px;"> 
+                        শুধু সিলেক্টেড প্রশ্নে খুঁজুন
+                    </label>
+                </div>
+                <div style="margin-top:10px; padding-top:10px; border-top:1px solid #bbdefb;">
+                    <div style="font-size:11px; color:#666;">
+                        <strong>সার্চ অপারেটর:</strong><br>
+                        <code>"exact phrase"</code> - হুবহু বাক্য<br>
+                        <code>বিজ্ঞান AND গণিত</code> - দুটোই আছে<br>
+                        <code>MCQ OR সৃজনশীল</code> - যেকোনোটি আছে<br>
+                        <code>-বোর্ড</code> - বোর্ড নেই এমন<br>
+                        <code>প্রথম*</code> - প্রথম দিয়ে শুরু<br>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        filterGroup.insertAdjacentHTML('afterbegin', searchFiltersHTML);
+        
+        // Add toggle button for advanced filters
+        const toggleBtn = document.createElement('button');
+        toggleBtn.innerHTML = '🔍 উন্নত সার্চ ফিল্টার';
+        toggleBtn.style.cssText = 'width:100%; background:#e3f2fd; color:var(--primary); border:1px solid #bbdefb; padding:8px; border-radius:5px; cursor:pointer; font-size:12px; font-weight:bold; margin-bottom:10px;';
+        toggleBtn.onclick = toggleSearchFilters;
+        filterGroup.insertAdjacentElement('afterbegin', toggleBtn);
+    }
+}
+
+function toggleSearchFilters() {
+    const filters = document.getElementById('searchFilters');
+    const toggleBtn = document.querySelector('[onclick="toggleSearchFilters()"]');
+    
+    if (filters.style.display === 'none' || filters.style.display === '') {
+        filters.style.display = 'block';
+        if (toggleBtn) toggleBtn.innerHTML = '▲ উন্নত সার্চ ফিল্টার লুকান';
+    } else {
+        filters.style.display = 'none';
+        if (toggleBtn) toggleBtn.innerHTML = '🔍 উন্নত সার্চ ফিল্টার';
+    }
+}
+
+function performSmartSearch() {
+    const searchTerm = document.getElementById('smartSearchBox').value.trim();
+    const searchField = document.getElementById('searchField')?.value || 'all';
+    const matchType = document.getElementById('matchType')?.value || 'contains';
+    const caseSensitive = document.getElementById('caseSensitive')?.checked || false;
+    const searchSelectedOnly = document.getElementById('searchSelectedOnly')?.checked || false;
+    
+    if (searchTerm === '') {
+        clearSearchHighlights();
+        renderSelectionList();
+        return;
+    }
+    
+    let searchPool = questionBank;
+    if (searchSelectedOnly) {
+        searchPool = questionBank.filter(q => q.selected);
+    }
+    
+    const searchResults = smartSearchAlgorithm(searchTerm, searchPool, {
+        field: searchField,
+        matchType: matchType,
+        caseSensitive: caseSensitive
+    });
+    
+    highlightSearchResults(searchResults);
+    updateSearchStats(searchResults.length, searchPool.length);
+}
+
+function smartSearchAlgorithm(searchTerm, pool, options) {
+    const results = [];
+    const terms = parseSearchQuery(searchTerm);
+    
+    pool.forEach((q, index) => {
+        let matchScore = 0;
+        let maxPossibleScore = 0;
+        
+        // Parse search operators
+        if (terms.exact) {
+            // Exact phrase search
+            const text = getSearchText(q, options.field);
+            if (text.includes(terms.exact)) {
+                matchScore += 100;
+                maxPossibleScore += 100;
+            }
+        }
+        
+        if (terms.and.length > 0) {
+            // AND operator
+            maxPossibleScore += terms.and.length * 50;
+            terms.and.forEach(term => {
+                if (checkMatch(q, term, options)) {
+                    matchScore += 50;
+                }
+            });
+        }
+        
+        if (terms.or.length > 0) {
+            // OR operator
+            maxPossibleScore += 30;
+            let orMatched = false;
+            terms.or.forEach(term => {
+                if (checkMatch(q, term, options)) {
+                    orMatched = true;
+                }
+            });
+            if (orMatched) {
+                matchScore += 30;
+            }
+        }
+        
+        if (terms.not.length > 0) {
+            // NOT operator
+            maxPossibleScore += 20;
+            let notMatched = false;
+            terms.not.forEach(term => {
+                if (checkMatch(q, term, options)) {
+                    notMatched = true;
+                }
+            });
+            if (!notMatched) {
+                matchScore += 20;
+            }
+        }
+        
+        if (terms.wildcard.length > 0) {
+            // Wildcard search
+            maxPossibleScore += terms.wildcard.length * 40;
+            terms.wildcard.forEach(wildcard => {
+                if (wildcardMatch(q, wildcard, options)) {
+                    matchScore += 40;
+                }
+            });
+        }
+        
+        // If no operators, do simple search
+        if (terms.simple.length > 0 && terms.and.length === 0 && terms.or.length === 0) {
+            maxPossibleScore += terms.simple.length * 40;
+            terms.simple.forEach(term => {
+                if (checkMatch(q, term, options)) {
+                    matchScore += 40;
+                }
+            });
+        }
+        
+        // Calculate relevance percentage
+        const relevance = maxPossibleScore > 0 ? (matchScore / maxPossibleScore) * 100 : 0;
+        
+        if (relevance > 0) {
+            results.push({
+                index: index,
+                question: q,
+                relevance: relevance,
+                matchFields: findMatchFields(q, terms, options)
+            });
+        }
+    });
+    
+    // Sort by relevance
+    results.sort((a, b) => b.relevance - a.relevance);
+    
+    return results;
+}
+
+function parseSearchQuery(query) {
+    const result = {
+        exact: null,
+        and: [],
+        or: [],
+        not: [],
+        wildcard: [],
+        simple: []
+    };
+    
+    // Extract exact phrases (within quotes)
+    const exactMatch = query.match(/"([^"]+)"/);
+    if (exactMatch) {
+        result.exact = exactMatch[1];
+        query = query.replace(exactMatch[0], '');
+    }
+    
+    // Split by spaces but keep quoted phrases
+    const tokens = query.match(/(?:[^\s"]+|"[^"]*")+/g) || [];
+    
+    tokens.forEach(token => {
+        token = token.replace(/"/g, '').trim();
+        if (!token) return;
+        
+        if (token.toUpperCase() === 'AND') {
+            // AND operator
+            return;
+        } else if (token.toUpperCase() === 'OR') {
+            // OR operator
+            return;
+        } else if (token.startsWith('-')) {
+            // NOT operator
+            result.not.push(token.substring(1));
+        } else if (token.includes('*')) {
+            // Wildcard
+            result.wildcard.push(token);
+        } else if (token.includes('+')) {
+            // AND operator alternative
+            result.and.push(token.replace('+', ''));
+        } else if (token.includes('|')) {
+            // OR operator alternative
+            result.or.push(token.replace('|', ''));
+        } else {
+            // Simple term
+            result.simple.push(token);
+        }
+    });
+    
+    return result;
+}
+
+function checkMatch(question, term, options) {
+    const text = getSearchText(question, options.field);
+    const searchText = options.caseSensitive ? text : text.toLowerCase();
+    const searchTerm = options.caseSensitive ? term : term.toLowerCase();
+    
+    switch (options.matchType) {
+        case 'exact':
+            return searchText === searchTerm;
+        case 'start':
+            return searchText.startsWith(searchTerm);
+        case 'end':
+            return searchText.endsWith(searchTerm);
+        case 'contains':
+        default:
+            return searchText.includes(searchTerm);
+    }
+}
+
+function getSearchText(question, field) {
+    switch (field) {
+        case 'body':
+            return question.body || '';
+        case 'sub':
+            return question.sub || '';
+        case 'chap':
+            return question.chap || '';
+        case 'board':
+            return question.board || '';
+        case 'ans':
+            return question.ans || '';
+        case 'all':
+        default:
+            return [
+                question.body || '',
+                question.sub || '',
+                question.chap || '',
+                question.board || '',
+                question.ans || '',
+                question.a || '',
+                question.b || '',
+                question.c || '',
+                question.d || ''
+            ].join(' ');
+    }
+}
+
+function wildcardMatch(question, wildcard, options) {
+    const text = getSearchText(question, options.field);
+    const searchText = options.caseSensitive ? text : text.toLowerCase();
+    const pattern = wildcard.replace(/\*/g, '.*').replace(/\?/g, '.');
+    
+    try {
+        const regex = new RegExp(`^${pattern}$`, options.caseSensitive ? '' : 'i');
+        return regex.test(searchText);
+    } catch (e) {
+        return false;
+    }
+}
+
+function findMatchFields(question, terms, options) {
+    const fields = [];
+    const allTerms = [...terms.simple, ...terms.and, ...terms.or].filter(t => !terms.not.includes(t));
+    
+    if (terms.exact) {
+        allTerms.push(terms.exact);
+    }
+    
+    const fieldNames = {
+        'body': 'প্রশ্ন',
+        'sub': 'বিষয়',
+        'chap': 'অধ্যায়',
+        'board': 'বোর্ড',
+        'ans': 'উত্তর',
+        'type': 'ধরন'
+    };
+    
+    Object.keys(fieldNames).forEach(field => {
+        const fieldText = getSearchText(question, field);
+        allTerms.forEach(term => {
+            if (fieldText && fieldText.toLowerCase().includes(term.toLowerCase())) {
+                if (!fields.includes(fieldNames[field])) {
+                    fields.push(fieldNames[field]);
+                }
+            }
+        });
+    });
+    
+    return fields;
+}
+
+function highlightSearchResults(results) {
+    // Store search results in global variable for highlighting
+    window.currentSearchResults = results.map(r => r.index);
+    
+    // Re-render selection list with highlights
+    renderSelectionList();
+    
+    // Highlight search terms in rendered questions
+    setTimeout(() => {
+        const searchTerm = document.getElementById('smartSearchBox').value.trim();
+        if (searchTerm) {
+            highlightTextInElements('.q-card-body', searchTerm);
+            highlightTextInElements('.q-card-options', searchTerm);
+        }
+    }, 100);
+}
+
+function highlightTextInElements(selector, searchTerm) {
+    const elements = document.querySelectorAll(selector);
+    const terms = searchTerm.split(' ').filter(t => t.length > 2);
+    
+    elements.forEach(element => {
+        let html = element.innerHTML;
+        terms.forEach(term => {
+            if (term.length > 2) {
+                const regex = new RegExp(`(${term})`, 'gi');
+                html = html.replace(regex, '<mark style="background:#ffeb3b; padding:1px 3px; border-radius:2px;">$1</mark>');
+            }
+        });
+        element.innerHTML = html;
+    });
+}
+
+function clearSearchHighlights() {
+    window.currentSearchResults = null;
+    document.querySelectorAll('mark').forEach(mark => {
+        const parent = mark.parentNode;
+        parent.replaceChild(document.createTextNode(mark.textContent), mark);
+        parent.normalize();
+    });
+}
+
+function clearSmartSearch() {
+    document.getElementById('smartSearchBox').value = '';
+    clearSearchHighlights();
+    renderSelectionList();
+    document.getElementById('searchStats').style.display = 'none';
+}
+
+function updateSearchStats(found, total) {
+    let statsElement = document.getElementById('searchStats');
+    if (!statsElement) {
+        statsElement = document.createElement('div');
+        statsElement.id = 'searchStats';
+        statsElement.style.cssText = 'background:#e8f5e9; padding:8px; border-radius:5px; margin-top:10px; border:1px solid #c8e6c9; font-size:12px;';
+        document.getElementById('smartSearchBox').parentNode.parentNode.appendChild(statsElement);
+    }
+    
+    if (found === 0) {
+        statsElement.innerHTML = `<span style="color:#d32f2f;">❌ কোন প্রশ্ন পাওয়া যায়নি (${total}টি প্রশ্নে খুঁজেছে)</span>`;
+    } else {
+        statsElement.innerHTML = `<span style="color:#2e7d32;">✅ ${found}টি প্রশ্ন পাওয়া গেছে (${total}টি প্রশ্নে খুঁজেছে)</span> 
+        <button onclick="navigateToFirstResult()" style="margin-left:10px; background:var(--primary); color:white; border:none; padding:3px 8px; border-radius:3px; cursor:pointer; font-size:11px;">📌 প্রথম ফলাফলে যান</button>`;
+    }
+    
+    statsElement.style.display = 'block';
+}
+
+function navigateToFirstResult() {
+    if (window.currentSearchResults && window.currentSearchResults.length > 0) {
+        // Find which page contains the first result
+        const firstIndex = window.currentSearchResults[0];
+        const questionsPerPage = selectionPerPage;
+        const pageNumber = Math.floor(firstIndex / questionsPerPage) + 1;
+        
+        selectionCurrentPage = pageNumber;
+        renderSelectionList();
+        
+        // Scroll to the question
+        setTimeout(() => {
+            const firstCard = document.querySelector('.q-card');
+            if (firstCard) {
+                firstCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                firstCard.style.animation = 'highlight 1.5s';
+            }
+        }, 200);
+    }
+}
+
+function showSearchTips() {
+    alert(`🔍 স্মার্ট সার্চ টিপস:
+
+1. সাধারণ সার্চ: "বিজ্ঞান প্রথম অধ্যায়"
+2. হুবহু বাক্য: "কোশ বিভাজন প্রক্রিয়া"
+3. AND অপারেটর: "বিজ্ঞান AND গণিত"
+4. OR অপারেটর: "MCQ OR সৃজনশীল"
+5. NOT অপারেটর: "-বোর্ড"
+6. Wildcard: "প্রথম*" (প্রথম দিয়ে শুরু)
+7. ফিল্ড সার্চ: "বিষয়:বিজ্ঞান" (শীঘ্রই আসছে)
+
+উন্নত ফিল্টার থেকে আরো অপশন পাবেন!`);
+}
+
+// Modify renderSelectionList to highlight search results
+const originalRenderSelectionList = renderSelectionList;
+renderSelectionList = function() {
+    originalRenderSelectionList.call(this);
+    
+    // Highlight search result cards
+    if (window.currentSearchResults && window.currentSearchResults.length > 0) {
+        const qCards = document.querySelectorAll('.q-card');
+        qCards.forEach((card, index) => {
+            const qIndex = (selectionCurrentPage - 1) * selectionPerPage + index;
+            if (window.currentSearchResults.includes(qIndex)) {
+                card.style.border = '2px solid #4caf50';
+                card.style.boxShadow = '0 2px 8px rgba(76, 175, 80, 0.3)';
+                
+                // Add search result badge
+                const badge = document.createElement('div');
+                badge.innerHTML = '🔍';
+                badge.style.cssText = 'position:absolute; top:-8px; right:-8px; background:#4caf50; color:white; width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:10px;';
+                card.style.position = 'relative';
+                card.appendChild(badge);
+            }
+        });
+    }
+};
+
+// Initialize smart search when page loads
+setTimeout(initializeSmartSearch, 1500);
 </script>
 </body>
 </html>
