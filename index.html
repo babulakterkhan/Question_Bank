@@ -477,6 +477,137 @@
             z-index: 10;
         }
         
+        /* মাসিক পরীক্ষা স্টাইল */
+        .monthly-exam-section {
+            background: #fff3e0;
+            border: 2px solid #ff9800;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .monthly-exam-section h3 {
+            color: #e65100;
+            margin-top: 0;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .subject-group {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #ffcc80;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .subject-group-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #ffcc80;
+        }
+        
+        .subject-group-header h4 {
+            margin: 0;
+            color: #e65100;
+        }
+        
+        .questions-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 10px;
+            background: #fff9c4;
+            border-radius: 5px;
+        }
+        
+        .question-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            background: white;
+            border-radius: 5px;
+            border: 1px solid #ffe082;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        
+        .question-item:hover {
+            background: #fff8e1;
+            border-color: #ffb74d;
+        }
+        
+        .question-item.selected {
+            background: #e8f5e9;
+            border-color: #4caf50;
+        }
+        
+        .question-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        
+        .question-preview {
+            flex: 1;
+            font-size: 12px;
+            color: #555;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .monthly-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .monthly-controls button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+        }
+        
+        .monthly-stats {
+            background: #e8f5e9;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: bold;
+            color: #2e7d32;
+        }
+        
+        /* Subject separator in output */
+        .subject-separator {
+            background: #f5f5f5;
+            padding: 6px 10px;
+            margin: 15px 0 8px 0;
+            border-left: 4px solid var(--primary);
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 14px;
+            color: var(--primary);
+            text-align: left;
+            break-inside: avoid;
+        }
+        
         @media print { 
             body {
                 background: white !important;
@@ -528,6 +659,13 @@
                 page-break-inside: avoid;
                 break-inside: avoid;
             }
+            
+            /* Prevent subject separator from breaking across pages */
+            .subject-separator {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+            
             /* Print optimization with smaller headers */
             .header h1 { 
                 font-size: 18px !important; 
@@ -719,6 +857,7 @@
     <div class="tab-btn-group">
         <button class="tab-btn active" onclick="openTab('select')">বাছাই</button>
         <button class="tab-btn" onclick="openTab('bank')">ব্যাংক</button>
+        <button class="tab-btn" onclick="openTab('monthly')">মাসিক পরীক্ষা</button>
         <button class="tab-btn" onclick="openTab('sets')">সেটিংস</button>
     </div>
 
@@ -840,8 +979,8 @@
             <button onclick="changeSelectionPage(1)" id="selectionNextBtn">পরের →</button>
         </div>
         
-        <!-- Temporary Edit Button - This will be added dynamically -->
-        <button id="tempEditBtn" class="btn-action" style="background:#ff9800; color:white; margin-top:10px; display:none;" onclick="openTemporaryEditor()">🖊️ টেম্পোরারি এডিট</button>
+        <!-- Temporary Edit Button -->
+        <button id="tempEditBtn" class="btn-action" style="background:#ff9800; color:white; margin-top:10px;" onclick="openTemporaryEditor()">🖊️ টেম্পোরারি এডিট</button>
         
         <button class="btn-action" style="background:#2e7d32; color:white; margin-top:15px;" onclick="window.print()">🖨️ প্রিন্ট / PDF</button>
     </div>
@@ -936,6 +1075,75 @@
             </div>
         </div>
         <div class="admin-hide-msg" style="text-align:center; color:#999; margin-top:30px;"><p>⚠️ এডমিন পাসওয়ার্ড দিন।</p></div>
+    </div>
+
+    <!-- Monthly Exam Panel -->
+    <div id="monthly" class="panel">
+        <div class="monthly-exam-section">
+            <h3>📅 মাসিক/সাপ্তাহিক পরীক্ষার প্রশ্ন তৈরি</h3>
+            
+            <div class="input-group">
+                <label>পরীক্ষার নাম</label>
+                <input type="text" id="monthlyExamName" placeholder="সাপ্তাহিক পরীক্ষা-১ / মাসিক পরীক্ষা-১" value="মাসিক পরীক্ষা">
+            </div>
+            
+            <div class="input-group">
+                <label>শ্রেণি নির্বাচন করুন</label>
+                <select id="monthlyClass" onchange="loadSubjectsForMonthly()">
+                    <option value="">সব শ্রেণি</option>
+                    <option value="HSC">HSC</option>
+                    <option value="দশম">দশম</option>
+                    <option value="নবম">নবম</option>
+                    <option value="অষ্টম">অষ্টম</option>
+                    <option value="সপ্তম">সপ্তম</option>
+                    <option value="ষষ্ঠ">ষষ্ঠ</option>
+                    <option value="পঞ্চম">পঞ্চম</option>
+                    <option value="চতুর্থ">চতুর্থ</option>
+                    <option value="তৃতীয়">তৃতীয়</option>
+                    <option value="দ্বিতীয়">দ্বিতীয়</option>
+                    <option value="প্রথম">প্রথম</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label>বিভাগ নির্বাচন করুন</label>
+                <select id="monthlyDivision" onchange="loadSubjectsForMonthly()">
+                    <option value="">সব বিভাগ</option>
+                    <option value="সাধারণ">সাধারণ</option>
+                    <option value="বিজ্ঞান">বিজ্ঞান</option>
+                    <option value="মানবিক">মানবিক</option>
+                    <option value="ব্যবসায় শিক্ষা">ব্যবসায় শিক্ষা</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label>প্রতিটি বিষয় থেকে প্রশ্ন সংখ্যা</label>
+                <input type="number" id="questionsPerSubject" min="1" max="10" value="2" onchange="updateMonthlyStats()">
+            </div>
+            
+            <button class="btn-action" style="background:#2196f3; color:white; margin-top:10px;" onclick="loadSubjectsForMonthly()">📚 বিষয়গুলো দেখুন</button>
+            
+            <div id="monthlySubjectsContainer" style="margin-top:15px;">
+                <!-- বিষয়গুলো এখানে লোড হবে -->
+            </div>
+            
+            <div id="monthlyStats" class="monthly-stats" style="display:none;">
+                মোট নির্বাচিত: <span id="monthlyTotalSelected">0</span>টি প্রশ্ন
+            </div>
+            
+            <div class="monthly-controls">
+                <button onclick="generateMonthlyExam()" style="background:#4caf50; color:white;">✅ মাসিক পরীক্ষা তৈরি করুন</button>
+                <button onclick="clearMonthlySelection()" style="background:#f44336; color:white;">🗑️ সব সিলেকশন ক্লিয়ার</button>
+            </div>
+            
+            <div style="margin-top:15px; background:#e8f5e9; padding:10px; border-radius:5px; font-size:12px;">
+                <strong>ব্যবহার নির্দেশিকা:</strong><br>
+                1. প্রথমে শ্রেণি ও বিভাগ নির্বাচন করুন<br>
+                2. "বিষয়গুলো দেখুন" বাটনে ক্লিক করুন<br>
+                3. প্রতিটি বিষয় থেকে প্রশ্ন সিলেক্ট করুন<br>
+                4. "মাসিক পরীক্ষা তৈরি করুন" বাটনে ক্লিক করুন
+            </div>
+        </div>
     </div>
 
     <!-- Settings Panel -->
@@ -1225,6 +1433,9 @@
     let currentSearchIndex = 0;
     let searchTerm = '';
 
+    // Monthly Exam Variables
+    let monthlySelectedQuestions = new Map(); // subject -> array of question indices
+
     function checkLicense() { 
         const savedKey = localStorage.getItem('bcti_app_license'); 
         if (savedKey !== MASTER_KEY) { 
@@ -1234,7 +1445,1553 @@
         } else { loadData(); } 
     }
     
-    // ==================== IMPROVED AUTO GENERATOR FUNCTIONS ====================
+    // ==================== RENDER OUTPUT PAGES WITH SUBJECT-WISE SERIAL ====================
+    
+    function renderOutputPages() {
+        const selected = questionBank.filter(q => q.selected);
+        const showPageNumbers = document.getElementById('showPageNumbers').checked;
+        
+        // Clear previous pages
+        document.getElementById('outputPagesContainer').innerHTML = '';
+        
+        // If no questions, show empty page
+        if (selected.length === 0) {
+            totalOutputPages = 1;
+            outputCurrentPage = 1;
+            
+            const topMargin = document.getElementById('mTop').value || '12';
+            const rightMargin = document.getElementById('mRight').value || '15';
+            const bottomMargin = document.getElementById('mBottom').value || '12';
+            const leftMargin = document.getElementById('mLeft').value || '15';
+            
+            let pageHeader = `
+            <div id="outSetLine"></div>
+            <div class="header"><h1 id="outH1"></h1><h2 id="outH2"></h2></div>
+            <div id="outClassLine" class="header-info"></div>
+            <div id="outSubjectLine" class="header-info" style="margin-bottom:10px;"></div>
+            <div class="marks-info"><span id="outTime"></span><span id="outMarks"></span></div>
+            <div id="outInst" class="instruction"></div>`;
+            
+            let pageFooter = '';
+            if (showPageNumbers) {
+                pageFooter = `<div class="page-number">পৃষ্ঠা 1/1</div>`;
+            }
+            
+            document.getElementById('outputPagesContainer').innerHTML = `
+            <div id="output-page-1" class="output-page active" style="padding: ${topMargin}mm ${rightMargin}mm ${bottomMargin}mm ${leftMargin}mm !important;">
+                ${pageHeader}
+                <div class="question-container" style="column-count: ${document.getElementById('colCount').value}; text-align: center; padding: 50px;">
+                    <p style="font-size: 18px; color: #666;">কোন প্রশ্ন নির্বাচন করা হয়নি। বাম পাশ থেকে প্রশ্ন নির্বাচন করুন।</p>
+                </div>
+                ${pageFooter}
+            </div>`;
+            
+            // Update header elements
+            updateHeaders();
+            updateOutputPagination();
+            
+            return;
+        }
+        
+        // Group selected questions by subject with their serial numbers
+        const groupedBySubject = {};
+        selected.forEach((question, index) => {
+            const subject = question.sub || 'বিষয়হীন';
+            if (!groupedBySubject[subject]) {
+                groupedBySubject[subject] = {
+                    questions: [],
+                    serialStart: 1
+                };
+            }
+            groupedBySubject[subject].questions.push({
+                question: question,
+                globalIndex: index,
+                subjectSerial: groupedBySubject[subject].questions.length + 1
+            });
+        });
+        
+        // Get output per page setting
+        outputPerPage = parseInt(document.getElementById('outputPerPage').value) || 30;
+        if (outputPerPage < 15) outputPerPage = 15;
+        if (outputPerPage > 60) outputPerPage = 60;
+        
+        // ✅ প্রথম পাতার মার্জিন স্লাইডার থেকে নিন
+        const topMargin = document.getElementById('mTop').value || '12';
+        const rightMargin = document.getElementById('mRight').value || '15';
+        const bottomMargin = document.getElementById('mBottom').value || '12';
+        const leftMargin = document.getElementById('mLeft').value || '15';
+        
+        // ✅ ২য় পাতার মার্জিন ফিক্সড ১০mm
+        const secondPageTopMargin = '10';
+        
+        // Get font size and line height from slider
+        const currentFontSize = document.getElementById('fSize').value;
+        const currentLineHeight = document.getElementById('lHeight').value;
+        
+        // Create pages
+        let pagesHTML = '';
+        let currentPage = 1;
+        let questionsOnCurrentPage = 0;
+        let currentPageContent = '';
+        let isFirstSubjectOnPage = true;
+        
+        // Process each subject
+        Object.keys(groupedBySubject).forEach((subject, subjectIndex) => {
+            const subjectData = groupedBySubject[subject];
+            const subjectQuestions = subjectData.questions;
+            
+            // বাংলা সংখ্যা কনভার্টার ফাংশন
+            function toBengaliNumber(num) {
+                if (!num && num !== 0) return '';
+                const bengaliDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+                return num.toString().replace(/\d/g, function(match) {
+                    return bengaliDigits[match];
+                });
+            }
+            
+            // বাংলা সংখ্যায় রূপান্তর
+            const bengaliTotalQuestions = toBengaliNumber(subjectQuestions.length);
+            
+            // Add subject separator
+            let subjectSeparator = '';
+            if (!isFirstSubjectOnPage) {
+                subjectSeparator = `<div class="subject-separator" style="font-size: ${currentFontSize}px !important; margin-top: 15px; margin-bottom: 8px;">📘 ${subject} (প্রশ্ন ১ থেকে ${bengaliTotalQuestions})</div>`;
+            } else {
+                subjectSeparator = `<div class="subject-separator" style="font-size: ${currentFontSize}px !important; margin-bottom: 8px;">📘 ${subject} (প্রশ্ন ১ থেকে ${bengaliTotalQuestions})</div>`;
+                isFirstSubjectOnPage = false;
+            }
+            
+            // Check if subject separator plus all questions will fit on current page
+            const questionsNeeded = subjectQuestions.length;
+            const spaceNeeded = questionsNeeded + 1; // +1 for subject separator
+            
+            if (questionsOnCurrentPage + spaceNeeded > outputPerPage && questionsOnCurrentPage > 0) {
+                // Need to start a new page
+                pagesHTML += createPageHTML(currentPage, currentPageContent, questionsOnCurrentPage, 
+                                           topMargin, rightMargin, bottomMargin, leftMargin, 
+                                           currentFontSize, currentLineHeight, showPageNumbers);
+                currentPage++;
+                questionsOnCurrentPage = 0;
+                currentPageContent = '';
+                isFirstSubjectOnPage = true;
+                
+                // Re-add subject separator for new page
+                subjectSeparator = `<div class="subject-separator" style="font-size: ${currentFontSize}px !important; margin-bottom: 8px;">📘 ${subject} (প্রশ্ন ১ থেকে ${bengaliTotalQuestions})</div>`;
+            }
+            
+            // Add subject separator to current page
+            currentPageContent += subjectSeparator;
+            questionsOnCurrentPage++; // Count subject separator as an item
+            
+            // Add each question from this subject
+            subjectQuestions.forEach((sq, questionIndex) => {
+                const q = sq.question;
+                const num = formatNum(sq.subjectSerial); // Use subject-wise serial number
+                const img = q.img ? `<img src="${q.img}" style="max-width:100%; display:block; margin:5px auto; max-height: 100px;">` : '';
+                const isEnglish = q.sub.toLowerCase().includes("english") || q.sub.includes("ইংরেজি");
+                const labels = isEnglish ? ["a", "b", "c", "d"] : ["ক", "খ", "গ", "ঘ"];
+                
+                // Clean body text - check if there's a temporary edit
+                let cleanBody = q.body || '';
+                cleanBody = cleanBody.replace(/<b>/gi, '').replace(/<\/b>/gi, '');
+                cleanBody = cleanBody.replace(/<strong>/gi, '').replace(/<\/strong>/gi, '');
+                
+                const formattedBody = processMathInText(cleanBody);
+
+                let opt = "";
+                if (q.type !== 'normal' && q.showOptions !== false) {
+                    if (q.type === 'cq') {
+                        // Clean options
+                        const cleanA = (q.a || '').replace(/<b>/gi, '').replace(/<\/b>/gi, '').replace(/<strong>/gi, '').replace(/<\/strong>/gi, '');
+                        const cleanB = (q.b || '').replace(/<b>/gi, '').replace(/<\/b>/gi, '').replace(/<strong>/gi, '').replace(/<\/strong>/gi, '');
+                        const cleanC = (q.c || '').replace(/<b>/gi, '').replace(/<\/b>/gi, '').replace(/<strong>/gi, '').replace(/<\/strong>/gi, '');
+                        const cleanD = (q.d || '').replace(/<b>/gi, '').replace(/<\/b>/gi, '').replace(/<strong>/gi, '').replace(/<\/strong>/gi, '');
+                        
+                        const options = [
+                            { label: labels[0], value: cleanA || '', mark: '১' },
+                            { label: labels[1], value: cleanB || '', mark: '২' },
+                            { label: labels[2], value: cleanC || '', mark: '৩' },
+                            { label: labels[3], value: cleanD || '', mark: '৪' }
+                        ];
+                        
+                        opt = `
+                        <div style="margin-top:4px; margin-left: 18px; font-size: ${currentFontSize}px !important; line-height: ${currentLineHeight} !important;">
+                            ${options.map(opt => `
+                                <div class="sub-q" style="font-size: ${currentFontSize}px !important; line-height: ${currentLineHeight} !important; margin-bottom: 8px; display: flex; align-items: flex-start; justify-content: space-between;">
+                                    <div style="display: flex; align-items: flex-start; flex: 1;">
+                                        <span style="margin-right: 5px; flex-shrink: 0;">${opt.label}.</span>
+                                        <div style="flex: 1; text-align: left;">${processMathInText(opt.value)}</div>
+                                    </div>
+                                    <span style="margin-left: 10px; flex-shrink: 0;">${opt.mark}</span>
+                                </div>
+                            `).join('')}
+                        </div>`;
+                    } else {
+                        // MCQ options
+                        const cleanA = (q.a || '').replace(/<b>/gi, '').replace(/<\/b>/gi, '').replace(/<strong>/gi, '').replace(/<\/strong>/gi, '');
+                        const cleanB = (q.b || '').replace(/<b>/gi, '').replace(/<\/b>/gi, '').replace(/<strong>/gi, '').replace(/<\/strong>/gi, '');
+                        const cleanC = (q.c || '').replace(/<b>/gi, '').replace(/<\/b>/gi, '').replace(/<strong>/gi, '').replace(/<\/strong>/gi, '');
+                        const cleanD = (q.d || '').replace(/<b>/gi, '').replace(/<\/b>/gi, '').replace(/<strong>/gi, '').replace(/<\/strong>/gi, '');
+                        
+                        const options = [
+                            { label: labels[0], value: cleanA || '' },
+                            { label: labels[1], value: cleanB || '' },
+                            { label: labels[2], value: cleanC || '' },
+                            { label: labels[3], value: cleanD || '' }
+                        ];
+                        
+                        opt = `
+                        <div class="mcq-grid" style="font-size: ${currentFontSize}px !important; line-height: ${currentLineHeight} !important; margin-top: 8px;">
+                            ${options.map(opt => `
+                                <div style="display: flex; align-items: flex-start; text-align: left; margin-bottom: 4px;">
+                                    <span style="margin-right: 5px; flex-shrink: 0;">${opt.label}.</span>
+                                    <div style="flex: 1;">${processMathInText(opt.value)}</div>
+                                </div>
+                            `).join('')}
+                        </div>`;
+                    }
+                }
+                
+                const questionHTML = `
+                <div class="${q.type==='cq'?'cq-box':'normal-q'}" style="font-size: ${currentFontSize}px !important; line-height: ${currentLineHeight} !important; margin-bottom: ${document.getElementById('qGapSlider').value}px !important;">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                        <div style="display:flex; gap:4px; width: 100%;"><span style="font-size: ${currentFontSize}px !important; flex-shrink: 0;">${num}.</span> <div style="font-size: ${currentFontSize}px !important; flex: 1; text-align: left;">${formattedBody}</div></div>
+                    </div>
+                    ${img}${opt}
+                </div>`;
+                
+                // Check if adding this question would exceed page limit
+                if (questionsOnCurrentPage >= outputPerPage) {
+                    // Save current page and start new one
+                    pagesHTML += createPageHTML(currentPage, currentPageContent, questionsOnCurrentPage, 
+                                               topMargin, rightMargin, bottomMargin, leftMargin, 
+                                               currentFontSize, currentLineHeight, showPageNumbers);
+                    currentPage++;
+                    questionsOnCurrentPage = 0;
+                    currentPageContent = '';
+                    isFirstSubjectOnPage = true;
+                    
+                    // Add subject separator again for new page if this is the first question
+                    if (questionIndex === 0) {
+                        currentPageContent += `<div class="subject-separator" style="font-size: ${currentFontSize}px !important; margin-bottom: 8px;">📘 ${subject} (প্রশ্ন ১ থেকে ${bengaliTotalQuestions})</div>`;
+                        questionsOnCurrentPage++;
+                        isFirstSubjectOnPage = false;
+                    }
+                }
+                
+                currentPageContent += questionHTML;
+                questionsOnCurrentPage++;
+            });
+        });
+        
+        // Add the last page
+        if (questionsOnCurrentPage > 0) {
+            pagesHTML += createPageHTML(currentPage, currentPageContent, questionsOnCurrentPage, 
+                                       topMargin, rightMargin, bottomMargin, leftMargin, 
+                                       currentFontSize, currentLineHeight, showPageNumbers);
+        }
+        
+        totalOutputPages = currentPage;
+        
+        // Set HTML to container
+        document.getElementById('outputPagesContainer').innerHTML = pagesHTML;
+        
+        // Update answer grid with subject-wise serial
+        let answerGridHTML = '';
+        let answerSerial = 1;
+        Object.keys(groupedBySubject).forEach(subject => {
+            const subjectQuestions = groupedBySubject[subject].questions;
+            
+            subjectQuestions.forEach((sq, index) => {
+                const q = sq.question;
+                const cleanAns = (q.ans || '...').replace(/<b>/gi, '').replace(/<\/b>/gi, '').replace(/<strong>/gi, '').replace(/<\/strong>/gi, '');
+                answerGridHTML += `<div class="ans-box" style="font-size: ${currentFontSize}px !important; line-height: ${currentLineHeight} !important; text-align: center;"><span>${formatNum(answerSerial)}.</span> ${cleanAns}</div>`;
+                answerSerial++;
+            });
+        });
+        
+        document.getElementById('ansGrid').innerHTML = answerGridHTML;
+        
+        // Update main header elements for first page
+        updateHeaders();
+        
+        // Update pagination
+        updateOutputPagination();
+        
+        // Make first page active
+        document.querySelectorAll('.output-page').forEach((page, index) => {
+            page.classList.remove('active');
+            if (index === 0) page.classList.add('active');
+        });
+        
+        outputCurrentPage = 1;
+        
+        // Render MathJax after content is loaded
+        setTimeout(renderMathJax, 200);
+    }
+    
+    function createPageHTML(pageNum, content, questionCount, topMargin, rightMargin, bottomMargin, leftMargin, fontSize, lineHeight, showPageNumbers) {
+        // Page header content - ONLY FOR FIRST PAGE
+        let pageHeader = '';
+        if (pageNum === 1) {
+            pageHeader = `
+            <div id="outSetLine"></div>
+            <div class="header"><h1 id="outH1"></h1><h2 id="outH2"></h2></div>
+            <div id="outClassLine" class="header-info"></div>
+            <div id="outSubjectLine" class="header-info" style="margin-bottom:8px;"></div>
+            <div class="marks-info"><span id="outTime"></span><span id="outMarks"></span></div>
+            <div id="outInst" class="instruction"></div>`;
+        }
+        
+        // ✅ মার্জিন সেট করুন: প্রথম পাতা স্লাইডার থেকে, ২য় পাতা ফিক্সড ১০mm
+        const pagePadding = pageNum === 1 
+            ? `${topMargin}mm ${rightMargin}mm ${bottomMargin}mm ${leftMargin}mm`  // প্রথম পাতা
+            : `10mm ${rightMargin}mm ${bottomMargin}mm ${leftMargin}mm`; // ২য়, ৩য়, ... পাতা
+        
+        // Page footer with page number
+        let pageFooter = '';
+        if (showPageNumbers) {
+            pageFooter = `<div class="page-number" style="font-size: 12px !important;">পৃষ্ঠা ${pageNum}/${totalOutputPages}</div>`;
+        }
+        
+        return `
+        <div id="output-page-${pageNum}" class="output-page ${pageNum === outputCurrentPage ? 'active' : ''}" 
+             style="font-size: ${fontSize}px !important; padding: ${pagePadding} !important;">
+            ${pageHeader}
+            <div class="question-container" style="
+                column-count: ${document.getElementById('colCount').value}; 
+                font-size: ${fontSize}px !important; 
+                line-height: ${lineHeight} !important; 
+                column-gap: 35px;
+                margin-top: ${pageNum === 1 ? '15px' : '0'};
+            ">
+                ${content}
+            </div>
+            ${pageFooter}
+            ${pageNum < totalOutputPages ? '<div class="print-page-break" style="font-size: 12px !important;">--- পেজ ব্রেক ---</div>' : ''}
+        </div>`;
+    }
+    
+    // ==================== END RENDER OUTPUT PAGES ====================
+    
+    function updateHeaders() {
+        document.getElementById('outH1').innerText = document.getElementById('h1').value;
+        document.getElementById('outH2').innerText = document.getElementById('h2').value;
+        document.getElementById('outClassLine').innerText = document.getElementById('hClass').value ? "শ্রেণি: " + document.getElementById('hClass').value : "";
+        document.getElementById('outSubjectLine').innerText = document.getElementById('h3').value ? "বিষয়: " + document.getElementById('h3').value : "";
+        document.getElementById('outTime').innerText = document.getElementById('hTime').value ? "সময়: " + document.getElementById('hTime').value : "";
+        document.getElementById('outMarks').innerText = document.getElementById('hMarks').value ? "পূর্ণমান: " + document.getElementById('hMarks').value : "";
+        document.getElementById('outInst').innerText = document.getElementById('hInst').value;
+        const setVal = document.getElementById('hSet').value, outSet = document.getElementById('outSetLine');
+        if(setVal) { outSet.innerText = "সেট: " + setVal; outSet.style.display = "block"; } else { outSet.style.display = "none"; }
+        document.getElementById('outH1').style.fontSize = document.getElementById('fsH1').value + "px";
+        document.getElementById('outH2').style.fontSize = document.getElementById('fsH2').value + "px";
+        document.getElementById('outClassLine').style.fontSize = document.getElementById('fsH3').value + "px";
+        document.getElementById('outSubjectLine').style.fontSize = document.getElementById('fsH3').value + "px";
+        document.getElementById('outInst').style.fontSize = document.getElementById('fsH4').value + "px";
+    }
+    
+    function processMathInText(text) {
+        if (!text) return '';
+        
+        // প্রথমে সব বোল্ড ট্যাগ সরিয়ে ফেলুন
+        let processed = text.replace(/<b>/gi, '').replace(/<\/b>/gi, '');
+        processed = processed.replace(/<strong>/gi, '').replace(/<\/strong>/gi, '');
+        
+        processed = processed.replace(/\n/g, '<br>');
+        
+        processed = processed.replace(/\$\$(.*?)\$\$/g, function(match, equation) {
+            return `<div class="equation-container">\\[${equation}\\]</div>`;
+        });
+        
+        processed = processed.replace(/\$(.*?)\$/g, '\\($1\\)');
+        
+        processed = processed.replace(/\\\[/g, '\\[').replace(/\\\]/g, '\\]');
+        
+        if (text.includes('ক:') || text.includes('খ:') || text.includes('গ:') || text.includes('ঘ:')) {
+            processed = processed.replace(/(ক|খ|গ|ঘ):/g, '<div class="mcq-option-equation"><span>$1:</span> ');
+            processed = processed + '</div>';
+        }
+        
+        return processed;
+    }
+    
+    function renderMathJax() {
+        if (window.MathJax && window.MathJax.typesetPromise) {
+            MathJax.typesetPromise().catch(err => console.log('MathJax typeset error:', err));
+        } else if (window.MathJax && window.MathJax.Hub) {
+            MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+        }
+    }
+    
+    function formatNum(n) { 
+        return document.getElementById('qLang').value === 'bn' ? 
+            n.toString().split('').map(d => '০১২৩৪৫৬৭৮৯'[d] || d).join('') : n; 
+    }
+    
+    function sync() {
+        document.getElementById('ansSheetArea').style.display = document.getElementById('showAnsKey').checked ? "block" : "none";
+        
+        setTimeout(() => {
+            renderOutputPages();
+        }, 100);
+        saveData();
+    }
+    
+    function saveData() {
+        const d = { 
+            sets: [document.getElementById('h1').value, document.getElementById('h2').value, document.getElementById('hClass').value, document.getElementById('h3').value, document.getElementById('hTime').value, document.getElementById('hMarks').value, document.getElementById('hInst').value, document.getElementById('targetCount').value, document.getElementById('hSet').value],
+            hSizes: [document.getElementById('fsH1').value, document.getElementById('fsH2').value, document.getElementById('fsH3').value, document.getElementById('fsH4').value],
+            margins: [document.getElementById('mTop').value, document.getElementById('mBottom').value, document.getElementById('mLeft').value, document.getElementById('mRight').value],
+            fSize: document.getElementById('fSize').value, 
+            lHeight: document.getElementById('lHeight').value, 
+            cols: document.getElementById('colCount').value, 
+            lang: document.getElementById('qLang').value, 
+            qs: questionBank,
+            restrictedList: document.getElementById('lockBox').value,
+            selectionPerPage: document.getElementById('selectionPerPage').value,
+            outputPerPage: document.getElementById('outputPerPage').value,
+            showPageNumbers: document.getElementById('showPageNumbers').checked,
+            showOutputPagination: document.getElementById('showOutputPagination').checked,
+            qGap: document.getElementById('qGapSlider').value,
+            monthlyExamName: document.getElementById('monthlyExamName').value
+        };
+        localStorage.setItem(DB_KEY, JSON.stringify(d));
+    }
+    
+    function loadData() {
+        const d = JSON.parse(localStorage.getItem(DB_KEY) || '{}');
+        if(d.qs) {
+            document.getElementById('h1').value = d.sets[0] || "শেরখালী সরকারি মহিলা কলেজ"; 
+            document.getElementById('h2').value = d.sets[1] || "বার্ষিক পরীক্ষা-২০২৬"; 
+            document.getElementById('hClass').value = d.sets[2] || "";
+            document.getElementById('h3').value = d.sets[3] || "";
+            document.getElementById('targetCount').value = d.sets[7] || 10; 
+            document.getElementById('hSet').value = d.sets[8] || "";
+            document.getElementById('fsH1').value = d.hSizes[0] || 20;
+            document.getElementById('fsH2').value = d.hSizes[1] || 16;
+            document.getElementById('fsH3').value = d.hSizes[2] || 13;
+            document.getElementById('fsH4').value = d.hSizes[3] || 13;
+            document.getElementById('lockBox').value = d.restrictedList || "";
+            questionBank = d.qs;
+            
+            // Load monthly exam name
+            if (d.monthlyExamName) {
+                document.getElementById('monthlyExamName').value = d.monthlyExamName;
+            }
+            
+            // Load margin values
+            if (d.margins && d.margins.length >= 4) {
+                document.getElementById('mTop').value = d.margins[0] || '12';
+                document.getElementById('mBottom').value = d.margins[1] || '12';
+                document.getElementById('mLeft').value = d.margins[2] || '15';
+                document.getElementById('mRight').value = d.margins[3] || '15';
+            }
+            
+            if (d.selectionPerPage) {
+                document.getElementById('selectionPerPage').value = d.selectionPerPage;
+            }
+            if (d.outputPerPage) {
+                document.getElementById('outputPerPage').value = d.outputPerPage;
+            }
+            if (d.showPageNumbers !== undefined) {
+                document.getElementById('showPageNumbers').checked = d.showPageNumbers;
+            }
+            if (d.showOutputPagination !== undefined) {
+                document.getElementById('showOutputPagination').checked = d.showOutputPagination;
+            }
+            
+            if (d.qGap) {
+                document.getElementById('qGapSlider').value = d.qGap;
+            }
+            
+            // Update slider value displays
+            updateSliderValue('fsH1', document.getElementById('fsH1').value + 'px');
+            updateSliderValue('fsH2', document.getElementById('fsH2').value + 'px');
+            updateSliderValue('fsH3', document.getElementById('fsH3').value + 'px');
+            updateSliderValue('fsH4', document.getElementById('fsH4').value + 'px');
+            updateSliderValue('qGapSlider', document.getElementById('qGapSlider').value + 'px');
+            updateSliderValue('fSize', document.getElementById('fSize').value + 'px');
+            updateSliderValue('lHeight', document.getElementById('lHeight').value);
+            updateSliderValue('mTop', document.getElementById('mTop').value + 'mm');
+            updateSliderValue('mBottom', document.getElementById('mBottom').value + 'mm');
+            updateSliderValue('mLeft', document.getElementById('mLeft').value + 'mm');
+            updateSliderValue('mRight', document.getElementById('mRight').value + 'mm');
+        }
+        
+        updateSubFilter(); 
+        updateChapterFilter(); 
+        updateQuestionCount();
+        sync(); 
+        renderSelectionList();
+    }
+    
+    // ==================== SELECTION LIST FUNCTIONS ====================
+
+    function renderSelectionList() {
+        document.getElementById('selectionList').style.textAlign = 'left';
+        
+        const isAdmin = document.getElementById('adminToggle').checked;
+        const subF = document.getElementById('fSub').value;
+        const classF = document.getElementById('fClass').value;
+        const divF = document.getElementById('fDiv').value;
+        const typeF = document.getElementById('fType').value;
+        const chapF = document.getElementById('fChap').value;
+        
+        let filtered = questionBank.map((q, i) => ({...q, originalIndex: i})).filter(q => {
+            return (!subF || q.sub === subF) && 
+                   (!classF || q.qClass === classF) && 
+                   (!divF || q.qDiv === divF) && 
+                   (!typeF || q.type === typeF) &&
+                   (!chapF || q.chap === chapF);
+        });
+        
+        const chapterGroups = {};
+        filtered.forEach(q => {
+            const chapter = q.chap || 'অধ্যায়হীন';
+            if (!chapterGroups[chapter]) {
+                chapterGroups[chapter] = [];
+            }
+            chapterGroups[chapter].push(q);
+        });
+        
+        selectionPerPage = parseInt(document.getElementById('selectionPerPage').value) || 10;
+        totalSelectionPages = Math.ceil(filtered.length / selectionPerPage);
+        if (totalSelectionPages < 1) totalSelectionPages = 1;
+        if (selectionCurrentPage > totalSelectionPages) selectionCurrentPage = totalSelectionPages;
+        
+        const startIndex = (selectionCurrentPage - 1) * selectionPerPage;
+        const endIndex = startIndex + selectionPerPage;
+        const pagedQuestions = filtered.slice(startIndex, endIndex);
+        
+        const chapterCounters = {};
+        
+        // বাংলা সংখ্যা কনভার্টার ফাংশন
+        function toBengaliNumber(num) {
+            if (!num && num !== 0) return '';
+            const bengaliDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+            return num.toString().replace(/\d/g, function(match) {
+                return bengaliDigits[match];
+            });
+        }
+        
+        let outputHTML = '';
+        let currentChapter = null;
+        
+        pagedQuestions.forEach((q, localIndex) => {
+            const chapter = q.chap || 'অধ্যায়হীন';
+            
+            if (chapter !== currentChapter) {
+                currentChapter = chapter;
+                
+                const totalInChapter = filtered.filter(item => item.chap === chapter).length;
+                const bengaliTotal = toBengaliNumber(totalInChapter);
+                
+                outputHTML += `
+                    <div class="chapter-header">
+                        <div style="text-align: left;">
+                            <strong>📚 ${chapter}</strong>
+                            <small style="display: block;">মোট প্রশ্ন: ${bengaliTotal}টি</small>
+                        </div>
+                        <div style="text-align: left;">
+                            <small>${q.sub} | ${q.type === 'cq' ? 'সৃজনশীল' : q.type === 'mcq' ? 'MCQ' : 'সাধারণ'}</small>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            chapterCounters[chapter] = (chapterCounters[chapter] || 0) + 1;
+            const chapterSerialNumber = chapterCounters[chapter];
+            const bengaliSerial = toBengaliNumber(chapterSerialNumber);
+            
+            let optHtml = "";
+            if (q.type !== 'normal') {
+                const options = [
+                    { label: 'ক', value: q.a || '-' },
+                    { label: 'খ', value: q.b || '-' },
+                    { label: 'গ', value: q.c || '-' },
+                    { label: 'ঘ', value: q.d || '-' }
+                ];
+                
+                optHtml = `
+                    <div class="q-card-options">
+                        ${options.map(opt => `
+                            <div style="text-align: left; padding-left: 0; margin-bottom: 8px; display: flex; align-items: flex-start; flex-direction: column;">
+                                <div style="display: flex; align-items: flex-start; width: 100%;">
+                                    <b style="margin-right: 8px; flex-shrink: 0;">${opt.label}:</b>
+                                    <div style="flex: 1; text-align: left;">${processMathInText(opt.value)}</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>`;
+            }
+            
+            outputHTML += `
+            <div class="q-card" onclick="toggleQ(${q.originalIndex})" style="border-left: ${q.selected ? '6px solid var(--primary)' : '1px solid #eee'}">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div class="chapter-serial-circle">
+                            ${bengaliSerial}
+                        </div>
+                        <div style="text-align: left; font-size: 12px; color: #555;">
+                            <span style="font-weight: bold;">${q.sub}</span> 
+                            ${q.qClass ? `| ${q.qClass}` : ''}
+                        </div>
+                    </div>
+                    ${q.board ? `<div class="board-tag" style="color: #d32f2f; font-weight: bold; font-size: 11px; background: #ffebee; padding: 2px 8px; border-radius: 3px; border: 1px solid #ffcdd2;">${q.board}</div>` : ''}
+                </div>
+                
+                <div class="q-card-body" style="text-align: left; padding-left: 0; margin-left: 0; padding-right: 0;">
+                    <div style="display: flex; align-items: flex-start; gap: 4px; text-align: left;">
+                        <b style="flex-shrink: 0;">${bengaliSerial}.</b>
+                        <div style="text-align: left; width: 100%;">${processMathInText(q.body)}</div>
+                    </div>
+                </div>
+                ${optHtml}
+                
+                <div style="margin-top:10px; display: ${isAdmin ? 'flex' : 'none'}; gap: 5px; text-align: left;">
+                    <button class="btn-mini" style="background:#1976d2; flex:1;" onclick="editQuestion(${q.originalIndex}, event)">📝 Edit</button>
+                    <button class="btn-mini" style="background:#d32f2f; flex:1;" onclick="deleteQuestion(${q.originalIndex}, event)">🗑️ Delete</button>
+                </div>
+            </div>`;
+        });
+        
+        if (outputHTML === '') {
+            outputHTML = '<p style="text-align:center; color:#666; padding:20px;">কোন প্রশ্ন পাওয়া যায়নি।</p>';
+        }
+        
+        document.getElementById('selectionList').innerHTML = outputHTML;
+        
+        updateSelectionPagination();
+        
+        sync();
+        renderOutputPages();
+        updateCounter();
+        
+        setTimeout(renderMathJax, 100);
+    }
+    
+    function updateSelectionPagination() {
+        const paginationDiv = document.getElementById('selectionPagination');
+        if (totalSelectionPages > 1) {
+            paginationDiv.style.display = 'flex';
+        } else {
+            paginationDiv.style.display = 'none';
+        }
+        
+        document.getElementById('selectionPageInfo').innerText = `পেজ ${selectionCurrentPage}/${totalSelectionPages}`;
+        document.getElementById('selectionPrevBtn').disabled = selectionCurrentPage === 1;
+        document.getElementById('selectionNextBtn').disabled = selectionCurrentPage === totalSelectionPages;
+    }
+    
+    function changeSelectionPage(delta) {
+        selectionCurrentPage += delta;
+        if (selectionCurrentPage < 1) selectionCurrentPage = 1;
+        if (selectionCurrentPage > totalSelectionPages) selectionCurrentPage = totalSelectionPages;
+        
+        renderSelectionList();
+    }
+    
+    function toggleQ(i) { 
+        questionBank[i].selected = !questionBank[i].selected; 
+        saveData(); 
+        renderSelectionList();
+    }
+    
+    // ==================== COUNTER FUNCTIONS ====================
+    
+    function updateCounter() {
+        const selected = questionBank.filter(q => q.selected).length;
+        const target = parseInt(document.getElementById('targetCount').value) || 0;
+        document.getElementById('liveCount').innerText = selected;
+        let percent = target > 0 ? (selected / target) * 100 : 0;
+        const bar = document.getElementById('fillBar');
+        const status = document.getElementById('counterStatus');
+        bar.style.width = (percent > 100 ? 100 : percent) + "%";
+        if(selected < target) { 
+            status.innerText = `আরও ${target - selected}টি প্রশ্ন লাগবে`; 
+            bar.style.background = "#ffeb3b"; 
+        } 
+        else if(selected == target) { 
+            status.innerText = "✅ লক্ষ্য পূরণ হয়েছে!"; 
+            bar.style.background = "#4caf50"; 
+        } 
+        else { 
+            status.innerText = `⚠️ ${selected - target}টি প্রশ্ন বেশি!`; 
+            bar.style.background = "#f44336"; 
+        }
+    }
+    
+    // ==================== QUESTION BANK FUNCTIONS ====================
+    
+    function addQuestion() {
+        const editIdx = parseInt(document.getElementById('editIndex').value);
+        const q = getQuestionFromForm();
+        
+        if(editIdx > -1) { 
+            q.selected = questionBank[editIdx].selected;
+            questionBank[editIdx] = q; 
+            cancelEdit(); 
+        }
+        
+        saveData(); 
+        updateSubFilter(); 
+        updateChapterFilter(); 
+        updateQuestionCount();
+        selectionCurrentPage = 1;
+        renderSelectionList(); 
+        alert("সংরক্ষিত হয়েছে!");
+    }
+    
+    function getQuestionFromForm() {
+        return { 
+            sub: document.getElementById('qSub').value.trim(), 
+            qClass: document.getElementById('qClassInput').value,
+            qDiv: document.getElementById('qDivInput').value,
+            chap: document.getElementById('qChap').value.trim(), 
+            type: document.getElementById('qType').value, 
+            body: document.getElementById('qBody').value.trim(), 
+            ans: document.getElementById('qAns').value.trim(), 
+            board: document.getElementById('qBoard').value.trim(), 
+            a: document.getElementById('qA').value.trim(), 
+            b: document.getElementById('qB').value.trim(), 
+            c: document.getElementById('qC').value.trim(), 
+            d: document.getElementById('qD').value.trim(), 
+            img: currentImgData, 
+            selected: false,
+            showOptions: document.getElementById('showOptionsToggle').checked
+        };
+    }
+    
+    function editQuestion(idx, e) {
+        e.stopPropagation();
+        const q = questionBank[idx];
+        document.getElementById('editIndex').value = idx;
+        document.getElementById('qSub').value = q.sub;
+        document.getElementById('qClassInput').value = q.qClass || "";
+        document.getElementById('qDivInput').value = q.qDiv || "";
+        document.getElementById('qChap').value = q.chap || "";
+        document.getElementById('qType').value = q.type;
+        document.getElementById('qBody').value = q.body;
+        document.getElementById('qA').value = q.a || "";
+        document.getElementById('qB').value = q.b || "";
+        document.getElementById('qC').value = q.c || "";
+        document.getElementById('qD').value = q.d || "";
+        document.getElementById('qAns').value = q.ans || "";
+        document.getElementById('qBoard').value = q.board || "";
+        document.getElementById('showOptionsToggle').checked = q.showOptions !== false;
+        currentImgData = q.img || "";
+        document.getElementById('imgPreview').innerHTML = currentImgData ? `<img src="${currentImgData}" style="width:100px;">` : "";
+        
+        toggleFields();
+        document.getElementById('saveBtn').innerText = "আপডেট করুন";
+        document.getElementById('cancelBtn').style.display = "block";
+        openTab('bank');
+    }
+    
+    function deleteQuestion(idx, e) {
+        e.stopPropagation();
+        if(confirm("আপনি কি নিশ্চিতভাবে এই প্রশ্নটি মুছে ফেলতে চান?")) {
+            questionBank.splice(idx, 1);
+            saveData(); 
+            updateSubFilter(); 
+            updateChapterFilter(); 
+            updateQuestionCount();
+            selectionCurrentPage = 1;
+            renderSelectionList();
+        }
+    }
+    
+    function cancelEdit() {
+        document.getElementById('editIndex').value = "-1";
+        document.getElementById('saveBtn').innerText = "সংরক্ষণ করুন";
+        document.getElementById('cancelBtn').style.display = "none";
+        document.querySelectorAll('#bank input, #bank textarea, #bank select').forEach(i => i.value = "");
+        document.getElementById('imgPreview').innerHTML = "";
+        currentImgData = "";
+        document.getElementById('duplicateStatus').style.display = 'none';
+        document.getElementById('saveBtn').style.background = 'var(--primary)';
+    }
+    
+    // ==================== FILTER FUNCTIONS ====================
+    
+    function updateSubFilter() {
+        const fSub = document.getElementById('fSub');
+        const lockText = document.getElementById('lockBox').value.trim();
+        const isAdmin = document.getElementById('adminToggle').checked;
+        let subs = [...new Set(questionBank.map(q => q.sub))];
+        if (lockText !== "" && !isAdmin) {
+            let allowed = lockText.split(',').map(s => s.trim().toLowerCase());
+            subs = subs.filter(s => allowed.includes(s.toLowerCase()));
+        }
+        fSub.innerHTML = '<option value="">সব বিষয়</option>' + subs.map(s => `<option value="${s}">${s}</option>`).join('');
+    }
+    
+    function updateChapterFilter() {
+        const subF = document.getElementById('fSub').value;
+        const fChap = document.getElementById('fChap');
+        let chapters = [];
+        if(subF) {
+            chapters = [...new Set(questionBank.filter(q => q.sub === subF).map(q => q.chap))];
+        } else {
+            chapters = [...new Set(questionBank.map(q => q.chap))];
+        }
+        fChap.innerHTML = '<option value="">সব অধ্যায়</option>' + chapters.filter(c => c).map(c => `<option value="${c}">${c}</option>`).join('');
+    }
+    
+    function updateQuestionCount() {
+        document.getElementById('totalQuestionCount').textContent = questionBank.length;
+    }
+    
+    // ==================== ADMIN FUNCTIONS ====================
+    
+    function toggleAdmin() {
+        const cb = document.getElementById('adminToggle');
+        if (cb.checked) { 
+            if (prompt("পাসওয়ার্ড:") === "1234") { 
+                document.getElementById('sidebarMain').classList.add('admin-active'); 
+                document.getElementById('currentModeDisplay').innerText = "এডমিন"; 
+            } else cb.checked = false; 
+        }
+        else { 
+            document.getElementById('sidebarMain').classList.remove('admin-active'); 
+            document.getElementById('currentModeDisplay').innerText = "সাধারণ"; 
+        }
+        updateSubFilter(); 
+        renderSelectionList();
+    }
+    
+    function toggleFields() { 
+        const type = document.getElementById('qType').value; 
+        document.getElementById('extraFields').style.display = (type === 'normal') ? 'none' : 'block'; 
+        document.getElementById('showOptionsLabel').style.display = (type === 'normal') ? 'none' : 'flex'; 
+    }
+    
+    // ==================== IMAGE FUNCTIONS ====================
+    
+    function handleImage(e) { 
+        const file = e.target.files[0]; 
+        if (!file) return; 
+        const reader = new FileReader(); 
+        reader.onload = function(ev) { 
+            document.getElementById('cropImage').src = ev.target.result; 
+            document.getElementById('cropperModal').style.display = 'block'; 
+            if (cropper) cropper.destroy(); 
+            setTimeout(() => { 
+                cropper = new Cropper(document.getElementById('cropImage'), { autoCropArea: 1, viewMode: 1 }); 
+            }, 100); 
+        }; 
+        reader.readAsDataURL(file); 
+    }
+    
+    function finishCrop() { 
+        currentImgData = cropper.getCroppedCanvas({ maxWidth: 800 }).toDataURL('image/jpeg', 0.7); 
+        document.getElementById('imgPreview').innerHTML = `<img src="${currentImgData}" style="width:100px;">`; 
+        closeCropper(); 
+    }
+    
+    function closeCropper() { 
+        document.getElementById('cropperModal').style.display = 'none'; 
+    }
+    
+    // ==================== UTILITY FUNCTIONS ====================
+    
+    function shuffleSelectedQuestions() {
+        let selected = questionBank.filter(q => q.selected);
+        let others = questionBank.filter(q => !q.selected);
+        for (let i = selected.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [selected[i], selected[j]] = [selected[j], selected[i]];
+        }
+        questionBank = [...selected, ...others];
+        saveData(); 
+        renderSelectionList();
+    }
+    
+    function exportJSON() { 
+        const a = document.createElement('a'); 
+        a.href = URL.createObjectURL(new Blob([localStorage.getItem(DB_KEY)], {type: "application/json"})); 
+        a.download = "BCTI_Backup.json"; 
+        a.click(); 
+    }
+    
+    function importJSON(e) { 
+        const r = new FileReader(); 
+        r.onload = (ev) => { 
+            const importedData = JSON.parse(ev.target.result);
+            
+            if (!importedData.qs || !Array.isArray(importedData.qs)) {
+                alert("ফাইল ফর্ম্যাট সঠিক নয়!");
+                return;
+            }
+            
+            let newQuestions = importedData.qs;
+            let duplicates = 0;
+            let added = 0;
+            const seen = new Set();
+            
+            // প্রথমে বিদ্যমান প্রশ্নগুলোর জন্য seen সেট তৈরি করুন
+            questionBank.forEach(q => {
+                const normalizedBody = normalizeText(q.body);
+                const questionKey = `${q.sub}|${q.chap}|${normalizedBody}`;
+                seen.add(questionKey);
+            });
+            
+            // প্রতিটি ইম্পোর্টেড প্রশ্ন চেক করুন
+            newQuestions.forEach(newQ => {
+                const normalizedBody = normalizeText(newQ.body);
+                const questionKey = `${newQ.sub}|${newQ.chap}|${normalizedBody}`;
+                
+                if (seen.has(questionKey)) {
+                    duplicates++;
+                } else {
+                    seen.add(questionKey);
+                    questionBank.push(newQ);
+                    added++;
+                }
+            });
+            
+            if (duplicates > 0) {
+                alert(`${added}টি নতুন প্রশ্ন যোগ হয়েছে। ${duplicates}টি ডুপ্লিকেট প্রশ্ন বাদ দেওয়া হয়েছে।`);
+            } else {
+                alert(`${added}টি নতুন প্রশ্ন সফলভাবে ইম্পোর্ট হয়েছে।`);
+            }
+            
+            saveData();
+            updateQuestionCount();
+            location.reload();
+        }; 
+        r.readAsText(e.target.files[0]); 
+    }
+    
+    function openTab(id) { 
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active')); 
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); 
+        document.getElementById(id).classList.add('active'); 
+        if(event) event.currentTarget.classList.add('active'); 
+    }
+    
+    // ==================== DUPLICATE FUNCTIONS ====================
+    
+    function normalizeText(text) {
+        if (!text) return '';
+        return text
+            .trim()
+            .toLowerCase()
+            .replace(/\s+/g, ' ') // একাধিক স্পেসকে একটি স্পেসে
+            .replace(/[^\w\u0980-\u09FF\s$\(\)\[\]\{\}\+\-\*\/=<>!@#%^&|~`]/g, '') // বিশেষ ক্যারেক্টার সরানো
+            .replace(/\n/g, ' ') // নতুন লাইনকে স্পেসে
+            .replace(/\./g, '') // ডট সরানো
+            .replace(/,/g, '') // কমা সরানো
+            .replace(/;/g, '') // সেমিকোলন সরানো
+            .replace(/:/g, '') // কোলন সরানো
+            .replace(/\?/g, ''); // প্রশ্নবোধক চিহ্ন সরানো
+    }
+    
+    function addQuestionWithDuplicateCheck() {
+        const editIdx = parseInt(document.getElementById('editIndex').value);
+        
+        // এডিট মোডে থাকলে সরাসরি সংরক্ষণ করুন
+        if (editIdx > -1) {
+            addQuestion();
+            return;
+        }
+        
+        const newQuestion = getQuestionFromForm();
+        
+        // ভ্যালিডেশন চেক
+        if (!newQuestion.sub || !newQuestion.body) {
+            alert("বিষয় এবং প্রশ্ন ফিল্ড অবশ্যই পূরণ করতে হবে!");
+            return;
+        }
+        
+        // ডুপ্লিকেট চেক
+        const duplicateInfo = findExactDuplicate(newQuestion);
+        
+        if (duplicateInfo.found && duplicateInfo.confidence >= 90) {
+            // ডুপ্লিকেট পাওয়া গেছে - ওয়ার্নিং শো করুন
+            showDuplicateWarning(duplicateInfo, newQuestion, function(shouldSave) {
+                if (shouldSave) {
+                    // তবুও সংরক্ষণ করতে চাইলে
+                    questionBank.push(newQuestion);
+                    saveData();
+                    updateSubFilter();
+                    updateChapterFilter();
+                    updateQuestionCount();
+                    selectionCurrentPage = 1;
+                    renderSelectionList();
+                    alert("প্রশ্ন সংরক্ষিত হয়েছে (ডুপ্লিকেট থাকা সত্ত্বেও)।");
+                    clearForm();
+                }
+            });
+        } else {
+            // ডুপ্লিকেট না থাকলে সরাসরি সংরক্ষণ করুন
+            questionBank.push(newQuestion);
+            saveData();
+            updateSubFilter();
+            updateChapterFilter();
+            updateQuestionCount();
+            selectionCurrentPage = 1;
+            renderSelectionList();
+            alert("প্রশ্ন সংরক্ষিত হয়েছে।");
+            clearForm();
+        }
+    }
+    
+    function findExactDuplicate(newQuestion) {
+        const newBodyNormalized = normalizeText(newQuestion.body);
+        
+        for (let i = 0; i < questionBank.length; i++) {
+            const existing = questionBank[i];
+            const existingBodyNormalized = normalizeText(existing.body);
+            
+            // 1. প্রথমে টেক্সট হুবহু মিলছে কিনা চেক
+            if (newBodyNormalized === existingBodyNormalized && newBodyNormalized !== '') {
+                return {
+                    found: true,
+                    type: 'exact_text',
+                    question: existing,
+                    index: i,
+                    confidence: 100
+                };
+            }
+            
+            // 2. MCQ/CQ প্রশ্নের জন্য অপশনগুলোও চেক
+            if (newQuestion.type === 'mcq' || newQuestion.type === 'cq') {
+                if (existing.type === newQuestion.type) {
+                    // অপশনগুলোর টেক্সট চেক
+                    const newANormalized = normalizeText(newQuestion.a);
+                    const newBNormalized = normalizeText(newQuestion.b);
+                    const newCNormalized = normalizeText(newQuestion.c);
+                    const newDNormalized = normalizeText(newQuestion.d);
+                    
+                    const existingANormalized = normalizeText(existing.a);
+                    const existingBNormalized = normalizeText(existing.b);
+                    const existingCNormalized = normalizeText(existing.c);
+                    const existingDNormalized = normalizeText(existing.d);
+                    
+                    // সব অপশন মিললে
+                    if (newANormalized === existingANormalized &&
+                        newBNormalized === existingBNormalized &&
+                        newCNormalized === existingCNormalized &&
+                        newDNormalized === existingDNormalized &&
+                        newBodyNormalized === existingBodyNormalized) {
+                        return {
+                            found: true,
+                            type: 'exact_mcq',
+                            question: existing,
+                            index: i,
+                            confidence: 100
+                        };
+                    }
+                }
+            }
+            
+            // 3. 90%+ মিল খোঁজা (সম্ভাব্য ডুপ্লিকেট)
+            if (newBodyNormalized.length > 20 && existingBodyNormalized.length > 20) {
+                const similarity = calculateSimilarity(newBodyNormalized, existingBodyNormalized);
+                if (similarity > 90) {
+                    return {
+                        found: true,
+                        type: 'similar',
+                        question: existing,
+                        index: i,
+                        confidence: similarity
+                    };
+                }
+            }
+        }
+        
+        return { found: false, type: 'none', question: null, index: -1, confidence: 0 };
+    }
+    
+    function calculateSimilarity(str1, str2) {
+        if (str1 === str2) return 100;
+        
+        const longer = str1.length > str2.length ? str1 : str2;
+        const shorter = str1.length > str2.length ? str2 : str1;
+        
+        if (longer.length === 0) return 100;
+        
+        // সহজ সিমিলারিটি ক্যালকুলেশন
+        let matches = 0;
+        for (let i = 0; i < shorter.length; i++) {
+            if (longer.includes(shorter[i])) {
+                matches++;
+            }
+        }
+        
+        return Math.round((matches / longer.length) * 100);
+    }
+    
+    function showDuplicateWarning(duplicateInfo, newQuestion, callback) {
+        const modal = document.getElementById('duplicateWarningModal');
+        const content = document.getElementById('duplicateWarningContent');
+        
+        let warningHTML = `
+            <div class="duplicate-warning">
+                <h4>⚠️ ডুপ্লিকেট প্রশ্ন পাওয়া গেছে!</h4>
+                
+                <div class="duplicate-warning-content">
+                    <p><strong>নতুন প্রশ্ন:</strong></p>
+                    <p>${newQuestion.body.substring(0, 150)}${newQuestion.body.length > 150 ? '...' : ''}</p>
+                    
+                    <p style="margin-top:10px;"><strong>বিদ্যমান প্রশ্ন (#${duplicateInfo.index + 1}):</strong></p>
+                    <p>${duplicateInfo.question.body.substring(0, 150)}${duplicateInfo.question.body.length > 150 ? '...' : ''}</p>
+                    
+                    <p style="margin-top:10px; color:#d32f2f;">
+                        <strong>মিলের হার:</strong> ${duplicateInfo.confidence}%<br>
+                        <strong>ধরন:</strong> ${duplicateInfo.type === 'exact_text' ? 'হুবহু টেক্সট মিল' : 
+                                             duplicateInfo.type === 'exact_mcq' ? 'হুবহু MCQ মিল' : 'অনুরূপ প্রশ্ন'}
+                    </p>
+                </div>
+                
+                <div class="duplicate-buttons">
+                    <button onclick="hideDuplicateWarning(); callback(false)" style="background:#4caf50; color:white;">
+                        বাতিল করুন (সংরক্ষণ করবেন না)
+                    </button>
+                    <button onclick="hideDuplicateWarning(); callback(true)" style="background:#f44336; color:white;">
+                        তবুও সংরক্ষণ করুন
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        content.innerHTML = warningHTML;
+        modal.style.display = 'block';
+    }
+    
+    function hideDuplicateWarning() {
+        document.getElementById('duplicateWarningModal').style.display = 'none';
+    }
+    
+    function checkDuplicateWhileTyping() {
+        const duplicateStatus = document.getElementById('duplicateStatus');
+        const question = getQuestionFromForm();
+        
+        if (!question.body || question.body.trim().length < 10) {
+            duplicateStatus.style.display = 'none';
+            return;
+        }
+        
+        const duplicateInfo = findExactDuplicate(question);
+        
+        if (duplicateInfo.found) {
+            duplicateStatus.style.display = 'block';
+            if (duplicateInfo.confidence === 100) {
+                duplicateStatus.innerHTML = `
+                    <div style="background:#ffebee; color:#c62828; padding:8px; border-radius:4px; border:1px solid #ef9a9a;">
+                        ⚠️ <strong>হুবহু মিলছে!</strong> এই প্রশ্নটি ইতিমধ্যে ডাটাবেসে আছে (#${duplicateInfo.index + 1})।
+                    </div>
+                `;
+                document.getElementById('saveBtn').style.background = '#f44336';
+            } else if (duplicateInfo.confidence >= 90) {
+                duplicateStatus.innerHTML = `
+                    <div style="background:#fff3e0; color:#e65100; padding:8px; border-radius:4px; border:1px solid #ffcc80;">
+                        ⚠️ <strong>অনুরূপ প্রশ্ন!</strong> ${duplicateInfo.confidence}% মিলছে বিদ্যমান প্রশ্নের সাথে (#${duplicateInfo.index + 1})।
+                    </div>
+                `;
+                document.getElementById('saveBtn').style.background = '#ff9800';
+            }
+        } else {
+            duplicateStatus.style.display = 'none';
+            document.getElementById('saveBtn').style.background = 'var(--primary)';
+        }
+    }
+    
+    function findAndShowAllDuplicates() {
+        const duplicates = [];
+        const seen = new Set();
+        
+        for (let i = 0; i < questionBank.length; i++) {
+            for (let j = i + 1; j < questionBank.length; j++) {
+                const q1 = questionBank[i];
+                const q2 = questionBank[j];
+                
+                const q1Normalized = normalizeText(q1.body);
+                const q2Normalized = normalizeText(q2.body);
+                
+                // হুবহু মিল খোঁজা
+                if (q1Normalized === q2Normalized && q1Normalized !== '') {
+                    const pairId = `${Math.min(i, j)}-${Math.max(i, j)}`;
+                    if (!seen.has(pairId)) {
+                        seen.add(pairId);
+                        duplicates.push({
+                            index1: i,
+                            question1: q1,
+                            index2: j,
+                            question2: q2,
+                            type: 'exact'
+                        });
+                    }
+                }
+            }
+        }
+        
+        if (duplicates.length === 0) {
+            alert("কোন ডুপ্লিকেট প্রশ্ন পাওয়া যায়নি।");
+            return;
+        }
+        
+        let message = `মোট ${duplicates.length} জোড়া ডুপ্লিকেট প্রশ্ন পাওয়া গেছে:\n\n`;
+        
+        duplicates.forEach((dup, idx) => {
+            message += `${idx + 1}. প্রশ্ন #${dup.index1 + 1} এবং প্রশ্ন #${dup.index2 + 1}\n`;
+            message += `   বিষয়: ${dup.question1.sub} | অধ্যায়: ${dup.question1.chap}\n`;
+            message += `   প্রশ্ন: ${dup.question1.body.substring(0, 80)}...\n\n`;
+        });
+        
+        message += "\nসব ডুপ্লিকেট মুছে ফেলতে 'সব ডুপ্লিকেট মুছুন' বাটনে ক্লিক করুন।";
+        
+        if (confirm(`${duplicates.length} জোড়া ডুপ্লিকেট পাওয়া গেছে। বিস্তারিত দেখতে OK চাপুন।`)) {
+            alert(message);
+        }
+    }
+    
+    function removeAllDuplicates() {
+        if (!confirm("আপনি কি নিশ্চিতভাবে সব ডুপ্লিকেট প্রশ্ন মুছে ফেলতে চান?\n\nশুধু একটি কপি রাখা হবে।")) {
+            return;
+        }
+        
+        const uniqueQuestions = [];
+        const seen = new Set();
+        let removedCount = 0;
+        
+        questionBank.forEach((q, index) => {
+            const normalizedBody = normalizeText(q.body);
+            const questionKey = `${q.sub}|${q.chap}|${normalizedBody}`;
+            
+            if (!seen.has(questionKey)) {
+                seen.add(questionKey);
+                uniqueQuestions.push(q);
+            } else {
+                removedCount++;
+            }
+        });
+        
+        questionBank = uniqueQuestions;
+        saveData();
+        updateSubFilter();
+        updateChapterFilter();
+        updateQuestionCount();
+        renderSelectionList();
+        
+        alert(`${removedCount}টি ডুপ্লিকেট প্রশ্ন মুছে ফেলা হয়েছে। ${uniqueQuestions.length}টি অনন্য প্রশ্ন রেখে দেওয়া হয়েছে।`);
+    }
+    
+    function clearForm() {
+        document.getElementById('qSub').value = '';
+        document.getElementById('qChap').value = '';
+        document.getElementById('qBody').value = '';
+        document.getElementById('qAns').value = '';
+        document.getElementById('qBoard').value = '';
+        document.getElementById('qA').value = '';
+        document.getElementById('qB').value = '';
+        document.getElementById('qC').value = '';
+        document.getElementById('qD').value = '';
+        document.getElementById('imgPreview').innerHTML = '';
+        currentImgData = '';
+        document.getElementById('duplicateStatus').style.display = 'none';
+        document.getElementById('saveBtn').style.background = 'var(--primary)';
+    }
+    
+    // ==================== OUTPUT PAGINATION FUNCTIONS ====================
+    
+    function updateOutputPagination() {
+        const selected = questionBank.filter(q => q.selected).length;
+        totalOutputPages = Math.max(1, totalOutputPages);
+        
+        document.getElementById('outputPageInfo').innerText = `পেজ ${outputCurrentPage}/${totalOutputPages}`;
+        document.getElementById('totalOutputPagesDisplay').innerText = totalOutputPages;
+        document.getElementById('jumpToOutputPage').value = outputCurrentPage;
+        document.getElementById('jumpToOutputPage').max = totalOutputPages;
+        
+        document.getElementById('outputPrevBtn').disabled = outputCurrentPage === 1;
+        document.getElementById('outputNextBtn').disabled = outputCurrentPage === totalOutputPages;
+        
+        toggleOutputPagination();
+    }
+    
+    function changeOutputPage(delta) {
+        const newPage = outputCurrentPage + delta;
+        if (newPage < 1 || newPage > totalOutputPages) return;
+        
+        document.querySelectorAll('.output-page').forEach(page => {
+            page.classList.remove('active');
+        });
+        
+        outputCurrentPage = newPage;
+        document.getElementById(`output-page-${outputCurrentPage}`).classList.add('active');
+        
+        updateOutputPagination();
+        document.querySelector('.preview-area').scrollTop = 0;
+    }
+    
+    function jumpToOutputPage() {
+        const pageInput = document.getElementById('jumpToOutputPage');
+        let pageNum = parseInt(pageInput.value);
+        
+        if (isNaN(pageNum) || pageNum < 1) pageNum = 1;
+        if (pageNum > totalOutputPages) pageNum = totalOutputPages;
+        
+        document.querySelectorAll('.output-page').forEach(page => {
+            page.classList.remove('active');
+        });
+        
+        outputCurrentPage = pageNum;
+        document.getElementById(`output-page-${outputCurrentPage}`).classList.add('active');
+        
+        updateOutputPagination();
+        document.querySelector('.preview-area').scrollTop = 0;
+    }
+    
+    function toggleOutputPagination() {
+        const showPagination = document.getElementById('showOutputPagination').checked;
+        const selected = questionBank.filter(q => q.selected).length;
+        
+        if (showPagination && totalOutputPages > 1) {
+            document.getElementById('outputPagination').style.display = 'flex';
+        } else {
+            document.getElementById('outputPagination').style.display = 'none';
+        }
+    }
+    
+    function updateSliderValue(sliderId, value) {
+        const valueElement = document.getElementById(sliderId + 'Value');
+        if (valueElement) {
+            valueElement.textContent = value;
+        }
+    }
+    
+    // ==================== MONTHLY EXAM FUNCTIONS ====================
+    
+    function loadSubjectsForMonthly() {
+        const classFilter = document.getElementById('monthlyClass').value;
+        const divisionFilter = document.getElementById('monthlyDivision').value;
+        const questionsPerSubject = parseInt(document.getElementById('questionsPerSubject').value) || 2;
+        
+        // Filter questions by class and division
+        let filteredQuestions = questionBank;
+        if (classFilter) {
+            filteredQuestions = filteredQuestions.filter(q => q.qClass === classFilter);
+        }
+        if (divisionFilter) {
+            filteredQuestions = filteredQuestions.filter(q => q.qDiv === divisionFilter);
+        }
+        
+        // Get unique subjects
+        const subjects = [...new Set(filteredQuestions.map(q => q.sub))];
+        
+        let container = document.getElementById('monthlySubjectsContainer');
+        if (subjects.length === 0) {
+            container.innerHTML = '<div style="text-align:center; color:#666; padding:20px;">এই শ্রেণি/বিভাগে কোন প্রশ্ন পাওয়া যায়নি।</div>';
+            document.getElementById('monthlyStats').style.display = 'none';
+            return;
+        }
+        
+        let html = '';
+        subjects.forEach(subject => {
+            // Get questions for this subject
+            const subjectQuestions = filteredQuestions.filter(q => q.sub === subject);
+            
+            html += `
+                <div class="subject-group">
+                    <div class="subject-group-header">
+                        <h4>📚 ${subject}</h4>
+                        <span style="font-size:12px; color:#666;">মোট: ${subjectQuestions.length}টি</span>
+                    </div>
+                    <div class="questions-list" id="subject-${subject.replace(/\s+/g, '-')}">
+            `;
+            
+            // Display questions for this subject
+            subjectQuestions.forEach((q, index) => {
+                const isSelected = monthlySelectedQuestions.has(subject) && 
+                                  monthlySelectedQuestions.get(subject).includes(index);
+                html += `
+                    <div class="question-item ${isSelected ? 'selected' : ''}" onclick="toggleMonthlyQuestion('${subject}', ${index})">
+                        <input type="checkbox" class="question-checkbox" ${isSelected ? 'checked' : ''}>
+                        <div class="question-preview">
+                            <strong>${q.type === 'cq' ? 'সৃজনশীল' : q.type === 'mcq' ? 'MCQ' : 'সাধারণ'}</strong>: 
+                            ${q.body.substring(0, 60)}${q.body.length > 60 ? '...' : ''}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += `
+                    </div>
+                    <div style="margin-top:10px; display:flex; gap:5px;">
+                        <button onclick="selectRandomFromSubject('${subject}', ${questionsPerSubject})" style="flex:1; background:#2196f3; color:white; border:none; padding:6px; border-radius:4px; cursor:pointer; font-size:12px;">
+                            🎲 ${questionsPerSubject}টি র‍্যান্ডম সিলেক্ট
+                        </button>
+                        <button onclick="deselectAllFromSubject('${subject}')" style="flex:1; background:#f44336; color:white; border:none; padding:6px; border-radius:4px; cursor:pointer; font-size:12px;">
+                            ❌ সব ডিসেলেক্ট
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+        
+        container.innerHTML = html;
+        updateMonthlyStats();
+        document.getElementById('monthlyStats').style.display = 'block';
+    }
+    
+    function toggleMonthlyQuestion(subject, questionIndex) {
+        if (!monthlySelectedQuestions.has(subject)) {
+            monthlySelectedQuestions.set(subject, []);
+        }
+        
+        const subjectQuestions = monthlySelectedQuestions.get(subject);
+        const indexInArray = subjectQuestions.indexOf(questionIndex);
+        
+        if (indexInArray === -1) {
+            // Add question
+            subjectQuestions.push(questionIndex);
+        } else {
+            // Remove question
+            subjectQuestions.splice(indexInArray, 1);
+        }
+        
+        // Update UI
+        const questionElement = document.querySelector(`#subject-${subject.replace(/\s+/g, '-')} .question-item:nth-child(${questionIndex + 1})`);
+        if (questionElement) {
+            questionElement.classList.toggle('selected');
+            const checkbox = questionElement.querySelector('.question-checkbox');
+            if (checkbox) {
+                checkbox.checked = !checkbox.checked;
+            }
+        }
+        
+        updateMonthlyStats();
+    }
+    
+    function selectRandomFromSubject(subject, count) {
+        const classFilter = document.getElementById('monthlyClass').value;
+        const divisionFilter = document.getElementById('monthlyDivision').value;
+        
+        // Get questions for this subject
+        let filteredQuestions = questionBank.filter(q => q.sub === subject);
+        if (classFilter) {
+            filteredQuestions = filteredQuestions.filter(q => q.qClass === classFilter);
+        }
+        if (divisionFilter) {
+            filteredQuestions = filteredQuestions.filter(q => q.qDiv === divisionFilter);
+        }
+        
+        if (filteredQuestions.length === 0) return;
+        
+        // Clear previous selections for this subject
+        monthlySelectedQuestions.set(subject, []);
+        
+        // Select random questions
+        const selectedIndices = [];
+        const availableIndices = Array.from({length: filteredQuestions.length}, (_, i) => i);
+        
+        count = Math.min(count, filteredQuestions.length);
+        
+        for (let i = 0; i < count; i++) {
+            if (availableIndices.length === 0) break;
+            
+            const randomIndex = Math.floor(Math.random() * availableIndices.length);
+            const selectedIndex = availableIndices[randomIndex];
+            
+            selectedIndices.push(selectedIndex);
+            monthlySelectedQuestions.get(subject).push(selectedIndex);
+            
+            availableIndices.splice(randomIndex, 1);
+        }
+        
+        // Update UI
+        loadSubjectsForMonthly();
+        updateMonthlyStats();
+    }
+    
+    function deselectAllFromSubject(subject) {
+        if (monthlySelectedQuestions.has(subject)) {
+            monthlySelectedQuestions.set(subject, []);
+            loadSubjectsForMonthly();
+            updateMonthlyStats();
+        }
+    }
+    
+    function updateMonthlyStats() {
+        let totalSelected = 0;
+        monthlySelectedQuestions.forEach((indices, subject) => {
+            totalSelected += indices.length;
+        });
+        
+        document.getElementById('monthlyTotalSelected').textContent = totalSelected;
+        document.getElementById('monthlyStats').style.display = totalSelected > 0 ? 'block' : 'none';
+    }
+    
+    function clearMonthlySelection() {
+        if (confirm("মাসিক পরীক্ষার সব সিলেকশন ক্লিয়ার করতে চান?")) {
+            monthlySelectedQuestions.clear();
+            loadSubjectsForMonthly();
+            updateMonthlyStats();
+        }
+    }
+    
+    function generateMonthlyExam() {
+        const examName = document.getElementById('monthlyExamName').value || "মাসিক পরীক্ষা";
+        const classFilter = document.getElementById('monthlyClass').value;
+        const divisionFilter = document.getElementById('monthlyDivision').value;
+        
+        // Clear all existing selections
+        questionBank.forEach(q => q.selected = false);
+        
+        // Add selected questions from monthly exam
+        let selectedCount = 0;
+        monthlySelectedQuestions.forEach((indices, subject) => {
+            // Get questions for this subject
+            let subjectQuestions = questionBank.filter(q => q.sub === subject);
+            if (classFilter) {
+                subjectQuestions = subjectQuestions.filter(q => q.qClass === classFilter);
+            }
+            if (divisionFilter) {
+                subjectQuestions = subjectQuestions.filter(q => q.qDiv === divisionFilter);
+            }
+            
+            // Select the chosen indices
+            indices.forEach(index => {
+                if (index < subjectQuestions.length) {
+                    const question = subjectQuestions[index];
+                    const originalIndex = questionBank.findIndex(q => q === question);
+                    if (originalIndex !== -1) {
+                        questionBank[originalIndex].selected = true;
+                        selectedCount++;
+                    }
+                }
+            });
+        });
+        
+        if (selectedCount === 0) {
+            alert("কোন প্রশ্ন সিলেক্ট করা হয়নি। প্রথমে প্রশ্ন সিলেক্ট করুন।");
+            return;
+        }
+        
+        // Update exam name in settings
+        document.getElementById('h2').value = examName;
+        
+        // Update class in settings if selected
+        if (classFilter) {
+            document.getElementById('hClass').value = classFilter;
+        }
+        
+        // Update subject line to show it's a monthly exam
+        let subjectsList = Array.from(monthlySelectedQuestions.keys()).join(', ');
+        document.getElementById('h3').value = `বিষয়সমূহ: ${subjectsList}`;
+        
+        // Save and update UI
+        saveData();
+        renderSelectionList();
+        openTab('select');
+        
+        alert(`✅ মাসিক পরীক্ষা তৈরি করা হয়েছে! ${selectedCount}টি প্রশ্ন সিলেক্ট করা হয়েছে।\n\nএখন প্রিন্ট/PDF তৈরি করতে পারেন।`);
+    }
+    
+    // ==================== AUTO GENERATOR FUNCTIONS ====================
     
     function autoSelectRandom() { 
         let count = parseInt(document.getElementById('randomCount').value);
@@ -1451,1044 +3208,6 @@
         alert(`✅ ${deselectedCount}টি প্রশ্ন র‍্যান্ডমভাবে ডিসেলেক্ট করা হয়েছে!`);
     }
     
-    // ==================== END IMPROVED AUTO GENERATOR FUNCTIONS ====================
-    
-    // ==================== SEARCH SYSTEM ====================
-    
-    function initializeSearchBox() {
-        const filterGroup = document.getElementById('filterGroup');
-        if (filterGroup && !document.getElementById('simpleSearchBox')) {
-            console.log("Initializing search box...");
-            
-            const searchHTML = `
-                <div id="searchContainer" style="margin-bottom:15px;">
-                    <div style="display:flex; gap:5px; margin-bottom:8px;">
-                        <input type="text" id="simpleSearchBox" placeholder="🔍 প্রশ্ন বা বিষয় সার্চ করুন..." 
-                               style="flex:1; padding:10px; border:1px solid #ccc; border-radius:5px; font-size:13px;"
-                               oninput="performSearch()">
-                        <button onclick="clearSearch()" style="background:#f44336; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer; font-weight:bold;">✖</button>
-                    </div>
-                    
-                    <div id="searchNavigationPanel" style="display:none; background:#e3f2fd; padding:10px; border-radius:5px; margin-top:10px; border:1px solid #bbdefb;">
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                            <strong style="color:var(--primary); font-size:13px;">🔍 সার্চ রেজাল্ট</strong>
-                            <button onclick="closeSearchPanel()" style="background:none; border:none; color:#666; cursor:pointer; font-size:12px;">✖</button>
-                        </div>
-                        
-                        <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
-                            <button onclick="prevSearchResult()" id="prevSearchBtn" 
-                                    style="background:var(--primary); color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-size:12px; flex:1;">
-                                ← পূর্বের
-                            </button>
-                            
-                            <div id="searchCounter" style="font-weight:bold; color:var(--primary); font-size:14px; text-align:center; min-width:80px;">
-                                ০/০
-                            </div>
-                            
-                            <button onclick="nextSearchResult()" id="nextSearchBtn"
-                                    style="background:var(--primary); color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-size:12px; flex:1;">
-                                পরের →
-                            </button>
-                        </div>
-                        
-                        <div id="searchResultInfo" style="font-size:12px; color:#555;">
-                            কোন তথ্য পাওয়া যায়নি
-                        </div>
-                    </div>
-                    <div id="searchStats" style="font-size:11px; color:#666; margin-top:5px; display:none;"></div>
-                </div>
-            `;
-            
-            // Insert at the beginning of filterGroup
-            filterGroup.insertAdjacentHTML('afterbegin', searchHTML);
-            console.log("Search box initialized successfully!");
-        }
-    }
-    
-    function performSearch() {
-        const searchInput = document.getElementById('simpleSearchBox');
-        if (!searchInput) return;
-        
-        searchTerm = searchInput.value.trim().toLowerCase();
-        
-        if (searchTerm === '') {
-            clearSearchResults();
-            return;
-        }
-        
-        console.log("Searching for:", searchTerm);
-        
-        // Filter questions based on search term
-        searchResults = [];
-        
-        questionBank.forEach((q, index) => {
-            let matchScore = 0;
-            
-            // Check in various fields
-            if (q.body && q.body.toLowerCase().includes(searchTerm)) matchScore += 10;
-            if (q.sub && q.sub.toLowerCase().includes(searchTerm)) matchScore += 5;
-            if (q.chap && q.chap.toLowerCase().includes(searchTerm)) matchScore += 3;
-            if (q.board && q.board.toLowerCase().includes(searchTerm)) matchScore += 2;
-            if (q.ans && q.ans.toLowerCase().includes(searchTerm)) matchScore += 1;
-            
-            // Check in MCQ options
-            if (q.type === 'mcq' || q.type === 'cq') {
-                if (q.a && q.a.toLowerCase().includes(searchTerm)) matchScore += 2;
-                if (q.b && q.b.toLowerCase().includes(searchTerm)) matchScore += 2;
-                if (q.c && q.c.toLowerCase().includes(searchTerm)) matchScore += 2;
-                if (q.d && q.d.toLowerCase().includes(searchTerm)) matchScore += 2;
-            }
-            
-            if (matchScore > 0) {
-                searchResults.push({
-                    index: index,
-                    question: q,
-                    score: matchScore
-                });
-            }
-        });
-        
-        // Sort by score
-        searchResults.sort((a, b) => b.score - a.score);
-        
-        if (searchResults.length > 0) {
-            currentSearchIndex = 0;
-            showSearchPanel();
-            highlightSearchResult(currentSearchIndex);
-            updateSearchPanel();
-            
-            // Update stats
-            document.getElementById('searchStats').innerHTML = `
-                <span style="color:#2e7d32;">✅ ${searchResults.length}টি প্রশ্ন পাওয়া গেছে</span>
-            `;
-            document.getElementById('searchStats').style.display = 'block';
-        } else {
-            showNoResults();
-            document.getElementById('searchStats').innerHTML = `
-                <span style="color:#d32f2f;">❌ কোন প্রশ্ন পাওয়া যায়নি</span>
-            `;
-            document.getElementById('searchStats').style.display = 'block';
-        }
-        
-        // Re-render list to show search highlights
-        renderSelectionList();
-    }
-    
-    function clearSearch() {
-        const searchInput = document.getElementById('simpleSearchBox');
-        if (searchInput) {
-            searchInput.value = '';
-        }
-        clearSearchResults();
-    }
-    
-    function clearSearchResults() {
-        searchResults = [];
-        currentSearchIndex = 0;
-        searchTerm = '';
-        
-        const searchPanel = document.getElementById('searchNavigationPanel');
-        if (searchPanel) {
-            searchPanel.style.display = 'none';
-        }
-        
-        const searchStats = document.getElementById('searchStats');
-        if (searchStats) {
-            searchStats.style.display = 'none';
-        }
-        
-        // Remove highlights
-        document.querySelectorAll('.q-card').forEach(card => {
-            card.classList.remove('search-navigation-active');
-            // Remove search badges
-            const badge = card.querySelector('.search-result-badge');
-            if (badge) {
-                badge.remove();
-            }
-        });
-        
-        // Re-render list
-        renderSelectionList();
-    }
-    
-    function showSearchPanel() {
-        const searchPanel = document.getElementById('searchNavigationPanel');
-        if (searchPanel) {
-            searchPanel.style.display = 'block';
-        }
-    }
-    
-    function closeSearchPanel() {
-        const searchPanel = document.getElementById('searchNavigationPanel');
-        if (searchPanel) {
-            searchPanel.style.display = 'none';
-        }
-    }
-    
-    function showNoResults() {
-        const searchPanel = document.getElementById('searchNavigationPanel');
-        if (searchPanel) {
-            searchPanel.style.display = 'block';
-        }
-        
-        const counter = document.getElementById('searchCounter');
-        const info = document.getElementById('searchResultInfo');
-        const prevBtn = document.getElementById('prevSearchBtn');
-        const nextBtn = document.getElementById('nextSearchBtn');
-        
-        if (counter) counter.textContent = "০/০";
-        if (info) info.innerHTML = `<span style="color:#d32f2f;">❌ কোন প্রশ্ন পাওয়া যায়নি</span>`;
-        if (prevBtn) prevBtn.disabled = true;
-        if (nextBtn) nextBtn.disabled = true;
-    }
-    
-    function updateSearchPanel() {
-        if (searchResults.length === 0) {
-            showNoResults();
-            return;
-        }
-        
-        const currentResult = searchResults[currentSearchIndex];
-        const question = currentResult.question;
-        
-        // Update counter
-        const counter = document.getElementById('searchCounter');
-        if (counter) {
-            counter.textContent = `${currentSearchIndex + 1}/${searchResults.length}`;
-        }
-        
-        // Update buttons
-        const prevBtn = document.getElementById('prevSearchBtn');
-        const nextBtn = document.getElementById('nextSearchBtn');
-        if (prevBtn) prevBtn.disabled = currentSearchIndex === 0;
-        if (nextBtn) nextBtn.disabled = currentSearchIndex === searchResults.length - 1;
-        
-        // Update info
-        const info = document.getElementById('searchResultInfo');
-        if (info) {
-            info.innerHTML = `
-                <strong>প্রশ্ন #${currentResult.index + 1}</strong><br>
-                <small>বিষয়: ${question.sub} | অধ্যায়: ${question.chap || 'নাই'}</small><br>
-                <small>ধরন: ${question.type === 'cq' ? 'সৃজনশীল' : question.type === 'mcq' ? 'MCQ' : 'সাধারণ'}</small>
-            `;
-        }
-    }
-    
-    function prevSearchResult() {
-        if (currentSearchIndex > 0) {
-            currentSearchIndex--;
-            highlightSearchResult(currentSearchIndex);
-            updateSearchPanel();
-        }
-    }
-    
-    function nextSearchResult() {
-        if (currentSearchIndex < searchResults.length - 1) {
-            currentSearchIndex++;
-            highlightSearchResult(currentSearchIndex);
-            updateSearchPanel();
-        }
-    }
-    
-    function highlightSearchResult(resultIndex) {
-        if (!searchResults[resultIndex]) return;
-        
-        const result = searchResults[resultIndex];
-        const questionIndex = result.index;
-        
-        // Calculate which page contains this question
-        const questionsPerPage = selectionPerPage;
-        const pageNumber = Math.floor(questionIndex / questionsPerPage) + 1;
-        
-        // Navigate to the page if needed
-        if (pageNumber !== selectionCurrentPage) {
-            selectionCurrentPage = pageNumber;
-            renderSelectionList();
-        }
-        
-        // Wait for rendering and then highlight
-        setTimeout(() => {
-            // Remove previous highlights
-            document.querySelectorAll('.q-card').forEach(card => {
-                card.classList.remove('search-navigation-active');
-            });
-            
-            // Find the question card
-            const localIndex = questionIndex % questionsPerPage;
-            const qCards = document.querySelectorAll('.q-card');
-            
-            if (qCards[localIndex]) {
-                // Add highlight
-                qCards[localIndex].classList.add('search-navigation-active');
-                
-                // Scroll to the question
-                qCards[localIndex].scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'center'
-                });
-            }
-            
-            // Update panel
-            updateSearchPanel();
-        }, 300);
-    }
-    
-    // Modified renderSelectionList to show search badges
-    const originalRenderSelectionList = renderSelectionList;
-    renderSelectionList = function() {
-        originalRenderSelectionList.call(this);
-        
-        // Add search result badges
-        if (searchResults.length > 0) {
-            const qCards = document.querySelectorAll('.q-card');
-            qCards.forEach((card, index) => {
-                const questionIndex = (selectionCurrentPage - 1) * selectionPerPage + index;
-                
-                // Check if this question is in search results
-                const isInSearchResults = searchResults.some(result => result.index === questionIndex);
-                const isCurrentResult = searchResults[currentSearchIndex] && 
-                                        searchResults[currentSearchIndex].index === questionIndex;
-                
-                if (isInSearchResults) {
-                    // Add search badge if not already present
-                    if (!card.querySelector('.search-result-badge')) {
-                        const badge = document.createElement('div');
-                        badge.className = 'search-result-badge';
-                        badge.innerHTML = '🔍';
-                        card.style.position = 'relative';
-                        card.appendChild(badge);
-                    }
-                    
-                    // Highlight current result
-                    if (isCurrentResult) {
-                        card.classList.add('search-navigation-active');
-                    }
-                } else {
-                    // Remove badge if exists
-                    const badge = card.querySelector('.search-result-badge');
-                    if (badge) {
-                        badge.remove();
-                    }
-                }
-            });
-        } else {
-            // Remove all badges if no search results
-            document.querySelectorAll('.search-result-badge').forEach(badge => {
-                badge.remove();
-            });
-        }
-    };
-    
-    // ==================== END SEARCH SYSTEM ====================
-    
-    // ==================== TEMPORARY EDIT FUNCTIONS ====================
-    
-    function openTemporaryEditor() {
-        const selectedQuestions = questionBank.filter(q => q.selected);
-        if (selectedQuestions.length === 0) {
-            alert("প্রথমে অন্তত একটি প্রশ্ন সিলেক্ট করুন!");
-            return;
-        }
-        
-        let editorHTML = `
-            <div id="temporaryEditorModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:10001; display:flex; justify-content:center; align-items:center;">
-                <div style="background:white; width:90%; max-width:800px; height:80%; border-radius:10px; padding:20px; display:flex; flex-direction:column;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                        <h3 style="margin:0; color:var(--primary);">🖊️ টেম্পোরারি এডিটর</h3>
-                        <button onclick="closeTemporaryEditor()" style="background:#f44336; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer; font-weight:bold;">✖ বন্ধ করুন</button>
-                    </div>
-                    
-                    <div style="display:flex; gap:15px; flex:1; overflow:hidden;">
-                        <!-- Left: Question List -->
-                        <div style="width:40%; border-right:1px solid #ddd; padding-right:15px; overflow-y:auto;">
-                            <h4 style="margin-top:0; color:#555;">সিলেক্টেড প্রশ্ন (${selectedQuestions.length}টি)</h4>
-                            <div id="tempEditQuestionList" style="display:flex; flex-direction:column; gap:8px;">
-                                ${selectedQuestions.map((q, index) => `
-                                    <div class="temp-edit-q-item" onclick="loadQuestionForEditing(${index})" 
-                                         style="padding:10px; border:1px solid #ddd; border-radius:5px; cursor:pointer; background:#f9f9f9;"
-                                         id="tempQItem${index}">
-                                        <strong style="color:var(--primary);">${index + 1}. ${q.sub}</strong>
-                                        <div style="font-size:12px; color:#666; margin-top:3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
-                                            ${q.body.substring(0, 50)}${q.body.length > 50 ? '...' : ''}
-                                        </div>
-                                        <div style="font-size:11px; color:#888; margin-top:5px;">
-                                            ${temporaryEdits.has(index) ? '<span style="color:#4caf50;">✓ এডিট করা</span>' : '<span style="color:#999;">এডিট করা হয়নি</span>'}
-                                        </div>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                        
-                        <!-- Right: Editor -->
-                        <div style="width:60%; display:flex; flex-direction:column;">
-                            <div id="tempEditCurrentQuestionInfo" style="background:#e3f2fd; padding:10px; border-radius:5px; margin-bottom:10px;">
-                                <strong>প্রশ্ন #1</strong> এডিট করুন
-                            </div>
-                            
-                            <div style="flex:1; overflow-y:auto; margin-bottom:15px;">
-                                <div class="input-group">
-                                    <label>প্রশ্নের টেক্সট</label>
-                                    <textarea id="tempEditQuestionBody" rows="6" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:5px;" placeholder="প্রশ্নের টেক্সট এডিট করুন..."></textarea>
-                                </div>
-                                
-                                <div id="tempEditOptionsSection" style="display:none;">
-                                    <h4 style="margin-top:15px; margin-bottom:10px;">MCQ অপশনসমূহ</h4>
-                                    <div class="input-group">
-                                        <label>ক</label>
-                                        <input type="text" id="tempEditOptionA" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:5px;">
-                                    </div>
-                                    <div class="input-group">
-                                        <label>খ</label>
-                                        <input type="text" id="tempEditOptionB" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:5px;">
-                                    </div>
-                                    <div class="input-group">
-                                        <label>গ</label>
-                                        <input type="text" id="tempEditOptionC" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:5px;">
-                                    </div>
-                                    <div class="input-group">
-                                        <label>ঘ</label>
-                                        <input type="text" id="tempEditOptionD" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:5px;">
-                                    </div>
-                                </div>
-                                
-                                <div class="input-group">
-                                    <label>উত্তর (যদি পরিবর্তন করতে চান)</label>
-                                    <input type="text" id="tempEditAnswer" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:5px;" placeholder="সঠিক উত্তর...">
-                                </div>
-                            </div>
-                            
-                            <div style="display:flex; gap:10px;">
-                                <button onclick="saveTemporaryEdit()" style="flex:1; background:var(--primary); color:white; border:none; padding:12px; border-radius:5px; cursor:pointer; font-weight:bold;">💾 এডিট সংরক্ষণ করুন</button>
-                                <button onclick="resetTemporaryEdit()" style="flex:1; background:#ff9800; color:white; border:none; padding:12px; border-radius:5px; cursor:pointer; font-weight:bold;">🔄 মূল টেক্সটে ফিরুন</button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div style="margin-top:15px; padding-top:15px; border-top:1px solid #ddd; display:flex; justify-content:space-between;">
-                        <button onclick="applyTemporaryEditsToPreview()" style="background:#4caf50; color:white; border:none; padding:10px 20px; border-radius:5px; cursor:pointer; font-weight:bold;">👁️ প্রিভিউতে দেখুন</button>
-                        <button onclick="clearAllTemporaryEdits()" style="background:#f44336; color:white; border:none; padding:10px 20px; border-radius:5px; cursor:pointer; font-weight:bold;">🗑️ সব এডিট মুছুন</button>
-                        <button onclick="closeTemporaryEditorAndUpdate()" style="background:#2196f3; color:white; border:none; padding:10px 20px; border-radius:5px; cursor:pointer; font-weight:bold;">✅ সংরক্ষণ করুন ও প্রিন্ট করুন</button>
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        document.body.insertAdjacentHTML('beforeend', editorHTML);
-        loadQuestionForEditing(0);
-    }
-    
-    function closeTemporaryEditor() {
-        const editor = document.getElementById('temporaryEditorModal');
-        if (editor) editor.remove();
-    }
-    
-    function closeTemporaryEditorAndUpdate() {
-        renderOutputPages(); // Update preview with temporary edits
-        closeTemporaryEditor();
-        alert("টেম্পোরারি এডিট সংরক্ষিত হয়েছে! এখন প্রিন্ট করুন।");
-    }
-    
-    function loadQuestionForEditing(index) {
-        currentEditingIndex = index;
-        const selectedQuestions = questionBank.filter(q => q.selected);
-        const question = selectedQuestions[index];
-        
-        // Update question list highlight
-        document.querySelectorAll('.temp-edit-q-item').forEach(item => {
-            item.style.background = '#f9f9f9';
-            item.style.borderColor = '#ddd';
-        });
-        const currentItem = document.getElementById(`tempQItem${index}`);
-        if (currentItem) {
-            currentItem.style.background = '#e3f2fd';
-            currentItem.style.borderColor = 'var(--primary)';
-        }
-        
-        // Update info
-        document.getElementById('tempEditCurrentQuestionInfo').innerHTML = `
-            <strong>প্রশ্ন #${index + 1}</strong> - ${question.sub} (${question.type === 'cq' ? 'সৃজনশীল' : question.type === 'mcq' ? 'MCQ' : 'সাধারণ'})
-            <br><small style="color:#666;">${question.chap ? 'অধ্যায়: ' + question.chap : ''}</small>
-        `;
-        
-        // Load original or edited content
-        let editedContent = temporaryEdits.get(index);
-        
-        document.getElementById('tempEditQuestionBody').value = editedContent ? editedContent.body : question.body;
-        document.getElementById('tempEditAnswer').value = editedContent ? editedContent.ans : question.ans || '';
-        
-        // Handle MCQ options
-        const optionsSection = document.getElementById('tempEditOptionsSection');
-        if (question.type === 'mcq' || question.type === 'cq') {
-            optionsSection.style.display = 'block';
-            document.getElementById('tempEditOptionA').value = editedContent ? editedContent.a : question.a || '';
-            document.getElementById('tempEditOptionB').value = editedContent ? editedContent.b : question.b || '';
-            document.getElementById('tempEditOptionC').value = editedContent ? editedContent.c : question.c || '';
-            document.getElementById('tempEditOptionD').value = editedContent ? editedContent.d : question.d || '';
-        } else {
-            optionsSection.style.display = 'none';
-        }
-    }
-    
-    function saveTemporaryEdit() {
-        const selectedQuestions = questionBank.filter(q => q.selected);
-        const originalQuestion = selectedQuestions[currentEditingIndex];
-        
-        const editedQuestion = {
-            body: document.getElementById('tempEditQuestionBody').value.trim(),
-            ans: document.getElementById('tempEditAnswer').value.trim(),
-            a: originalQuestion.type === 'mcq' || originalQuestion.type === 'cq' ? 
-               document.getElementById('tempEditOptionA').value.trim() : '',
-            b: originalQuestion.type === 'mcq' || originalQuestion.type === 'cq' ? 
-               document.getElementById('tempEditOptionB').value.trim() : '',
-            c: originalQuestion.type === 'mcq' || originalQuestion.type === 'cq' ? 
-               document.getElementById('tempEditOptionC').value.trim() : '',
-            d: originalQuestion.type === 'mcq' || originalQuestion.type === 'cq' ? 
-               document.getElementById('tempEditOptionD').value.trim() : '',
-            type: originalQuestion.type,
-            sub: originalQuestion.sub,
-            chap: originalQuestion.chap,
-            originalIndex: currentEditingIndex
-        };
-        
-        // Save to temporary edits map
-        temporaryEdits.set(currentEditingIndex, editedQuestion);
-        
-        // Update UI
-        const itemElement = document.getElementById(`tempQItem${currentEditingIndex}`);
-        if (itemElement) {
-            itemElement.innerHTML = `
-                <strong style="color:var(--primary);">${currentEditingIndex + 1}. ${originalQuestion.sub}</strong>
-                <div style="font-size:12px; color:#666; margin-top:3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
-                    ${editedQuestion.body.substring(0, 50)}${editedQuestion.body.length > 50 ? '...' : ''}
-                </div>
-                <div style="font-size:11px; color:#4caf50; margin-top:5px;">
-                    ✓ এডিট করা হয়েছে
-                </div>
-            `;
-        }
-        
-        alert(`প্রশ্ন #${currentEditingIndex + 1} এর এডিট সংরক্ষিত হয়েছে (অস্থায়ীভাবে)।`);
-    }
-    
-    function resetTemporaryEdit() {
-        temporaryEdits.delete(currentEditingIndex);
-        loadQuestionForEditing(currentEditingIndex);
-        alert(`প্রশ্ন #${currentEditingIndex + 1} মূল টেক্সটে ফিরে গেছে।`);
-    }
-    
-    function clearAllTemporaryEdits() {
-        if (temporaryEdits.size > 0 && confirm("সব টেম্পোরারি এডিট মুছে ফেলতে চান?")) {
-            temporaryEdits.clear();
-            loadQuestionForEditing(currentEditingIndex);
-            alert("সব টেম্পোরারি এডিট মুছে ফেলা হয়েছে।");
-        }
-    }
-    
-    function applyTemporaryEditsToPreview() {
-        renderOutputPages(); // This will use temporary edits
-        alert("এডিট করা সংস্করণ প্রিভিউতে দেখানো হচ্ছে। প্রিন্ট করতে পারেন।");
-    }
-    
-    // Modified renderOutputPages function to use temporary edits
-    const originalRenderOutputPages = renderOutputPages;
-    renderOutputPages = function() {
-        const selected = questionBank.filter(q => q.selected);
-        
-        if (selected.length === 0) {
-            return originalRenderOutputPages.call(this);
-        }
-        
-        // If there are temporary edits, create a modified copy
-        let questionsToRender = selected;
-        if (temporaryEdits.size > 0) {
-            questionsToRender = selected.map((q, index) => {
-                if (temporaryEdits.has(index)) {
-                    const edit = temporaryEdits.get(index);
-                    return {
-                        ...q,
-                        body: edit.body,
-                        ans: edit.ans || q.ans,
-                        a: edit.a || q.a,
-                        b: edit.b || q.b,
-                        c: edit.c || q.c,
-                        d: edit.d || q.d
-                    };
-                }
-                return q;
-            });
-        }
-        
-        // Temporarily replace selected questions with modified version
-        const originalSelected = [...selected];
-        
-        // Call the original function but with modified questions
-        const tempQuestionBank = questionBank.map(q => {
-            const isSelected = q.selected;
-            if (isSelected) {
-                const selectedIndex = originalSelected.indexOf(q);
-                if (selectedIndex !== -1 && temporaryEdits.has(selectedIndex)) {
-                    const edit = temporaryEdits.get(selectedIndex);
-                    return {
-                        ...q,
-                        body: edit.body,
-                        ans: edit.ans || q.ans,
-                        a: edit.a || q.a,
-                        b: edit.b || q.b,
-                        c: edit.c || q.c,
-                        d: edit.d || q.d
-                    };
-                }
-            }
-            return q;
-        });
-        
-        // Save original questionBank and temporarily replace it
-        const originalQuestionBank = [...questionBank];
-        questionBank = tempQuestionBank;
-        
-        // Call original render function
-        originalRenderOutputPages.call(this);
-        
-        // Restore original questionBank
-        questionBank = originalQuestionBank;
-    };
-    
-    // Add temporary edit button to selection panel
-    function addTemporaryEditButton() {
-        const selectionPanel = document.getElementById('select');
-        const printButton = selectionPanel.querySelector('.btn-action[style*="background:#2e7d32"]');
-        
-        if (printButton && !document.getElementById('tempEditBtn')) {
-            const tempEditBtn = document.createElement('button');
-            tempEditBtn.id = 'tempEditBtn';
-            tempEditBtn.className = 'btn-action';
-            tempEditBtn.style.cssText = 'background:#ff9800; color:white; margin-top:10px;';
-            tempEditBtn.innerHTML = '🖊️ টেম্পোরারি এডিট';
-            tempEditBtn.onclick = openTemporaryEditor;
-            
-            printButton.parentNode.insertBefore(tempEditBtn, printButton);
-        }
-        
-        // Show the button
-        if (document.getElementById('tempEditBtn')) {
-            document.getElementById('tempEditBtn').style.display = 'block';
-        }
-    }
-    
-    // Initialize the button when page loads
-    setTimeout(addTemporaryEditButton, 1000);
-    
-    // ==================== DUPLICATE PREVENTION FUNCTIONS ====================
-    
-    // প্রশ্নের টেক্সট নরমালাইজ করার ফাংশন (স্পেস, কেস ইগনোর করার জন্য)
-    function normalizeText(text) {
-        if (!text) return '';
-        return text
-            .trim()
-            .toLowerCase()
-            .replace(/\s+/g, ' ') // একাধিক স্পেসকে একটি স্পেসে
-            .replace(/[^\w\u0980-\u09FF\s$\(\)\[\]\{\}\+\-\*\/=<>!@#%^&|~`]/g, '') // বিশেষ ক্যারেক্টার সরানো
-            .replace(/\n/g, ' ') // নতুন লাইনকে স্পেসে
-            .replace(/\./g, '') // ডট সরানো
-            .replace(/,/g, '') // কমা সরানো
-            .replace(/;/g, '') // সেমিকোলন সরানো
-            .replace(/:/g, '') // কোলন সরানো
-            .replace(/\?/g, ''); // প্রশ্নবোধক চিহ্ন সরানো
-    }
-    
-    // হুবহু মিল খোঁজার ফাংশন
-    function findExactDuplicate(newQuestion) {
-        const newBodyNormalized = normalizeText(newQuestion.body);
-        
-        for (let i = 0; i < questionBank.length; i++) {
-            const existing = questionBank[i];
-            const existingBodyNormalized = normalizeText(existing.body);
-            
-            // 1. প্রথমে টেক্সট হুবহু মিলছে কিনা চেক
-            if (newBodyNormalized === existingBodyNormalized && newBodyNormalized !== '') {
-                return {
-                    found: true,
-                    type: 'exact_text',
-                    question: existing,
-                    index: i,
-                    confidence: 100
-                };
-            }
-            
-            // 2. MCQ/CQ প্রশ্নের জন্য অপশনগুলোও চেক
-            if (newQuestion.type === 'mcq' || newQuestion.type === 'cq') {
-                if (existing.type === newQuestion.type) {
-                    // অপশনগুলোর টেক্সট চেক
-                    const newANormalized = normalizeText(newQuestion.a);
-                    const newBNormalized = normalizeText(newQuestion.b);
-                    const newCNormalized = normalizeText(newQuestion.c);
-                    const newDNormalized = normalizeText(newQuestion.d);
-                    
-                    const existingANormalized = normalizeText(existing.a);
-                    const existingBNormalized = normalizeText(existing.b);
-                    const existingCNormalized = normalizeText(existing.c);
-                    const existingDNormalized = normalizeText(existing.d);
-                    
-                    // সব অপশন মিললে
-                    if (newANormalized === existingANormalized &&
-                        newBNormalized === existingBNormalized &&
-                        newCNormalized === existingCNormalized &&
-                        newDNormalized === existingDNormalized &&
-                        newBodyNormalized === existingBodyNormalized) {
-                        return {
-                            found: true,
-                            type: 'exact_mcq',
-                            question: existing,
-                            index: i,
-                            confidence: 100
-                        };
-                    }
-                }
-            }
-            
-            // 3. 90%+ মিল খোঁজা (সম্ভাব্য ডুপ্লিকেট)
-            if (newBodyNormalized.length > 20 && existingBodyNormalized.length > 20) {
-                const similarity = calculateSimilarity(newBodyNormalized, existingBodyNormalized);
-                if (similarity > 90) {
-                    return {
-                        found: true,
-                        type: 'similar',
-                        question: existing,
-                        index: i,
-                        confidence: similarity
-                    };
-                }
-            }
-        }
-        
-        return { found: false, type: 'none', question: null, index: -1, confidence: 0 };
-    }
-    
-    // টেক্সট সিমিলারিটি ক্যালকুলেট করার ফাংশন
-    function calculateSimilarity(str1, str2) {
-        if (str1 === str2) return 100;
-        
-        const longer = str1.length > str2.length ? str1 : str2;
-        const shorter = str1.length > str2.length ? str2 : str1;
-        
-        if (longer.length === 0) return 100;
-        
-        // সহজ সিমিলারিটি ক্যালকুলেশন
-        let matches = 0;
-        for (let i = 0; i < shorter.length; i++) {
-            if (longer.includes(shorter[i])) {
-                matches++;
-            }
-        }
-        
-        return Math.round((matches / longer.length) * 100);
-    }
-    
-    // ডুপ্লিকেট ওয়ার্নিং শো করার ফাংশন
-    function showDuplicateWarning(duplicateInfo, newQuestion, callback) {
-        const modal = document.getElementById('duplicateWarningModal');
-        const content = document.getElementById('duplicateWarningContent');
-        
-        let warningHTML = `
-            <div class="duplicate-warning">
-                <h4>⚠️ ডুপ্লিকেট প্রশ্ন পাওয়া গেছে!</h4>
-                
-                <div class="duplicate-warning-content">
-                    <p><strong>নতুন প্রশ্ন:</strong></p>
-                    <p>${newQuestion.body.substring(0, 150)}${newQuestion.body.length > 150 ? '...' : ''}</p>
-                    
-                    <p style="margin-top:10px;"><strong>বিদ্যমান প্রশ্ন (#${duplicateInfo.index + 1}):</strong></p>
-                    <p>${duplicateInfo.question.body.substring(0, 150)}${duplicateInfo.question.body.length > 150 ? '...' : ''}</p>
-                    
-                    <p style="margin-top:10px; color:#d32f2f;">
-                        <strong>মিলের হার:</strong> ${duplicateInfo.confidence}%<br>
-                        <strong>ধরন:</strong> ${duplicateInfo.type === 'exact_text' ? 'হুবহু টেক্সট মিল' : 
-                                             duplicateInfo.type === 'exact_mcq' ? 'হুবহু MCQ মিল' : 'অনুরূপ প্রশ্ন'}
-                    </p>
-                </div>
-                
-                <div class="duplicate-buttons">
-                    <button onclick="hideDuplicateWarning(); callback(false)" style="background:#4caf50; color:white;">
-                        বাতিল করুন (সংরক্ষণ করবেন না)
-                    </button>
-                    <button onclick="hideDuplicateWarning(); callback(true)" style="background:#f44336; color:white;">
-                        তবুও সংরক্ষণ করুন
-                    </button>
-                </div>
-            </div>
-        `;
-        
-        content.innerHTML = warningHTML;
-        modal.style.display = 'block';
-    }
-    
-    function hideDuplicateWarning() {
-        document.getElementById('duplicateWarningModal').style.display = 'none';
-    }
-    
-    // ডুপ্লিকেট চেক করে সংরক্ষণের ফাংশন
-    function addQuestionWithDuplicateCheck() {
-        const editIdx = parseInt(document.getElementById('editIndex').value);
-        
-        // এডিট মোডে থাকলে সরাসরি সংরক্ষণ করুন
-        if (editIdx > -1) {
-            addQuestion();
-            return;
-        }
-        
-        const newQuestion = getQuestionFromForm();
-        
-        // ভ্যালিডেশন চেক
-        if (!newQuestion.sub || !newQuestion.body) {
-            alert("বিষয় এবং প্রশ্ন ফিল্ড অবশ্যই পূরণ করতে হবে!");
-            return;
-        }
-        
-        // ডুপ্লিকেট চেক
-        const duplicateInfo = findExactDuplicate(newQuestion);
-        
-        if (duplicateInfo.found && duplicateInfo.confidence >= 90) {
-            // ডুপ্লিকেট পাওয়া গেছে - ওয়ার্নিং শো করুন
-            showDuplicateWarning(duplicateInfo, newQuestion, function(shouldSave) {
-                if (shouldSave) {
-                    // তবুও সংরক্ষণ করতে চাইলে
-                    questionBank.push(newQuestion);
-                    saveData();
-                    updateSubFilter();
-                    updateChapterFilter();
-                    updateQuestionCount();
-                    selectionCurrentPage = 1;
-                    renderSelectionList();
-                    alert("প্রশ্ন সংরক্ষিত হয়েছে (ডুপ্লিকেট থাকা সত্ত্বেও)।");
-                    clearForm();
-                }
-            });
-        } else {
-            // ডুপ্লিকেট না থাকলে সরাসরি সংরক্ষণ করুন
-            questionBank.push(newQuestion);
-            saveData();
-            updateSubFilter();
-            updateChapterFilter();
-            updateQuestionCount();
-            selectionCurrentPage = 1;
-            renderSelectionList();
-            alert("প্রশ্ন সংরক্ষিত হয়েছে।");
-            clearForm();
-        }
-    }
-    
-    // ফর্ম থেকে প্রশ্ন ডেটা পাওয়ার ফাংশন
-    function getQuestionFromForm() {
-        return { 
-            sub: document.getElementById('qSub').value.trim(), 
-            qClass: document.getElementById('qClassInput').value,
-            qDiv: document.getElementById('qDivInput').value,
-            chap: document.getElementById('qChap').value.trim(), 
-            type: document.getElementById('qType').value, 
-            body: document.getElementById('qBody').value.trim(), 
-            ans: document.getElementById('qAns').value.trim(), 
-            board: document.getElementById('qBoard').value.trim(), 
-            a: document.getElementById('qA').value.trim(), 
-            b: document.getElementById('qB').value.trim(), 
-            c: document.getElementById('qC').value.trim(), 
-            d: document.getElementById('qD').value.trim(), 
-            img: currentImgData, 
-            selected: false,
-            showOptions: document.getElementById('showOptionsToggle').checked
-        };
-    }
-    
-    // ফর্ম ক্লিয়ার করার ফাংশন
-    function clearForm() {
-        document.getElementById('qSub').value = '';
-        document.getElementById('qChap').value = '';
-        document.getElementById('qBody').value = '';
-        document.getElementById('qAns').value = '';
-        document.getElementById('qBoard').value = '';
-        document.getElementById('qA').value = '';
-        document.getElementById('qB').value = '';
-        document.getElementById('qC').value = '';
-        document.getElementById('qD').value = '';
-        document.getElementById('imgPreview').innerHTML = '';
-        currentImgData = '';
-        document.getElementById('duplicateStatus').style.display = 'none';
-        document.getElementById('saveBtn').style.background = 'var(--primary)';
-    }
-    
-    // টাইপ করার সময় ডুপ্লিকেট চেক করার ফাংশন
-    function checkDuplicateWhileTyping() {
-        const duplicateStatus = document.getElementById('duplicateStatus');
-        const question = getQuestionFromForm();
-        
-        if (!question.body || question.body.trim().length < 10) {
-            duplicateStatus.style.display = 'none';
-            return;
-        }
-        
-        const duplicateInfo = findExactDuplicate(question);
-        
-        if (duplicateInfo.found) {
-            duplicateStatus.style.display = 'block';
-            if (duplicateInfo.confidence === 100) {
-                duplicateStatus.innerHTML = `
-                    <div style="background:#ffebee; color:#c62828; padding:8px; border-radius:4px; border:1px solid #ef9a9a;">
-                        ⚠️ <strong>হুবহু মিলছে!</strong> এই প্রশ্নটি ইতিমধ্যে ডাটাবেসে আছে (#${duplicateInfo.index + 1})।
-                    </div>
-                `;
-                document.getElementById('saveBtn').style.background = '#f44336';
-            } else if (duplicateInfo.confidence >= 90) {
-                duplicateStatus.innerHTML = `
-                    <div style="background:#fff3e0; color:#e65100; padding:8px; border-radius:4px; border:1px solid #ffcc80;">
-                        ⚠️ <strong>অনুরূপ প্রশ্ন!</strong> ${duplicateInfo.confidence}% মিলছে বিদ্যমান প্রশ্নের সাথে (#${duplicateInfo.index + 1})।
-                    </div>
-                `;
-                document.getElementById('saveBtn').style.background = '#ff9800';
-            }
-        } else {
-            duplicateStatus.style.display = 'none';
-            document.getElementById('saveBtn').style.background = 'var(--primary)';
-        }
-    }
-    
-    // সব ডুপ্লিকেট খুঁজে দেখানোর ফাংশন
-    function findAndShowAllDuplicates() {
-        const duplicates = [];
-        const seen = new Set();
-        
-        for (let i = 0; i < questionBank.length; i++) {
-            for (let j = i + 1; j < questionBank.length; j++) {
-                const q1 = questionBank[i];
-                const q2 = questionBank[j];
-                
-                const q1Normalized = normalizeText(q1.body);
-                const q2Normalized = normalizeText(q2.body);
-                
-                // হুবহু মিল খোঁজা
-                if (q1Normalized === q2Normalized && q1Normalized !== '') {
-                    const pairId = `${Math.min(i, j)}-${Math.max(i, j)}`;
-                    if (!seen.has(pairId)) {
-                        seen.add(pairId);
-                        duplicates.push({
-                            index1: i,
-                            question1: q1,
-                            index2: j,
-                            question2: q2,
-                            type: 'exact'
-                        });
-                    }
-                }
-            }
-        }
-        
-        if (duplicates.length === 0) {
-            alert("কোন ডুপ্লিকেট প্রশ্ন পাওয়া যায়নি।");
-            return;
-        }
-        
-        let message = `মোট ${duplicates.length} জোড়া ডুপ্লিকেট প্রশ্ন পাওয়া গেছে:\n\n`;
-        
-        duplicates.forEach((dup, idx) => {
-            message += `${idx + 1}. প্রশ্ন #${dup.index1 + 1} এবং প্রশ্ন #${dup.index2 + 1}\n`;
-            message += `   বিষয়: ${dup.question1.sub} | অধ্যায়: ${dup.question1.chap}\n`;
-            message += `   প্রশ্ন: ${dup.question1.body.substring(0, 80)}...\n\n`;
-        });
-        
-        message += "\nসব ডুপ্লিকেট মুছে ফেলতে 'সব ডুপ্লিকেট মুছুন' বাটনে ক্লিক করুন।";
-        
-        if (confirm(`${duplicates.length} জোড়া ডুপ্লিকেট পাওয়া গেছে। বিস্তারিত দেখতে OK চাপুন।`)) {
-            alert(message);
-        }
-    }
-    
-    // সব ডুপ্লিকেট মুছে ফেলার ফাংশন
-    function removeAllDuplicates() {
-        if (!confirm("আপনি কি নিশ্চিতভাবে সব ডুপ্লিকেট প্রশ্ন মুছে ফেলতে চান?\n\nশুধু একটি কপি রাখা হবে।")) {
-            return;
-        }
-        
-        const uniqueQuestions = [];
-        const seen = new Set();
-        let removedCount = 0;
-        
-        questionBank.forEach((q, index) => {
-            const normalizedBody = normalizeText(q.body);
-            const questionKey = `${q.sub}|${q.chap}|${normalizedBody}`;
-            
-            if (!seen.has(questionKey)) {
-                seen.add(questionKey);
-                uniqueQuestions.push(q);
-            } else {
-                removedCount++;
-            }
-        });
-        
-        questionBank = uniqueQuestions;
-        saveData();
-        updateSubFilter();
-        updateChapterFilter();
-        updateQuestionCount();
-        renderSelectionList();
-        
-        alert(`${removedCount}টি ডুপ্লিকেট প্রশ্ন মুছে ফেলা হয়েছে। ${uniqueQuestions.length}টি অনন্য প্রশ্ন রেখে দেওয়া হয়েছে।`);
-    }
-    
-    // ইম্পোর্টের সময় ডুপ্লিকেট চেক
-    function importJSON(e) { 
-        const r = new FileReader(); 
-        r.onload = (ev) => { 
-            const importedData = JSON.parse(ev.target.result);
-            
-            if (!importedData.qs || !Array.isArray(importedData.qs)) {
-                alert("ফাইল ফর্ম্যাট সঠিক নয়!");
-                return;
-            }
-            
-            let newQuestions = importedData.qs;
-            let duplicates = 0;
-            let added = 0;
-            const seen = new Set();
-            
-            // প্রথমে বিদ্যমান প্রশ্নগুলোর জন্য seen সেট তৈরি করুন
-            questionBank.forEach(q => {
-                const normalizedBody = normalizeText(q.body);
-                const questionKey = `${q.sub}|${q.chap}|${normalizedBody}`;
-                seen.add(questionKey);
-            });
-            
-            // প্রতিটি ইম্পোর্টেড প্রশ্ন চেক করুন
-            newQuestions.forEach(newQ => {
-                const normalizedBody = normalizeText(newQ.body);
-                const questionKey = `${newQ.sub}|${newQ.chap}|${normalizedBody}`;
-                
-                if (seen.has(questionKey)) {
-                    duplicates++;
-                } else {
-                    seen.add(questionKey);
-                    questionBank.push(newQ);
-                    added++;
-                }
-            });
-            
-            if (duplicates > 0) {
-                alert(`${added}টি নতুন প্রশ্ন যোগ হয়েছে। ${duplicates}টি ডুপ্লিকেট প্রশ্ন বাদ দেওয়া হয়েছে।`);
-            } else {
-                alert(`${added}টি নতুন প্রশ্ন সফলভাবে ইম্পোর্ট হয়েছে।`);
-            }
-            
-            saveData();
-            updateQuestionCount();
-            location.reload();
-        }; 
-        r.readAsText(e.target.files[0]); 
-    }
-    
-    // মোট প্রশ্ন কাউন্ট আপডেট করার ফাংশন
-    function updateQuestionCount() {
-        document.getElementById('totalQuestionCount').textContent = questionBank.length;
-    }
-    
-    // ==================== END DUPLICATE FUNCTIONS ====================
-    
     function selectAllQuestions() {
         // বর্তমান ফিল্টার অনুযায়ী দেখানো প্রশ্নগুলো সিলেক্ট করুন
         const subF = document.getElementById('fSub').value;
@@ -2514,7 +3233,7 @@
         renderSelectionList();
         alert("সকল ফিল্টার করা প্রশ্ন সিলেক্ট করা হয়েছে!");
     }
-
+    
     function deselectAllQuestions() {
         // বর্তমান ফিল্টার অনুযায়ী দেখানো প্রশ্নগুলো ডিসেলেক্ট করুন
         const subF = document.getElementById('fSub').value;
@@ -2541,773 +3260,275 @@
         alert("সকল ফিল্টার করা প্রশ্ন ডিসেলেক্ট করা হয়েছে!");
     }
     
-    function processMathInText(text) {
-        if (!text) return '';
-        
-        // প্রথমে সব বোল্ড ট্যাগ সরিয়ে ফেলুন
-        let processed = text.replace(/<b>/gi, '').replace(/<\/b>/gi, '');
-        processed = processed.replace(/<strong>/gi, '').replace(/<\/strong>/gi, '');
-        
-        processed = processed.replace(/\n/g, '<br>');
-        
-        processed = processed.replace(/\$\$(.*?)\$\$/g, function(match, equation) {
-            return `<div class="equation-container">\\[${equation}\\]</div>`;
-        });
-        
-        processed = processed.replace(/\$(.*?)\$/g, '\\($1\\)');
-        
-        processed = processed.replace(/\\\[/g, '\\[').replace(/\\\]/g, '\\]');
-        
-        if (text.includes('ক:') || text.includes('খ:') || text.includes('গ:') || text.includes('ঘ:')) {
-            processed = processed.replace(/(ক|খ|গ|ঘ):/g, '<div class="mcq-option-equation"><span>$1:</span> ');
-            processed = processed + '</div>';
-        }
-        
-        return processed;
-    }
+    // ==================== TEMPORARY EDIT FUNCTIONS ====================
     
-    function renderMathJax() {
-        if (window.MathJax && window.MathJax.typesetPromise) {
-            MathJax.typesetPromise().catch(err => console.log('MathJax typeset error:', err));
-        } else if (window.MathJax && window.MathJax.Hub) {
-            MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
-        }
-    }
-    
-    function updateCounter() {
-        const selected = questionBank.filter(q => q.selected).length;
-        const target = parseInt(document.getElementById('targetCount').value) || 0;
-        document.getElementById('liveCount').innerText = selected;
-        let percent = target > 0 ? (selected / target) * 100 : 0;
-        const bar = document.getElementById('fillBar');
-        const status = document.getElementById('counterStatus');
-        bar.style.width = (percent > 100 ? 100 : percent) + "%";
-        if(selected < target) { status.innerText = `আরও ${target - selected}টি প্রশ্ন লাগবে`; bar.style.background = "#ffeb3b"; } 
-        else if(selected == target) { status.innerText = "✅ লক্ষ্য পূরণ হয়েছে!"; bar.style.background = "#4caf50"; } 
-        else { status.innerText = `⚠️ ${selected - target}টি প্রশ্ন বেশি!`; bar.style.background = "#f44336"; }
-    }
-
-    function renderSelectionList() {
-        document.getElementById('selectionList').style.textAlign = 'left';
-        
-        const isAdmin = document.getElementById('adminToggle').checked;
-        const subF = document.getElementById('fSub').value;
-        const classF = document.getElementById('fClass').value;
-        const divF = document.getElementById('fDiv').value;
-        const typeF = document.getElementById('fType').value;
-        const chapF = document.getElementById('fChap').value;
-        
-        let filtered = questionBank.map((q, i) => ({...q, originalIndex: i})).filter(q => {
-            return (!subF || q.sub === subF) && 
-                   (!classF || q.qClass === classF) && 
-                   (!divF || q.qDiv === divF) && 
-                   (!typeF || q.type === typeF) &&
-                   (!chapF || q.chap === chapF);
-        });
-        
-        const chapterGroups = {};
-        filtered.forEach(q => {
-            const chapter = q.chap || 'অধ্যায়হীন';
-            if (!chapterGroups[chapter]) {
-                chapterGroups[chapter] = [];
-            }
-            chapterGroups[chapter].push(q);
-        });
-        
-        selectionPerPage = parseInt(document.getElementById('selectionPerPage').value) || 10;
-        totalSelectionPages = Math.ceil(filtered.length / selectionPerPage);
-        if (totalSelectionPages < 1) totalSelectionPages = 1;
-        if (selectionCurrentPage > totalSelectionPages) selectionCurrentPage = totalSelectionPages;
-        
-        const startIndex = (selectionCurrentPage - 1) * selectionPerPage;
-        const endIndex = startIndex + selectionPerPage;
-        const pagedQuestions = filtered.slice(startIndex, endIndex);
-        
-        const chapterCounters = {};
-        
-        let outputHTML = '';
-        let currentChapter = null;
-        
-        pagedQuestions.forEach((q, localIndex) => {
-            const chapter = q.chap || 'অধ্যায়হীন';
-            
-            if (chapter !== currentChapter) {
-                currentChapter = chapter;
-                
-                const totalInChapter = filtered.filter(item => item.chap === chapter).length;
-                
-                outputHTML += `
-                    <div class="chapter-header">
-                        <div style="text-align: left;">
-                            <strong>📚 ${chapter}</strong>
-                            <small style="display: block;">মোট প্রশ্ন: ${totalInChapter}টি</small>
-                        </div>
-                        <div style="text-align: left;">
-                            <small>${q.sub} | ${q.type === 'cq' ? 'সৃজনশীল' : q.type === 'mcq' ? 'MCQ' : 'সাধারণ'}</small>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            chapterCounters[chapter] = (chapterCounters[chapter] || 0) + 1;
-            const chapterSerialNumber = chapterCounters[chapter];
-            
-            let optHtml = "";
-            if (q.type !== 'normal') {
-                const options = [
-                    { label: 'ক', value: q.a || '-' },
-                    { label: 'খ', value: q.b || '-' },
-                    { label: 'গ', value: q.c || '-' },
-                    { label: 'ঘ', value: q.d || '-' }
-                ];
-                
-                optHtml = `
-                    <div class="q-card-options">
-                        ${options.map(opt => `
-                            <div style="text-align: left; padding-left: 0; margin-bottom: 8px; display: flex; align-items: flex-start; flex-direction: column;">
-                                <div style="display: flex; align-items: flex-start; width: 100%;">
-                                    <b style="margin-right: 8px; flex-shrink: 0;">${opt.label}:</b>
-                                    <div style="flex: 1; text-align: left;">${processMathInText(opt.value)}</div>
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>`;
-            }
-            
-            outputHTML += `
-            <div class="q-card" onclick="toggleQ(${q.originalIndex})" style="border-left: ${q.selected ? '6px solid var(--primary)' : '1px solid #eee'}">
-                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px; justify-content: space-between;">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <div class="chapter-serial-circle">
-                            ${chapterSerialNumber}
-                        </div>
-                        <div style="text-align: left; font-size: 12px; color: #555;">
-                            <span style="font-weight: bold;">${q.sub}</span> 
-                            ${q.qClass ? `| ${q.qClass}` : ''}
-                        </div>
-                    </div>
-                    ${q.board ? `<div class="board-tag" style="color: #d32f2f; font-weight: bold; font-size: 11px; background: #ffebee; padding: 2px 8px; border-radius: 3px; border: 1px solid #ffcdd2;">${q.board}</div>` : ''}
-                </div>
-                
-                <div class="q-card-body" style="text-align: left; padding-left: 0; margin-left: 0; padding-right: 0;">
-                    <div style="display: flex; align-items: flex-start; gap: 4px; text-align: left;">
-                        <b style="flex-shrink: 0;">${chapterSerialNumber}.</b>
-                        <div style="text-align: left; width: 100%;">${processMathInText(q.body)}</div>
-                    </div>
-                </div>
-                ${optHtml}
-                
-                <div style="margin-top:10px; display: ${isAdmin ? 'flex' : 'none'}; gap: 5px; text-align: left;">
-                    <button class="btn-mini" style="background:#1976d2; flex:1;" onclick="editQuestion(${q.originalIndex}, event)">📝 Edit</button>
-                    <button class="btn-mini" style="background:#d32f2f; flex:1;" onclick="deleteQuestion(${q.originalIndex}, event)">🗑️ Delete</button>
-                </div>
-            </div>`;
-        });
-        
-        if (outputHTML === '') {
-            outputHTML = '<p style="text-align:center; color:#666; padding:20px;">কোন প্রশ্ন পাওয়া যায়নি।</p>';
-        }
-        
-        document.getElementById('selectionList').innerHTML = outputHTML;
-        
-        updateSelectionPagination();
-        
-        sync();
-        renderOutputPages();
-        updateCounter();
-        
-        setTimeout(renderMathJax, 100);
-    }
-
-    function updateSelectionPagination() {
-        const paginationDiv = document.getElementById('selectionPagination');
-        if (totalSelectionPages > 1) {
-            paginationDiv.style.display = 'flex';
-        } else {
-            paginationDiv.style.display = 'none';
-        }
-        
-        document.getElementById('selectionPageInfo').innerText = `পেজ ${selectionCurrentPage}/${totalSelectionPages}`;
-        document.getElementById('selectionPrevBtn').disabled = selectionCurrentPage === 1;
-        document.getElementById('selectionNextBtn').disabled = selectionCurrentPage === totalSelectionPages;
-    }
-
-    function changeSelectionPage(delta) {
-        selectionCurrentPage += delta;
-        if (selectionCurrentPage < 1) selectionCurrentPage = 1;
-        if (selectionCurrentPage > totalSelectionPages) selectionCurrentPage = totalSelectionPages;
-        
-        renderSelectionList();
-    }
-
-    function toggleQ(i) { 
-        questionBank[i].selected = !questionBank[i].selected; 
-        saveData(); 
-        renderSelectionList();
-    }
-
-    function renderOutputPages() {
+    function openTemporaryEditor() {
         const selected = questionBank.filter(q => q.selected);
-        const showPageNumbers = document.getElementById('showPageNumbers').checked;
-        
-        // Clear previous pages
-        document.getElementById('outputPagesContainer').innerHTML = '';
-        
-        // If no questions, show empty page
         if (selected.length === 0) {
-            totalOutputPages = 1;
-            outputCurrentPage = 1;
-            
-            // ✅ প্রথম পাতার মার্জিন স্লাইডার থেকে নিন
-            const topMargin = document.getElementById('mTop').value || '12';
-            const rightMargin = document.getElementById('mRight').value || '15';
-            const bottomMargin = document.getElementById('mBottom').value || '12';
-            const leftMargin = document.getElementById('mLeft').value || '15';
-            
-            let pageHeader = `
-            <div id="outSetLine"></div>
-            <div class="header"><h1 id="outH1"></h1><h2 id="outH2"></h2></div>
-            <div id="outClassLine" class="header-info"></div>
-            <div id="outSubjectLine" class="header-info" style="margin-bottom:10px;"></div>
-            <div class="marks-info"><span id="outTime"></span><span id="outMarks"></span></div>
-            <div id="outInst" class="instruction"></div>`;
-            
-            let pageFooter = '';
-            if (showPageNumbers) {
-                pageFooter = `<div class="page-number">পৃষ্ঠা 1/1</div>`;
-            }
-            
-            document.getElementById('outputPagesContainer').innerHTML = `
-            <div id="output-page-1" class="output-page active" style="padding: ${topMargin}mm ${rightMargin}mm ${bottomMargin}mm ${leftMargin}mm !important;">
-                ${pageHeader}
-                <div class="question-container" style="column-count: ${document.getElementById('colCount').value}; text-align: center; padding: 50px;">
-                    <p style="font-size: 18px; color: #666;">কোন প্রশ্ন নির্বাচন করা হয়নি। বাম পাশ থেকে প্রশ্ন নির্বাচন করুন।</p>
-                </div>
-                ${pageFooter}
-            </div>`;
-            
-            // Update header elements
-            updateHeaders();
-            updateOutputPagination();
-            
+            alert("প্রথমে কিছু প্রশ্ন সিলেক্ট করুন!");
             return;
         }
         
-        // Get output per page setting
-        outputPerPage = parseInt(document.getElementById('outputPerPage').value) || 30;
-        if (outputPerPage < 15) outputPerPage = 15;
-        if (outputPerPage > 60) outputPerPage = 60;
-        
-        // Calculate number of pages needed based on questions
-        totalOutputPages = Math.ceil(selected.length / outputPerPage);
-        if (totalOutputPages < 1) totalOutputPages = 1;
-        
-        // Create pages
-        let pagesHTML = '';
-        
-        // Get font size and line height from slider
-        const currentFontSize = document.getElementById('fSize').value;
-        const currentLineHeight = document.getElementById('lHeight').value;
-        
-        // ✅ প্রথম পাতার মার্জিন স্লাইডার থেকে নিন
-        const topMargin = document.getElementById('mTop').value || '12';
-        const rightMargin = document.getElementById('mRight').value || '15';
-        const bottomMargin = document.getElementById('mBottom').value || '12';
-        const leftMargin = document.getElementById('mLeft').value || '15';
-        
-        // ✅ ২য় পাতার মার্জিন ফিক্সড ১০mm
-        const secondPageTopMargin = '10';
-        
-        for (let pageNum = 1; pageNum <= totalOutputPages; pageNum++) {
-            const startIdx = (pageNum - 1) * outputPerPage;
-            const endIdx = Math.min(startIdx + outputPerPage, selected.length);
-            const pageQuestions = selected.slice(startIdx, endIdx);
-            
-            // Page header content - ONLY FOR FIRST PAGE
-            let pageHeader = '';
-            if (pageNum === 1) {
-                pageHeader = `
-                <div id="outSetLine"></div>
-                <div class="header"><h1 id="outH1"></h1><h2 id="outH2"></h2></div>
-                <div id="outClassLine" class="header-info"></div>
-                <div id="outSubjectLine" class="header-info" style="margin-bottom:8px;"></div>
-                <div class="marks-info"><span id="outTime"></span><span id="outMarks"></span></div>
-                <div id="outInst" class="instruction"></div>`;
-            }
-            
-            // ✅ মার্জিন সেট করুন: প্রথম পাতা স্লাইডার থেকে, ২য় পাতা ফিক্সড ১০mm
-            const pagePadding = pageNum === 1 
-                ? `${topMargin}mm ${rightMargin}mm ${bottomMargin}mm ${leftMargin}mm`  // প্রথম পাতা
-                : `${secondPageTopMargin}mm ${rightMargin}mm ${bottomMargin}mm ${leftMargin}mm`; // ২য়, ৩য়, ... পাতা
-            
-            let pageContent = pageQuestions.map((q, i) => {
-                const num = formatNum(startIdx + i + 1);
-                const img = q.img ? `<img src="${q.img}" style="max-width:100%; display:block; margin:5px auto; max-height: 100px;">` : '';
-                const isEnglish = q.sub.toLowerCase().includes("english") || q.sub.includes("ইংরেজি");
-                const labels = isEnglish ? ["a", "b", "c", "d"] : ["ক", "খ", "গ", "ঘ"];
-                
-                // প্রশ্নের টেক্সট থেকে <b>, <strong> ট্যাগ সরিয়ে ফেলুন
-                let cleanBody = q.body;
-                cleanBody = cleanBody.replace(/<b>/gi, '').replace(/<\/b>/gi, '');
-                cleanBody = cleanBody.replace(/<strong>/gi, '').replace(/<\/strong>/gi, '');
-                
-                const formattedBody = processMathInText(cleanBody);
-
-                let opt = "";
-                if (q.type !== 'normal' && q.showOptions !== false) {
-                    if (q.type === 'cq') {
-                        // অপশনগুলোর বোল্ড ট্যাগও সরিয়ে ফেলুন
-                        const cleanA = (q.a || '').replace(/<b>/gi, '').replace(/<\/b>/gi, '').replace(/<strong>/gi, '').replace(/<\/strong>/gi, '');
-                        const cleanB = (q.b || '').replace(/<b>/gi, '').replace(/<\/b>/gi, '').replace(/<strong>/gi, '').replace(/<\/strong>/gi, '');
-                        const cleanC = (q.c || '').replace(/<b>/gi, '').replace(/<\/b>/gi, '').replace(/<strong>/gi, '').replace(/<\/strong>/gi, '');
-                        const cleanD = (q.d || '').replace(/<b>/gi, '').replace(/<\/b>/gi, '').replace(/<strong>/gi, '').replace(/<\/strong>/gi, '');
-                        
-                        const options = [
-                            { label: labels[0], value: cleanA || '', mark: '১' },
-                            { label: labels[1], value: cleanB || '', mark: '২' },
-                            { label: labels[2], value: cleanC || '', mark: '৩' },
-                            { label: labels[3], value: cleanD || '', mark: '৪' }
-                        ];
-                        
-                        opt = `
-                        <div style="margin-top:4px; margin-left: 18px; font-size: ${currentFontSize}px !important; line-height: ${currentLineHeight} !important;">
-                            ${options.map(opt => `
-                                <div class="sub-q" style="font-size: ${currentFontSize}px !important; line-height: ${currentLineHeight} !important; margin-bottom: 8px; display: flex; align-items: flex-start; justify-content: space-between;">
-                                    <div style="display: flex; align-items: flex-start; flex: 1;">
-                                        <span style="margin-right: 5px; flex-shrink: 0;">${opt.label}.</span>
-                                        <div style="flex: 1; text-align: left;">${processMathInText(opt.value)}</div>
-                                    </div>
-                                    <span style="margin-left: 10px; flex-shrink: 0;">${opt.mark}</span>
-                                </div>
-                            `).join('')}
-                        </div>`;
-                    } else {
-                        // MCQ অপশনগুলোর বোল্ড ট্যাগও সরিয়ে ফেলুন
-                        const cleanA = (q.a || '').replace(/<b>/gi, '').replace(/<\/b>/gi, '').replace(/<strong>/gi, '').replace(/<\/strong>/gi, '');
-                        const cleanB = (q.b || '').replace(/<b>/gi, '').replace(/<\/b>/gi, '').replace(/<strong>/gi, '').replace(/<\/strong>/gi, '');
-                        const cleanC = (q.c || '').replace(/<b>/gi, '').replace(/<\/b>/gi, '').replace(/<strong>/gi, '').replace(/<\/strong>/gi, '');
-                        const cleanD = (q.d || '').replace(/<b>/gi, '').replace(/<\/b>/gi, '').replace(/<strong>/gi, '').replace(/<\/strong>/gi, '');
-                        
-                        const options = [
-                            { label: labels[0], value: cleanA || '' },
-                            { label: labels[1], value: cleanB || '' },
-                            { label: labels[2], value: cleanC || '' },
-                            { label: labels[3], value: cleanD || '' }
-                        ];
-                        
-                        opt = `
-                        <div class="mcq-grid" style="font-size: ${currentFontSize}px !important; line-height: ${currentLineHeight} !important; margin-top: 8px;">
-                            ${options.map(opt => `
-                                <div style="display: flex; align-items: flex-start; text-align: left; margin-bottom: 4px;">
-                                    <span style="margin-right: 5px; flex-shrink: 0;">${opt.label}.</span>
-                                    <div style="flex: 1;">${processMathInText(opt.value)}</div>
-                                </div>
-                            `).join('')}
-                        </div>`;
-                    }
-                }
-                
-                return `
-                <div class="${q.type==='cq'?'cq-box':'normal-q'}" style="font-size: ${currentFontSize}px !important; line-height: ${currentLineHeight} !important; margin-bottom: ${document.getElementById('qGapSlider').value}px !important;">
-                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                        <div style="display:flex; gap:4px; width: 100%;"><span style="font-size: ${currentFontSize}px !important; flex-shrink: 0;">${num}.</span> <div style="font-size: ${currentFontSize}px !important; flex: 1; text-align: left;">${formattedBody}</div></div>
-                    </div>
-                    ${img}${opt}
-                </div>`;
-            }).join('');
-            
-            // Page footer with page number
-            let pageFooter = '';
-            if (showPageNumbers) {
-                pageFooter = `<div class="page-number" style="font-size: 12px !important;">পৃষ্ঠা ${pageNum}/${totalOutputPages}</div>`;
-            }
-            
-            pagesHTML += `
-            <div id="output-page-${pageNum}" class="output-page ${pageNum === outputCurrentPage ? 'active' : ''}" 
-                 style="font-size: ${currentFontSize}px !important; padding: ${pagePadding} !important;">
-                ${pageHeader}
-                <div class="question-container" style="
-                    column-count: ${document.getElementById('colCount').value}; 
-                    font-size: ${currentFontSize}px !important; 
-                    line-height: ${currentLineHeight} !important; 
-                    column-gap: 35px;
-                    margin-top: ${pageNum === 1 ? '15px' : '0'};
-                ">
-                    ${pageContent}
+        // Create temporary editor modal
+        const modalHTML = `
+        <div id="tempEditModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:10000; display:flex; justify-content:center; align-items:center;">
+            <div style="background:white; width:90%; max-width:800px; height:80vh; border-radius:10px; padding:20px; display:flex; flex-direction:column;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:2px solid var(--primary); padding-bottom:10px;">
+                    <h3 style="margin:0; color:var(--primary);">🖊️ টেম্পোরারি এডিট</h3>
+                    <button onclick="closeTempEditor()" style="background:#f44336; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">✖ বন্ধ করুন</button>
                 </div>
-                ${pageFooter}
-                ${pageNum < totalOutputPages ? '<div class="print-page-break" style="font-size: 12px !important;">--- পেজ ব্রেক ---</div>' : ''}
-            </div>`;
+                
+                <div style="display:flex; gap:20px; flex:1; overflow:hidden;">
+                    <!-- Left sidebar - question list -->
+                    <div style="width:300px; border-right:1px solid #ddd; padding-right:15px; overflow-y:auto;">
+                        <h4 style="margin-top:0; margin-bottom:10px;">সিলেক্টেড প্রশ্ন (${selected.length})</h4>
+                        <div id="tempEditQuestionList" style="display:flex; flex-direction:column; gap:8px;">
+                            <!-- Questions will be loaded here -->
+                        </div>
+                    </div>
+                    
+                    <!-- Right editor area -->
+                    <div style="flex:1; overflow-y:auto; display:flex; flex-direction:column;">
+                        <div id="tempEditCurrentInfo" style="background:#e3f2fd; padding:10px; border-radius:5px; margin-bottom:15px;">
+                            <strong>এডিট করছেন:</strong> প্রশ্ন <span id="currentEditNum">1</span>/${selected.length}
+                        </div>
+                        
+                        <div style="margin-bottom:15px;">
+                            <label style="display:block; margin-bottom:5px; font-weight:bold;">প্রশ্নের টেক্সট</label>
+                            <textarea id="tempEditBody" rows="6" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:5px; font-family:inherit;"></textarea>
+                        </div>
+                        
+                        <div id="tempEditOptionsArea" style="margin-bottom:15px; display:none;">
+                            <label style="display:block; margin-bottom:5px; font-weight:bold;">অপশনসমূহ</label>
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                                <div>
+                                    <label style="font-size:12px;">ক</label>
+                                    <textarea id="tempEditOptionA" rows="2" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:5px;"></textarea>
+                                </div>
+                                <div>
+                                    <label style="font-size:12px;">খ</label>
+                                    <textarea id="tempEditOptionB" rows="2" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:5px;"></textarea>
+                                </div>
+                                <div>
+                                    <label style="font-size:12px;">গ</label>
+                                    <textarea id="tempEditOptionC" rows="2" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:5px;"></textarea>
+                                </div>
+                                <div>
+                                    <label style="font-size:12px;">ঘ</label>
+                                    <textarea id="tempEditOptionD" rows="2" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:5px;"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="display:flex; gap:10px; margin-top:auto;">
+                            <button onclick="saveTempEdit()" style="flex:1; background:#4caf50; color:white; border:none; padding:12px; border-radius:5px; cursor:pointer; font-weight:bold;">💾 পরিবর্তন সংরক্ষণ করুন</button>
+                            <button onclick="loadPrevQuestion()" style="width:50px; background:#2196f3; color:white; border:none; padding:12px; border-radius:5px; cursor:pointer;">←</button>
+                            <button onclick="loadNextQuestion()" style="width:50px; background:#2196f3; color:white; border:none; padding:12px; border-radius:5px; cursor:pointer;">→</button>
+                        </div>
+                        
+                        <div style="margin-top:15px; background:#f5f5f5; padding:10px; border-radius:5px; font-size:12px;">
+                            <strong>📌 নোট:</strong> টেম্পোরারি এডিট শুধুমাত্র এই সেশনের জন্য প্রযোজ্য। পেজ রিলোড করলে মূল টেক্সট ফিরে আসবে।
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+        
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+        loadTempEditorQuestions();
+        loadQuestionForTempEdit(0);
+    }
+    
+    function loadTempEditorQuestions() {
+        const selected = questionBank.filter(q => q.selected);
+        const listDiv = document.getElementById('tempEditQuestionList');
+        
+        listDiv.innerHTML = '';
+        
+        selected.forEach((q, index) => {
+            const isEdited = temporaryEdits.has(index);
+            const item = document.createElement('div');
+            item.className = 'q-card temp-edit-q-item';
+            item.style.cursor = 'pointer';
+            item.style.padding = '10px';
+            item.style.border = isEdited ? '2px solid #4caf50' : '1px solid #ddd';
+            item.style.background = isEdited ? '#e8f5e9' : '#fff';
+            
+            item.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+                    <strong style="color:var(--primary);">প্রশ্ন ${index + 1}</strong>
+                    ${isEdited ? '<span style="color:#4caf50; font-size:11px;">✏️ এডিট করা</span>' : ''}
+                </div>
+                <div style="font-size:12px; color:#666; max-height:60px; overflow:hidden;">
+                    ${q.body.substring(0, 80)}${q.body.length > 80 ? '...' : ''}
+                </div>
+                <div style="font-size:11px; color:#999; margin-top:5px;">
+                    ${q.sub} | ${q.type === 'cq' ? 'সৃজনশীল' : q.type === 'mcq' ? 'MCQ' : 'সাধারণ'}
+                </div>
+            `;
+            
+            item.onclick = () => {
+                // Remove active class from all items
+                document.querySelectorAll('.temp-edit-q-item').forEach(el => {
+                    el.classList.remove('active');
+                    el.style.background = el.style.background.includes('#e8f5e9') ? '#e8f5e9' : '#fff';
+                });
+                
+                // Add active class to clicked item
+                item.classList.add('active');
+                item.style.background = '#e3f2fd';
+                
+                loadQuestionForTempEdit(index);
+            };
+            
+            listDiv.appendChild(item);
+        });
+    }
+    
+    function loadQuestionForTempEdit(index) {
+        const selected = questionBank.filter(q => q.selected);
+        if (index >= selected.length) return;
+        
+        currentEditingIndex = index;
+        const q = selected[index];
+        
+        // Check if there's a temporary edit
+        const editedQ = temporaryEdits.get(index);
+        
+        document.getElementById('currentEditNum').textContent = index + 1;
+        document.getElementById('tempEditBody').value = editedQ ? editedQ.body : q.body;
+        
+        // Show/hide options area
+        if (q.type !== 'normal') {
+            document.getElementById('tempEditOptionsArea').style.display = 'block';
+            document.getElementById('tempEditOptionA').value = editedQ ? editedQ.a : (q.a || '');
+            document.getElementById('tempEditOptionB').value = editedQ ? editedQ.b : (q.b || '');
+            document.getElementById('tempEditOptionC').value = editedQ ? editedQ.c : (q.c || '');
+            document.getElementById('tempEditOptionD').value = editedQ ? editedQ.d : (q.d || '');
+        } else {
+            document.getElementById('tempEditOptionsArea').style.display = 'none';
         }
         
-        document.getElementById('outputPagesContainer').innerHTML = pagesHTML;
-        
-        // Update answer grid (এখানেও বোল্ড সরিয়ে ফেলুন)
-        document.getElementById('ansGrid').innerHTML = selected.map((q, i) => {
-            const cleanAns = (q.ans || '...').replace(/<b>/gi, '').replace(/<\/b>/gi, '').replace(/<strong>/gi, '').replace(/<\/strong>/gi, '');
-            return `<div class="ans-box" style="font-size: ${currentFontSize}px !important; line-height: ${currentLineHeight} !important; text-align: center;"><span>${formatNum(i+1)}.</span> ${cleanAns}</div>`;
-        }).join('');
-        
-        // Update main header elements for first page
-        updateHeaders();
-        
-        updateOutputPagination();
-        
-        // Render MathJax after content is loaded
-        setTimeout(renderMathJax, 200);
-    }
-
-    function updateHeaders() {
-        document.getElementById('outH1').innerText = document.getElementById('h1').value;
-        document.getElementById('outH2').innerText = document.getElementById('h2').value;
-        document.getElementById('outClassLine').innerText = document.getElementById('hClass').value ? "শ্রেণি: " + document.getElementById('hClass').value : "";
-        document.getElementById('outSubjectLine').innerText = document.getElementById('h3').value ? "বিষয়: " + document.getElementById('h3').value : "";
-        document.getElementById('outTime').innerText = document.getElementById('hTime').value ? "সময়: " + document.getElementById('hTime').value : "";
-        document.getElementById('outMarks').innerText = document.getElementById('hMarks').value ? "পূর্ণমান: " + document.getElementById('hMarks').value : "";
-        document.getElementById('outInst').innerText = document.getElementById('hInst').value;
-        const setVal = document.getElementById('hSet').value, outSet = document.getElementById('outSetLine');
-        if(setVal) { outSet.innerText = "সেট: " + setVal; outSet.style.display = "block"; } else { outSet.style.display = "none"; }
-        document.getElementById('outH1').style.fontSize = document.getElementById('fsH1').value + "px";
-        document.getElementById('outH2').style.fontSize = document.getElementById('fsH2').value + "px";
-        document.getElementById('outClassLine').style.fontSize = document.getElementById('fsH3').value + "px";
-        document.getElementById('outSubjectLine').style.fontSize = document.getElementById('fsH3').value + "px";
-        document.getElementById('outInst').style.fontSize = document.getElementById('fsH4').value + "px";
-    }
-
-    function updateSliderValue(sliderId, value) {
-        const valueElement = document.getElementById(sliderId + 'Value');
-        if (valueElement) {
-            valueElement.textContent = value;
-        }
-    }
-
-    function updateOutputPagination() {
-        const selected = questionBank.filter(q => q.selected).length;
-        totalOutputPages = Math.max(1, totalOutputPages);
-        
-        document.getElementById('outputPageInfo').innerText = `পেজ ${outputCurrentPage}/${totalOutputPages}`;
-        document.getElementById('totalOutputPagesDisplay').innerText = totalOutputPages;
-        document.getElementById('jumpToOutputPage').value = outputCurrentPage;
-        document.getElementById('jumpToOutputPage').max = totalOutputPages;
-        
-        document.getElementById('outputPrevBtn').disabled = outputCurrentPage === 1;
-        document.getElementById('outputNextBtn').disabled = outputCurrentPage === totalOutputPages;
-        
-        toggleOutputPagination();
-    }
-
-    function changeOutputPage(delta) {
-        const newPage = outputCurrentPage + delta;
-        if (newPage < 1 || newPage > totalOutputPages) return;
-        
-        document.querySelectorAll('.output-page').forEach(page => {
-            page.classList.remove('active');
+        // Update active item in list
+        document.querySelectorAll('.temp-edit-q-item').forEach((el, i) => {
+            el.classList.remove('active');
+            const isEdited = temporaryEdits.has(i);
+            el.style.background = isEdited ? '#e8f5e9' : '#fff';
         });
         
-        outputCurrentPage = newPage;
-        document.getElementById(`output-page-${outputCurrentPage}`).classList.add('active');
-        
-        updateOutputPagination();
-        document.querySelector('.preview-area').scrollTop = 0;
-    }
-
-    function jumpToOutputPage() {
-        const pageInput = document.getElementById('jumpToOutputPage');
-        let pageNum = parseInt(pageInput.value);
-        
-        if (isNaN(pageNum) || pageNum < 1) pageNum = 1;
-        if (pageNum > totalOutputPages) pageNum = totalOutputPages;
-        
-        document.querySelectorAll('.output-page').forEach(page => {
-            page.classList.remove('active');
-        });
-        
-        outputCurrentPage = pageNum;
-        document.getElementById(`output-page-${outputCurrentPage}`).classList.add('active');
-        
-        updateOutputPagination();
-        document.querySelector('.preview-area').scrollTop = 0;
-    }
-
-    function toggleOutputPagination() {
-        const showPagination = document.getElementById('showOutputPagination').checked;
-        const selected = questionBank.filter(q => q.selected).length;
-        
-        if (showPagination && totalOutputPages > 1) {
-            document.getElementById('outputPagination').style.display = 'flex';
-        } else {
-            document.getElementById('outputPagination').style.display = 'none';
+        const currentItem = document.querySelectorAll('.temp-edit-q-item')[index];
+        if (currentItem) {
+            currentItem.classList.add('active');
+            currentItem.style.background = '#e3f2fd';
         }
     }
-
-    // পুরাতন addQuestion ফাংশন (এডিটের জন্য)
-    function addQuestion() {
-        const editIdx = parseInt(document.getElementById('editIndex').value);
-        const q = getQuestionFromForm();
+    
+    function saveTempEdit() {
+        const selected = questionBank.filter(q => q.selected);
+        if (currentEditingIndex >= selected.length) return;
         
-        if(editIdx > -1) { 
-            q.selected = questionBank[editIdx].selected;
-            questionBank[editIdx] = q; 
-            cancelEdit(); 
-        }
+        const q = selected[currentEditingIndex];
         
-        saveData(); 
-        updateSubFilter(); 
-        updateChapterFilter(); 
-        updateQuestionCount();
-        selectionCurrentPage = 1;
-        renderSelectionList(); 
-        alert("সংরক্ষিত হয়েছে!");
-    }
-
-    function editQuestion(idx, e) {
-        e.stopPropagation();
-        const q = questionBank[idx];
-        document.getElementById('editIndex').value = idx;
-        document.getElementById('qSub').value = q.sub;
-        document.getElementById('qClassInput').value = q.qClass || "";
-        document.getElementById('qDivInput').value = q.qDiv || "";
-        document.getElementById('qChap').value = q.chap || "";
-        document.getElementById('qType').value = q.type;
-        document.getElementById('qBody').value = q.body;
-        document.getElementById('qA').value = q.a || "";
-        document.getElementById('qB').value = q.b || "";
-        document.getElementById('qC').value = q.c || "";
-        document.getElementById('qD').value = q.d || "";
-        document.getElementById('qAns').value = q.ans || "";
-        document.getElementById('qBoard').value = q.board || "";
-        document.getElementById('showOptionsToggle').checked = q.showOptions !== false;
-        currentImgData = q.img || "";
-        document.getElementById('imgPreview').innerHTML = currentImgData ? `<img src="${currentImgData}" style="width:100px;">` : "";
+        // Get edited values
+        const editedBody = document.getElementById('tempEditBody').value.trim();
         
-        toggleFields();
-        document.getElementById('saveBtn').innerText = "আপডেট করুন";
-        document.getElementById('cancelBtn').style.display = "block";
-        openTab('bank');
-    }
-
-    function deleteQuestion(idx, e) {
-        e.stopPropagation();
-        if(confirm("আপনি কি নিশ্চিতভাবে এই প্রশ্নটি মুছে ফেলতে চান?")) {
-            questionBank.splice(idx, 1);
-            saveData(); 
-            updateSubFilter(); 
-            updateChapterFilter(); 
-            updateQuestionCount();
-            selectionCurrentPage = 1;
-            renderSelectionList();
-        }
-    }
-
-    function cancelEdit() {
-        document.getElementById('editIndex').value = "-1";
-        document.getElementById('saveBtn').innerText = "সংরক্ষণ করুন";
-        document.getElementById('cancelBtn').style.display = "none";
-        document.querySelectorAll('#bank input, #bank textarea, #bank select').forEach(i => i.value = "");
-        document.getElementById('imgPreview').innerHTML = "";
-        currentImgData = "";
-        document.getElementById('duplicateStatus').style.display = 'none';
-        document.getElementById('saveBtn').style.background = 'var(--primary)';
-    }
-
-    function sync() {
-        document.getElementById('ansSheetArea').style.display = document.getElementById('showAnsKey').checked ? "block" : "none";
-        
-        // ✅ মার্জিন আপডেট করুন
-        setTimeout(() => {
-            renderOutputPages();
-        }, 100);
-        saveData();
-    }
-
-    function updateSubFilter() {
-        const fSub = document.getElementById('fSub');
-        const lockText = document.getElementById('lockBox').value.trim();
-        const isAdmin = document.getElementById('adminToggle').checked;
-        let subs = [...new Set(questionBank.map(q => q.sub))];
-        if (lockText !== "" && !isAdmin) {
-            let allowed = lockText.split(',').map(s => s.trim().toLowerCase());
-            subs = subs.filter(s => allowed.includes(s.toLowerCase()));
-        }
-        fSub.innerHTML = '<option value="">সব বিষয়</option>' + subs.map(s => `<option value="${s}">${s}</option>`).join('');
-    }
-
-    function updateChapterFilter() {
-        const subF = document.getElementById('fSub').value;
-        const fChap = document.getElementById('fChap');
-        let chapters = [];
-        if(subF) {
-            chapters = [...new Set(questionBank.filter(q => q.sub === subF).map(q => q.chap))];
-        } else {
-            chapters = [...new Set(questionBank.map(q => q.chap))];
-        }
-        fChap.innerHTML = '<option value="">সব অধ্যায়</option>' + chapters.filter(c => c).map(c => `<option value="${c}">${c}</option>`).join('');
-    }
-
-    function toggleAdmin() {
-        const cb = document.getElementById('adminToggle');
-        if (cb.checked) { 
-            if (prompt("পাসওয়ার্ড:") === "1234") { 
-                document.getElementById('sidebarMain').classList.add('admin-active'); 
-                document.getElementById('currentModeDisplay').innerText = "এডমিন"; 
-            } else cb.checked = false; 
-        }
-        else { 
-            document.getElementById('sidebarMain').classList.remove('admin-active'); 
-            document.getElementById('currentModeDisplay').innerText = "সাধারণ"; 
-        }
-        updateSubFilter(); 
-        renderSelectionList();
-    }
-
-    function saveData() {
-        const d = { 
-            sets: [document.getElementById('h1').value, document.getElementById('h2').value, document.getElementById('hClass').value, document.getElementById('h3').value, document.getElementById('hTime').value, document.getElementById('hMarks').value, document.getElementById('hInst').value, document.getElementById('targetCount').value, document.getElementById('hSet').value],
-            hSizes: [document.getElementById('fsH1').value, document.getElementById('fsH2').value, document.getElementById('fsH3').value, document.getElementById('fsH4').value],
-            margins: [document.getElementById('mTop').value, document.getElementById('mBottom').value, document.getElementById('mLeft').value, document.getElementById('mRight').value],
-            fSize: document.getElementById('fSize').value, 
-            lHeight: document.getElementById('lHeight').value, 
-            cols: document.getElementById('colCount').value, 
-            lang: document.getElementById('qLang').value, 
-            qs: questionBank,
-            restrictedList: document.getElementById('lockBox').value,
-            selectionPerPage: document.getElementById('selectionPerPage').value,
-            outputPerPage: document.getElementById('outputPerPage').value,
-            showPageNumbers: document.getElementById('showPageNumbers').checked,
-            showOutputPagination: document.getElementById('showOutputPagination').checked,
-            qGap: document.getElementById('qGapSlider').value
+        // Create edited question object
+        const editedQ = {
+            body: editedBody,
+            sub: q.sub,
+            type: q.type,
+            chap: q.chap
         };
-        localStorage.setItem(DB_KEY, JSON.stringify(d));
-    }
-
-    function loadData() {
-        const d = JSON.parse(localStorage.getItem(DB_KEY) || '{}');
-        if(d.qs) {
-            document.getElementById('h1').value = d.sets[0] || "শেরখালী সরকারি মহিলা কলেজ"; 
-            document.getElementById('h2').value = d.sets[1] || "বার্ষিক পরীক্ষা-২০২৬"; 
-            document.getElementById('hClass').value = d.sets[2] || "";
-            document.getElementById('h3').value = d.sets[3] || "";
-            document.getElementById('targetCount').value = d.sets[7] || 10; 
-            document.getElementById('hSet').value = d.sets[8] || "";
-            document.getElementById('fsH1').value = d.hSizes[0] || 20;
-            document.getElementById('fsH2').value = d.hSizes[1] || 16;
-            document.getElementById('fsH3').value = d.hSizes[2] || 13;
-            document.getElementById('fsH4').value = d.hSizes[3] || 13;
-            document.getElementById('lockBox').value = d.restrictedList || "";
-            questionBank = d.qs;
-            
-            // Load margin values
-            if (d.margins && d.margins.length >= 4) {
-                document.getElementById('mTop').value = d.margins[0] || '12';
-                document.getElementById('mBottom').value = d.margins[1] || '12';
-                document.getElementById('mLeft').value = d.margins[2] || '15';
-                document.getElementById('mRight').value = d.margins[3] || '15';
-            }
-            
-            if (d.selectionPerPage) {
-                document.getElementById('selectionPerPage').value = d.selectionPerPage;
-            }
-            if (d.outputPerPage) {
-                document.getElementById('outputPerPage').value = d.outputPerPage;
-            }
-            if (d.showPageNumbers !== undefined) {
-                document.getElementById('showPageNumbers').checked = d.showPageNumbers;
-            }
-            if (d.showOutputPagination !== undefined) {
-                document.getElementById('showOutputPagination').checked = d.showOutputPagination;
-            }
-            
-            if (d.qGap) {
-                document.getElementById('qGapSlider').value = d.qGap;
-            }
-            
-            // Update slider value displays
-            updateSliderValue('fsH1', document.getElementById('fsH1').value + 'px');
-            updateSliderValue('fsH2', document.getElementById('fsH2').value + 'px');
-            updateSliderValue('fsH3', document.getElementById('fsH3').value + 'px');
-            updateSliderValue('fsH4', document.getElementById('fsH4').value + 'px');
-            updateSliderValue('qGapSlider', document.getElementById('qGapSlider').value + 'px');
-            updateSliderValue('fSize', document.getElementById('fSize').value + 'px');
-            updateSliderValue('lHeight', document.getElementById('lHeight').value);
-            updateSliderValue('mTop', document.getElementById('mTop').value + 'mm');
-            updateSliderValue('mBottom', document.getElementById('mBottom').value + 'mm');
-            updateSliderValue('mLeft', document.getElementById('mLeft').value + 'mm');
-            updateSliderValue('mRight', document.getElementById('mRight').value + 'mm');
+        
+        // Add options if not normal type
+        if (q.type !== 'normal') {
+            editedQ.a = document.getElementById('tempEditOptionA').value.trim();
+            editedQ.b = document.getElementById('tempEditOptionB').value.trim();
+            editedQ.c = document.getElementById('tempEditOptionC').value.trim();
+            editedQ.d = document.getElementById('tempEditOptionD').value.trim();
         }
         
-        updateSubFilter(); 
-        updateChapterFilter(); 
-        updateQuestionCount();
-        sync(); 
-        renderSelectionList();
+        // Store in temporary edits map
+        temporaryEdits.set(currentEditingIndex, editedQ);
         
+        // Update the actual question in the bank for this session
+        // Find the original question index
+        const originalQ = selected[currentEditingIndex];
+        const originalIndex = questionBank.findIndex(qb => qb === originalQ);
+        
+        if (originalIndex !== -1) {
+            // Create a modified copy
+            questionBank[originalIndex] = {
+                ...questionBank[originalIndex],
+                body: editedBody,
+                ...(q.type !== 'normal' && {
+                    a: editedQ.a,
+                    b: editedQ.b,
+                    c: editedQ.c,
+                    d: editedQ.d
+                })
+            };
+        }
+        
+        // Update UI
+        loadTempEditorQuestions();
+        
+        // Highlight current item
+        const currentItem = document.querySelectorAll('.temp-edit-q-item')[currentEditingIndex];
+        if (currentItem) {
+            currentItem.classList.add('active');
+            currentItem.style.background = '#e3f2fd';
+        }
+        
+        // Re-render output to see changes
+        renderOutputPages();
+        
+        alert("✅ পরিবর্তন সংরক্ষিত হয়েছে!");
+    }
+    
+    function loadPrevQuestion() {
+        if (currentEditingIndex > 0) {
+            loadQuestionForTempEdit(currentEditingIndex - 1);
+        }
+    }
+    
+    function loadNextQuestion() {
+        const selected = questionBank.filter(q => q.selected);
+        if (currentEditingIndex < selected.length - 1) {
+            loadQuestionForTempEdit(currentEditingIndex + 1);
+        }
+    }
+    
+    function closeTempEditor() {
+        const modal = document.getElementById('tempEditModal');
+        if (modal) {
+            modal.remove();
+        }
+    }
+    
+    // ==================== INITIALIZATION ====================
+    
+    // Initialize the button when page loads
+    setTimeout(function() {
         // Show temporary edit button
-        addTemporaryEditButton();
-        // Initialize search box
-        setTimeout(initializeSearchBox, 500);
-    }
-
-    function formatNum(n) { 
-        return document.getElementById('qLang').value === 'bn' ? 
-            n.toString().split('').map(d => '০১২৩৪৫৬৭৮৯'[d] || d).join('') : n; 
-    }
-    
-    function openTab(id) { 
-        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active')); 
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); 
-        document.getElementById(id).classList.add('active'); 
-        if(event) event.currentTarget.classList.add('active'); 
-    }
-    
-    function toggleFields() { 
-        const type = document.getElementById('qType').value; 
-        document.getElementById('extraFields').style.display = (type === 'normal') ? 'none' : 'block'; 
-        document.getElementById('showOptionsLabel').style.display = (type === 'normal') ? 'none' : 'flex'; 
-    }
-    
-    function handleImage(e) { 
-        const file = e.target.files[0]; 
-        if (!file) return; 
-        const reader = new FileReader(); 
-        reader.onload = function(ev) { 
-            document.getElementById('cropImage').src = ev.target.result; 
-            document.getElementById('cropperModal').style.display = 'block'; 
-            if (cropper) cropper.destroy(); 
-            setTimeout(() => { 
-                cropper = new Cropper(document.getElementById('cropImage'), { autoCropArea: 1, viewMode: 1 }); 
-            }, 100); 
-        }; 
-        reader.readAsDataURL(file); 
-    }
-    
-    function finishCrop() { 
-        currentImgData = cropper.getCroppedCanvas({ maxWidth: 800 }).toDataURL('image/jpeg', 0.7); 
-        document.getElementById('imgPreview').innerHTML = `<img src="${currentImgData}" style="width:100px;">`; 
-        closeCropper(); 
-    }
-    
-    function closeCropper() { 
-        document.getElementById('cropperModal').style.display = 'none'; 
-    }
-    
-    function shuffleSelectedQuestions() {
-        let selected = questionBank.filter(q => q.selected);
-        let others = questionBank.filter(q => !q.selected);
-        for (let i = selected.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [selected[i], selected[j]] = [selected[j], selected[i]];
+        const selectionPanel = document.getElementById('select');
+        const printButton = selectionPanel.querySelector('.btn-action[style*="background:#2e7d32"]');
+        
+        if (printButton) {
+            // Make sure the button exists
+            const tempEditBtn = document.getElementById('tempEditBtn');
+            if (!tempEditBtn) {
+                const newTempEditBtn = document.createElement('button');
+                newTempEditBtn.id = 'tempEditBtn';
+                newTempEditBtn.className = 'btn-action';
+                newTempEditBtn.style.cssText = 'background:#ff9800 !important; color:white !important; margin-top:10px !important;';
+                newTempEditBtn.innerHTML = '🖊️ টেম্পোরারি এডিট';
+                newTempEditBtn.onclick = openTemporaryEditor;
+                
+                printButton.parentNode.insertBefore(newTempEditBtn, printButton);
+            }
         }
-        questionBank = [...selected, ...others];
-        saveData(); 
-        renderSelectionList();
-    }
-    
-    function exportJSON() { 
-        const a = document.createElement('a'); 
-        a.href = URL.createObjectURL(new Blob([localStorage.getItem(DB_KEY)], {type: "application/json"})); 
-        a.download = "BCTI_Backup.json"; 
-        a.click(); 
-    }
+    }, 1000);
     
     // Initialize on load
     document.addEventListener('DOMContentLoaded', function() {
