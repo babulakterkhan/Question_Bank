@@ -448,6 +448,35 @@
             margin-top: 10px !important;
         }
         
+        /* Search Navigation Styles */
+        .search-navigation-active {
+            border: 3px solid #ff9800 !important;
+            box-shadow: 0 4px 12px rgba(255, 152, 0, 0.4) !important;
+            animation: highlight 1.5s;
+        }
+        
+        @keyframes highlight {
+            0% { background-color: rgba(255, 152, 0, 0.1); }
+            50% { background-color: rgba(255, 152, 0, 0.3); }
+            100% { background-color: transparent; }
+        }
+        
+        .search-result-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #4caf50;
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            z-index: 10;
+        }
+        
         @media print { 
             body {
                 background: white !important;
@@ -718,9 +747,44 @@
                 <button onclick="autoSelectRandom()" style="flex:1; background:#673ab7; color:white; border:none; border-radius:4px; cursor:pointer;">প্রশ্ন বাছাই করো</button>
             </div>
             <button onclick="shuffleSelectedQuestions()" style="width:100%; margin-top:5px; background:#ff9800; color:white; border:none; border-radius:4px; padding:8px; cursor:pointer; font-weight:bold;">🔀 প্রশ্ন উলট-পালট করো</button>
+            
+            <!-- উন্নত অটো জেনারেটর -->
+            <div style="margin-top: 15px; padding: 10px; background: #f3e5f5; border-radius: 5px; border: 1px solid #ce93d8;">
+                <label style="font-size: 12px; font-weight: bold; color: #7b1fa2;">🎯 উন্নত অটো জেনারেটর</label>
+                
+                <div style="display: flex; gap: 5px; margin-top: 8px; align-items: center;">
+                    <input type="number" id="advancedRandomCount" placeholder="প্রশ্ন সংখ্যা" 
+                           style="width: 80px; padding: 6px; border: 1px solid #ba68c8; border-radius: 4px; text-align: center;"
+                           min="1" max="100" value="5">
+                    
+                    <select id="autoTypeFilter" style="flex: 1; padding: 6px; border: 1px solid #ba68c8; border-radius: 4px;">
+                        <option value="current">বর্তমান ফিল্টার</option>
+                        <option value="all">সব প্রশ্ন</option>
+                        <option value="mcq">শুধু MCQ</option>
+                        <option value="cq">শুধু সৃজনশীল</option>
+                        <option value="normal">শুধু সাধারণ</option>
+                    </select>
+                </div>
+                
+                <div style="display: flex; gap: 5px; margin-top: 8px;">
+                    <button onclick="advancedAutoSelect()" 
+                            style="flex: 1; background: #7b1fa2; color: white; border: none; border-radius: 4px; padding: 8px; cursor: pointer; font-weight: bold;">
+                        🎲 অটো সিলেক্ট
+                    </button>
+                    
+                    <button onclick="autoDeselectRandom()" 
+                            style="flex: 1; background: #f44336; color: white; border: none; border-radius: 4px; padding: 8px; cursor: pointer; font-weight: bold;">
+                        🗑️ অটো ডিসেলেক্ট
+                    </button>
+                </div>
+                
+                <div id="autoGenStatus" style="font-size: 11px; color: #666; margin-top: 5px; display: none;"></div>
+            </div>
         </div>
 
         <div id="filterGroup" style="background: #f0f0f0; padding: 10px; border-radius: 5px; margin-bottom: 10px; border:1px solid #ddd;">
+            <!-- Search Box will be inserted here by JavaScript -->
+            
             <div class="admin-only restriction-box">
                 <h4>🔒 সাবজেক্ট রেস্ট্রিকশন</h4>
                 <input type="text" id="lockBox" placeholder="উদা: বাংলা, ইংরেজি" oninput="saveData(); updateSubFilter()" class="input-group" style="margin-bottom:0;">
@@ -1156,6 +1220,11 @@
     let temporaryEdits = new Map();
     let currentEditingIndex = 0;
 
+    // Search variables
+    let searchResults = [];
+    let currentSearchIndex = 0;
+    let searchTerm = '';
+
     function checkLicense() { 
         const savedKey = localStorage.getItem('bcti_app_license'); 
         if (savedKey !== MASTER_KEY) { 
@@ -1164,6 +1233,553 @@
             else { document.body.innerHTML = `<h1>Invalid Access</h1>`; } 
         } else { loadData(); } 
     }
+    
+    // ==================== IMPROVED AUTO GENERATOR FUNCTIONS ====================
+    
+    function autoSelectRandom() { 
+        let count = parseInt(document.getElementById('randomCount').value);
+        if(!count || count < 1) {
+            alert("প্রথমে কতটি প্রশ্ন চান তা সংখ্যায় লিখুন!");
+            return;
+        }
+        
+        // বর্তমান ফিল্টার অনুযায়ী প্রশ্নগুলো পান
+        const subF = document.getElementById('fSub').value;
+        const classF = document.getElementById('fClass').value;
+        const divF = document.getElementById('fDiv').value;
+        const typeF = document.getElementById('fType').value;
+        const chapF = document.getElementById('fChap').value;
+        
+        // ফিল্টার অনুযায়ী প্রশ্নগুলো ফিল্টার করুন (যেগুলো সিলেক্ট করা নেই)
+        let pool = questionBank.filter((q, index) => {
+            const matchesFilter = (!subF || q.sub === subF) && 
+                                 (!classF || q.qClass === classF) && 
+                                 (!divF || q.qDiv === divF) && 
+                                 (!typeF || q.type === typeF) &&
+                                 (!chapF || q.chap === chapF) &&
+                                 !q.selected; // শুধু অনসিলেক্টেড প্রশ্ন
+            return matchesFilter;
+        });
+        
+        if(pool.length === 0) {
+            alert("❌ এই ফিল্টারে আর কোন অনসিলেক্টেড প্রশ্ন নেই!\nঅথবা আগে সব প্রশ্ন সিলেক্ট করা হয়েছে।");
+            return;
+        }
+        
+        if(count > pool.length) {
+            alert(`⚠️ শুধুমাত্র ${pool.length}টি অনসিলেক্টেড প্রশ্ন পাওয়া গেছে।\nসবগুলোই সিলেক্ট করা হবে।`);
+            count = pool.length;
+        }
+        
+        // র‍্যান্ডম প্রশ্ন সিলেক্ট করুন
+        let selectedIndices = [];
+        for(let i = 0; i < count; i++){
+            if(pool.length === 0) break;
+            
+            let rIdx = Math.floor(Math.random() * pool.length);
+            let selectedQuestion = pool[rIdx];
+            
+            // মূল প্রশ্ন ব্যাংকে এই প্রশ্নটির ইনডেক্স খুঁজে বের করুন
+            let originalIndex = questionBank.findIndex(q => 
+                q === selectedQuestion || 
+                (q.sub === selectedQuestion.sub && 
+                 q.body === selectedQuestion.body &&
+                 q.type === selectedQuestion.type)
+            );
+            
+            if(originalIndex !== -1) {
+                questionBank[originalIndex].selected = true;
+                selectedIndices.push(originalIndex + 1); // 1-based index for display
+            }
+            
+            // পুল থেকে সরিয়ে দিন যাতে আবার সিলেক্ট না হয়
+            pool.splice(rIdx, 1);
+        }
+        
+        saveData(); 
+        renderSelectionList();
+        
+        // সাফল্য বার্তা
+        if(selectedIndices.length > 0) {
+            let message = `✅ ${selectedIndices.length}টি প্রশ্ন র‍্যান্ডমভাবে সিলেক্ট করা হয়েছে!`;
+            
+            // যদি কম সংখ্যক প্রশ্ন সিলেক্ট করা হয়, তাহলে সেগুলোর নাম্বার দেখান
+            if(selectedIndices.length <= 10) {
+                message += `\n\nসিলেক্টেড প্রশ্ন নম্বর: ${selectedIndices.join(', ')}`;
+            }
+            
+            alert(message);
+        }
+    }
+    
+    function advancedAutoSelect() {
+        const countInput = document.getElementById('advancedRandomCount');
+        const typeFilter = document.getElementById('autoTypeFilter').value;
+        const statusDiv = document.getElementById('autoGenStatus');
+        
+        let count = parseInt(countInput.value);
+        if(!count || count < 1) {
+            alert("প্রথমে কতটি প্রশ্ন চান তা সংখ্যায় লিখুন!");
+            return;
+        }
+        
+        let pool = [];
+        
+        if(typeFilter === 'current') {
+            // বর্তমান ফিল্টার অনুযায়ী
+            const subF = document.getElementById('fSub').value;
+            const classF = document.getElementById('fClass').value;
+            const divF = document.getElementById('fDiv').value;
+            const typeF = document.getElementById('fType').value;
+            const chapF = document.getElementById('fChap').value;
+            
+            pool = questionBank.filter(q => {
+                const matchesFilter = (!subF || q.sub === subF) && 
+                                     (!classF || q.qClass === classF) && 
+                                     (!divF || q.qDiv === divF) && 
+                                     (!typeF || q.type === typeF) &&
+                                     (!chapF || q.chap === chapF) &&
+                                     !q.selected;
+                return matchesFilter;
+            });
+        } 
+        else if(typeFilter === 'all') {
+            // সব অনসিলেক্টেড প্রশ্ন
+            pool = questionBank.filter(q => !q.selected);
+        }
+        else {
+            // নির্দিষ্ট ধরনের প্রশ্ন
+            pool = questionBank.filter(q => !q.selected && q.type === typeFilter);
+        }
+        
+        if(pool.length === 0) {
+            statusDiv.innerHTML = `<span style="color:#f44336;">❌ কোন অনসিলেক্টেড প্রশ্ন পাওয়া যায়নি!</span>`;
+            statusDiv.style.display = 'block';
+            setTimeout(() => { statusDiv.style.display = 'none'; }, 3000);
+            return;
+        }
+        
+        if(count > pool.length) {
+            statusDiv.innerHTML = `<span style="color:#ff9800;">⚠️ শুধুমাত্র ${pool.length}টি প্রশ্ন পাওয়া গেছে। সবগুলো সিলেক্ট করা হবে।</span>`;
+            statusDiv.style.display = 'block';
+            count = pool.length;
+        }
+        
+        // র‍্যান্ডম প্রশ্ন সিলেক্ট করুন
+        let selectedCount = 0;
+        for(let i = 0; i < count; i++){
+            if(pool.length === 0) break;
+            
+            let rIdx = Math.floor(Math.random() * pool.length);
+            let selectedQuestion = pool[rIdx];
+            
+            // মূল প্রশ্ন ব্যাংকে এই প্রশ্নটির ইনডেক্স খুঁজে বের করুন
+            let originalIndex = questionBank.findIndex(q => 
+                q === selectedQuestion || 
+                (q.sub === selectedQuestion.sub && 
+                 q.body === selectedQuestion.body &&
+                 q.type === selectedQuestion.type)
+            );
+            
+            if(originalIndex !== -1) {
+                questionBank[originalIndex].selected = true;
+                selectedCount++;
+            }
+            
+            // পুল থেকে সরিয়ে দিন যাতে আবার সিলেক্ট না হয়
+            pool.splice(rIdx, 1);
+        }
+        
+        saveData(); 
+        renderSelectionList();
+        
+        // সাফল্য বার্তা
+        statusDiv.innerHTML = `<span style="color:#4caf50;">✅ ${selectedCount}টি প্রশ্ন সফলভাবে সিলেক্ট করা হয়েছে!</span>`;
+        statusDiv.style.display = 'block';
+        setTimeout(() => { statusDiv.style.display = 'none'; }, 3000);
+    }
+    
+    function autoDeselectRandom() {
+        const countInput = document.getElementById('advancedRandomCount');
+        let count = parseInt(countInput.value);
+        if(!count || count < 1) {
+            alert("প্রথমে কতটি প্রশ্ন ডিসেলেক্ট করতে চান তা সংখ্যায় লিখুন!");
+            return;
+        }
+        
+        // শুধুমাত্র সিলেক্টেড প্রশ্নগুলোর পুল তৈরি করুন
+        let pool = questionBank.filter(q => q.selected);
+        
+        if(pool.length === 0) {
+            alert("❌ কোন সিলেক্টেড প্রশ্ন নেই!");
+            return;
+        }
+        
+        if(count > pool.length) {
+            alert(`⚠️ শুধুমাত্র ${pool.length}টি সিলেক্টেড প্রশ্ন আছে। সবগুলো ডিসেলেক্ট করা হবে।`);
+            count = pool.length;
+        }
+        
+        // র‍্যান্ডমভাবে ডিসেলেক্ট করুন
+        let deselectedCount = 0;
+        for(let i = 0; i < count; i++){
+            if(pool.length === 0) break;
+            
+            let rIdx = Math.floor(Math.random() * pool.length);
+            let deselectedQuestion = pool[rIdx];
+            
+            // মূল প্রশ্ন ব্যাংকে এই প্রশ্নটির ইনডেক্স খুঁজে বের করুন
+            let originalIndex = questionBank.findIndex(q => 
+                q === deselectedQuestion || 
+                (q.sub === deselectedQuestion.sub && 
+                 q.body === deselectedQuestion.body &&
+                 q.type === deselectedQuestion.type)
+            );
+            
+            if(originalIndex !== -1) {
+                questionBank[originalIndex].selected = false;
+                deselectedCount++;
+            }
+            
+            // পুল থেকে সরিয়ে দিন
+            pool.splice(rIdx, 1);
+        }
+        
+        saveData(); 
+        renderSelectionList();
+        
+        alert(`✅ ${deselectedCount}টি প্রশ্ন র‍্যান্ডমভাবে ডিসেলেক্ট করা হয়েছে!`);
+    }
+    
+    // ==================== END IMPROVED AUTO GENERATOR FUNCTIONS ====================
+    
+    // ==================== SEARCH SYSTEM ====================
+    
+    function initializeSearchBox() {
+        const filterGroup = document.getElementById('filterGroup');
+        if (filterGroup && !document.getElementById('simpleSearchBox')) {
+            console.log("Initializing search box...");
+            
+            const searchHTML = `
+                <div id="searchContainer" style="margin-bottom:15px;">
+                    <div style="display:flex; gap:5px; margin-bottom:8px;">
+                        <input type="text" id="simpleSearchBox" placeholder="🔍 প্রশ্ন বা বিষয় সার্চ করুন..." 
+                               style="flex:1; padding:10px; border:1px solid #ccc; border-radius:5px; font-size:13px;"
+                               oninput="performSearch()">
+                        <button onclick="clearSearch()" style="background:#f44336; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer; font-weight:bold;">✖</button>
+                    </div>
+                    
+                    <div id="searchNavigationPanel" style="display:none; background:#e3f2fd; padding:10px; border-radius:5px; margin-top:10px; border:1px solid #bbdefb;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                            <strong style="color:var(--primary); font-size:13px;">🔍 সার্চ রেজাল্ট</strong>
+                            <button onclick="closeSearchPanel()" style="background:none; border:none; color:#666; cursor:pointer; font-size:12px;">✖</button>
+                        </div>
+                        
+                        <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+                            <button onclick="prevSearchResult()" id="prevSearchBtn" 
+                                    style="background:var(--primary); color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-size:12px; flex:1;">
+                                ← পূর্বের
+                            </button>
+                            
+                            <div id="searchCounter" style="font-weight:bold; color:var(--primary); font-size:14px; text-align:center; min-width:80px;">
+                                ০/০
+                            </div>
+                            
+                            <button onclick="nextSearchResult()" id="nextSearchBtn"
+                                    style="background:var(--primary); color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-size:12px; flex:1;">
+                                পরের →
+                            </button>
+                        </div>
+                        
+                        <div id="searchResultInfo" style="font-size:12px; color:#555;">
+                            কোন তথ্য পাওয়া যায়নি
+                        </div>
+                    </div>
+                    <div id="searchStats" style="font-size:11px; color:#666; margin-top:5px; display:none;"></div>
+                </div>
+            `;
+            
+            // Insert at the beginning of filterGroup
+            filterGroup.insertAdjacentHTML('afterbegin', searchHTML);
+            console.log("Search box initialized successfully!");
+        }
+    }
+    
+    function performSearch() {
+        const searchInput = document.getElementById('simpleSearchBox');
+        if (!searchInput) return;
+        
+        searchTerm = searchInput.value.trim().toLowerCase();
+        
+        if (searchTerm === '') {
+            clearSearchResults();
+            return;
+        }
+        
+        console.log("Searching for:", searchTerm);
+        
+        // Filter questions based on search term
+        searchResults = [];
+        
+        questionBank.forEach((q, index) => {
+            let matchScore = 0;
+            
+            // Check in various fields
+            if (q.body && q.body.toLowerCase().includes(searchTerm)) matchScore += 10;
+            if (q.sub && q.sub.toLowerCase().includes(searchTerm)) matchScore += 5;
+            if (q.chap && q.chap.toLowerCase().includes(searchTerm)) matchScore += 3;
+            if (q.board && q.board.toLowerCase().includes(searchTerm)) matchScore += 2;
+            if (q.ans && q.ans.toLowerCase().includes(searchTerm)) matchScore += 1;
+            
+            // Check in MCQ options
+            if (q.type === 'mcq' || q.type === 'cq') {
+                if (q.a && q.a.toLowerCase().includes(searchTerm)) matchScore += 2;
+                if (q.b && q.b.toLowerCase().includes(searchTerm)) matchScore += 2;
+                if (q.c && q.c.toLowerCase().includes(searchTerm)) matchScore += 2;
+                if (q.d && q.d.toLowerCase().includes(searchTerm)) matchScore += 2;
+            }
+            
+            if (matchScore > 0) {
+                searchResults.push({
+                    index: index,
+                    question: q,
+                    score: matchScore
+                });
+            }
+        });
+        
+        // Sort by score
+        searchResults.sort((a, b) => b.score - a.score);
+        
+        if (searchResults.length > 0) {
+            currentSearchIndex = 0;
+            showSearchPanel();
+            highlightSearchResult(currentSearchIndex);
+            updateSearchPanel();
+            
+            // Update stats
+            document.getElementById('searchStats').innerHTML = `
+                <span style="color:#2e7d32;">✅ ${searchResults.length}টি প্রশ্ন পাওয়া গেছে</span>
+            `;
+            document.getElementById('searchStats').style.display = 'block';
+        } else {
+            showNoResults();
+            document.getElementById('searchStats').innerHTML = `
+                <span style="color:#d32f2f;">❌ কোন প্রশ্ন পাওয়া যায়নি</span>
+            `;
+            document.getElementById('searchStats').style.display = 'block';
+        }
+        
+        // Re-render list to show search highlights
+        renderSelectionList();
+    }
+    
+    function clearSearch() {
+        const searchInput = document.getElementById('simpleSearchBox');
+        if (searchInput) {
+            searchInput.value = '';
+        }
+        clearSearchResults();
+    }
+    
+    function clearSearchResults() {
+        searchResults = [];
+        currentSearchIndex = 0;
+        searchTerm = '';
+        
+        const searchPanel = document.getElementById('searchNavigationPanel');
+        if (searchPanel) {
+            searchPanel.style.display = 'none';
+        }
+        
+        const searchStats = document.getElementById('searchStats');
+        if (searchStats) {
+            searchStats.style.display = 'none';
+        }
+        
+        // Remove highlights
+        document.querySelectorAll('.q-card').forEach(card => {
+            card.classList.remove('search-navigation-active');
+            // Remove search badges
+            const badge = card.querySelector('.search-result-badge');
+            if (badge) {
+                badge.remove();
+            }
+        });
+        
+        // Re-render list
+        renderSelectionList();
+    }
+    
+    function showSearchPanel() {
+        const searchPanel = document.getElementById('searchNavigationPanel');
+        if (searchPanel) {
+            searchPanel.style.display = 'block';
+        }
+    }
+    
+    function closeSearchPanel() {
+        const searchPanel = document.getElementById('searchNavigationPanel');
+        if (searchPanel) {
+            searchPanel.style.display = 'none';
+        }
+    }
+    
+    function showNoResults() {
+        const searchPanel = document.getElementById('searchNavigationPanel');
+        if (searchPanel) {
+            searchPanel.style.display = 'block';
+        }
+        
+        const counter = document.getElementById('searchCounter');
+        const info = document.getElementById('searchResultInfo');
+        const prevBtn = document.getElementById('prevSearchBtn');
+        const nextBtn = document.getElementById('nextSearchBtn');
+        
+        if (counter) counter.textContent = "০/০";
+        if (info) info.innerHTML = `<span style="color:#d32f2f;">❌ কোন প্রশ্ন পাওয়া যায়নি</span>`;
+        if (prevBtn) prevBtn.disabled = true;
+        if (nextBtn) nextBtn.disabled = true;
+    }
+    
+    function updateSearchPanel() {
+        if (searchResults.length === 0) {
+            showNoResults();
+            return;
+        }
+        
+        const currentResult = searchResults[currentSearchIndex];
+        const question = currentResult.question;
+        
+        // Update counter
+        const counter = document.getElementById('searchCounter');
+        if (counter) {
+            counter.textContent = `${currentSearchIndex + 1}/${searchResults.length}`;
+        }
+        
+        // Update buttons
+        const prevBtn = document.getElementById('prevSearchBtn');
+        const nextBtn = document.getElementById('nextSearchBtn');
+        if (prevBtn) prevBtn.disabled = currentSearchIndex === 0;
+        if (nextBtn) nextBtn.disabled = currentSearchIndex === searchResults.length - 1;
+        
+        // Update info
+        const info = document.getElementById('searchResultInfo');
+        if (info) {
+            info.innerHTML = `
+                <strong>প্রশ্ন #${currentResult.index + 1}</strong><br>
+                <small>বিষয়: ${question.sub} | অধ্যায়: ${question.chap || 'নাই'}</small><br>
+                <small>ধরন: ${question.type === 'cq' ? 'সৃজনশীল' : question.type === 'mcq' ? 'MCQ' : 'সাধারণ'}</small>
+            `;
+        }
+    }
+    
+    function prevSearchResult() {
+        if (currentSearchIndex > 0) {
+            currentSearchIndex--;
+            highlightSearchResult(currentSearchIndex);
+            updateSearchPanel();
+        }
+    }
+    
+    function nextSearchResult() {
+        if (currentSearchIndex < searchResults.length - 1) {
+            currentSearchIndex++;
+            highlightSearchResult(currentSearchIndex);
+            updateSearchPanel();
+        }
+    }
+    
+    function highlightSearchResult(resultIndex) {
+        if (!searchResults[resultIndex]) return;
+        
+        const result = searchResults[resultIndex];
+        const questionIndex = result.index;
+        
+        // Calculate which page contains this question
+        const questionsPerPage = selectionPerPage;
+        const pageNumber = Math.floor(questionIndex / questionsPerPage) + 1;
+        
+        // Navigate to the page if needed
+        if (pageNumber !== selectionCurrentPage) {
+            selectionCurrentPage = pageNumber;
+            renderSelectionList();
+        }
+        
+        // Wait for rendering and then highlight
+        setTimeout(() => {
+            // Remove previous highlights
+            document.querySelectorAll('.q-card').forEach(card => {
+                card.classList.remove('search-navigation-active');
+            });
+            
+            // Find the question card
+            const localIndex = questionIndex % questionsPerPage;
+            const qCards = document.querySelectorAll('.q-card');
+            
+            if (qCards[localIndex]) {
+                // Add highlight
+                qCards[localIndex].classList.add('search-navigation-active');
+                
+                // Scroll to the question
+                qCards[localIndex].scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }
+            
+            // Update panel
+            updateSearchPanel();
+        }, 300);
+    }
+    
+    // Modified renderSelectionList to show search badges
+    const originalRenderSelectionList = renderSelectionList;
+    renderSelectionList = function() {
+        originalRenderSelectionList.call(this);
+        
+        // Add search result badges
+        if (searchResults.length > 0) {
+            const qCards = document.querySelectorAll('.q-card');
+            qCards.forEach((card, index) => {
+                const questionIndex = (selectionCurrentPage - 1) * selectionPerPage + index;
+                
+                // Check if this question is in search results
+                const isInSearchResults = searchResults.some(result => result.index === questionIndex);
+                const isCurrentResult = searchResults[currentSearchIndex] && 
+                                        searchResults[currentSearchIndex].index === questionIndex;
+                
+                if (isInSearchResults) {
+                    // Add search badge if not already present
+                    if (!card.querySelector('.search-result-badge')) {
+                        const badge = document.createElement('div');
+                        badge.className = 'search-result-badge';
+                        badge.innerHTML = '🔍';
+                        card.style.position = 'relative';
+                        card.appendChild(badge);
+                    }
+                    
+                    // Highlight current result
+                    if (isCurrentResult) {
+                        card.classList.add('search-navigation-active');
+                    }
+                } else {
+                    // Remove badge if exists
+                    const badge = card.querySelector('.search-result-badge');
+                    if (badge) {
+                        badge.remove();
+                    }
+                }
+            });
+        } else {
+            // Remove all badges if no search results
+            document.querySelectorAll('.search-result-badge').forEach(badge => {
+                badge.remove();
+            });
+        }
+    };
+    
+    // ==================== END SEARCH SYSTEM ====================
     
     // ==================== TEMPORARY EDIT FUNCTIONS ====================
     
@@ -1696,6 +2312,7 @@
         document.getElementById('imgPreview').innerHTML = '';
         currentImgData = '';
         document.getElementById('duplicateStatus').style.display = 'none';
+        document.getElementById('saveBtn').style.background = 'var(--primary)';
     }
     
     // টাইপ করার সময় ডুপ্লিকেট চেক করার ফাংশন
@@ -2626,6 +3243,8 @@
         
         // Show temporary edit button
         addTemporaryEditButton();
+        // Initialize search box
+        setTimeout(initializeSearchBox, 500);
     }
 
     function formatNum(n) { 
@@ -2671,19 +3290,6 @@
         document.getElementById('cropperModal').style.display = 'none'; 
     }
     
-    function autoSelectRandom() { 
-        let count = parseInt(document.getElementById('randomCount').value);
-        if(!count) return;
-        let pool = questionBank.filter(q => !q.selected);
-        for(let i=0; i<count && pool.length>0; i++){
-            let rIdx = Math.floor(Math.random() * pool.length);
-            pool[rIdx].selected = true;
-            pool.splice(rIdx, 1);
-        }
-        saveData(); 
-        renderSelectionList();
-    }
-    
     function shuffleSelectedQuestions() {
         let selected = questionBank.filter(q => q.selected);
         let others = questionBank.filter(q => !q.selected);
@@ -2707,500 +3313,6 @@
     document.addEventListener('DOMContentLoaded', function() {
         checkLicense();
     });
-
-// ==================== SMART SEARCH FEATURE ====================
-
-function initializeSmartSearch() {
-    // Add search box to selection panel
-    const filterGroup = document.getElementById('filterGroup');
-    if (filterGroup && !document.getElementById('smartSearchBox')) {
-        const searchHTML = `
-            <div style="margin-bottom:10px;">
-                <div style="display:flex; gap:5px; margin-bottom:5px;">
-                    <input type="text" id="smartSearchBox" placeholder="🔍 প্রশ্ন, বিষয়, অধ্যায় বা কীওয়ার্ড লিখুন..." 
-                           style="flex:1; padding:10px; border:1px solid #ccc; border-radius:5px; font-size:13px;"
-                           oninput="performSmartSearch()">
-                    <button onclick="clearSmartSearch()" style="background:#f44336; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer; font-weight:bold;">✖</button>
-                </div>
-                <div style="font-size:11px; color:#666; display:flex; justify-content:space-between;">
-                    <span>স্মার্ট সার্চ: প্রশ্ন টেক্সট, বিষয়, অধ্যায়, বোর্ড, টাইপ</span>
-                    <button onclick="showSearchTips()" style="background:none; border:none; color:var(--primary); cursor:pointer; font-size:11px;">সার্চ টিপস</button>
-                </div>
-            </div>
-        `;
-        
-        filterGroup.insertAdjacentHTML('afterbegin', searchHTML);
-        
-        // Add search filters
-        const searchFiltersHTML = `
-            <div id="searchFilters" style="display:none; background:#e3f2fd; padding:10px; border-radius:5px; margin-top:10px; border:1px solid #bbdefb;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                    <strong style="color:var(--primary); font-size:13px;">🔍 উন্নত সার্চ ফিল্টার</strong>
-                    <button onclick="toggleSearchFilters()" style="background:none; border:none; color:#666; cursor:pointer; font-size:12px;">▲</button>
-                </div>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                    <div>
-                        <label style="font-size:12px; font-weight:bold; display:block; margin-bottom:3px;">সার্চ ফিল্ড:</label>
-                        <select id="searchField" style="width:100%; padding:5px; border:1px solid #ccc; border-radius:3px; font-size:12px;">
-                            <option value="all">সব ফিল্ড</option>
-                            <option value="body">প্রশ্ন টেক্সট</option>
-                            <option value="sub">বিষয়</option>
-                            <option value="chap">অধ্যায়</option>
-                            <option value="board">বোর্ড/সাল</option>
-                            <option value="ans">উত্তর</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label style="font-size:12px; font-weight:bold; display:block; margin-bottom:3px;">ম্যাচ টাইপ:</label>
-                        <select id="matchType" style="width:100%; padding:5px; border:1px solid #ccc; border-radius:3px; font-size:12px;">
-                            <option value="contains">যেকোনো অংশে আছে</option>
-                            <option value="exact">হুবহু মিল</option>
-                            <option value="start">শুরুতে আছে</option>
-                            <option value="end">শেষে আছে</option>
-                        </select>
-                    </div>
-                </div>
-                <div style="margin-top:8px;">
-                    <label style="font-size:12px; display:flex; align-items:center; cursor:pointer;">
-                        <input type="checkbox" id="caseSensitive" style="margin-right:5px;"> 
-                        কেস সেন্সিটিভ
-                    </label>
-                    <label style="font-size:12px; display:flex; align-items:center; cursor:pointer;">
-                        <input type="checkbox" id="searchSelectedOnly" style="margin-right:5px;"> 
-                        শুধু সিলেক্টেড প্রশ্নে খুঁজুন
-                    </label>
-                </div>
-                <div style="margin-top:10px; padding-top:10px; border-top:1px solid #bbdefb;">
-                    <div style="font-size:11px; color:#666;">
-                        <strong>সার্চ অপারেটর:</strong><br>
-                        <code>"exact phrase"</code> - হুবহু বাক্য<br>
-                        <code>বিজ্ঞান AND গণিত</code> - দুটোই আছে<br>
-                        <code>MCQ OR সৃজনশীল</code> - যেকোনোটি আছে<br>
-                        <code>-বোর্ড</code> - বোর্ড নেই এমন<br>
-                        <code>প্রথম*</code> - প্রথম দিয়ে শুরু<br>
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        filterGroup.insertAdjacentHTML('afterbegin', searchFiltersHTML);
-        
-        // Add toggle button for advanced filters
-        const toggleBtn = document.createElement('button');
-        toggleBtn.innerHTML = '🔍 উন্নত সার্চ ফিল্টার';
-        toggleBtn.style.cssText = 'width:100%; background:#e3f2fd; color:var(--primary); border:1px solid #bbdefb; padding:8px; border-radius:5px; cursor:pointer; font-size:12px; font-weight:bold; margin-bottom:10px;';
-        toggleBtn.onclick = toggleSearchFilters;
-        filterGroup.insertAdjacentElement('afterbegin', toggleBtn);
-    }
-}
-
-function toggleSearchFilters() {
-    const filters = document.getElementById('searchFilters');
-    const toggleBtn = document.querySelector('[onclick="toggleSearchFilters()"]');
-    
-    if (filters.style.display === 'none' || filters.style.display === '') {
-        filters.style.display = 'block';
-        if (toggleBtn) toggleBtn.innerHTML = '▲ উন্নত সার্চ ফিল্টার লুকান';
-    } else {
-        filters.style.display = 'none';
-        if (toggleBtn) toggleBtn.innerHTML = '🔍 উন্নত সার্চ ফিল্টার';
-    }
-}
-
-function performSmartSearch() {
-    const searchTerm = document.getElementById('smartSearchBox').value.trim();
-    const searchField = document.getElementById('searchField')?.value || 'all';
-    const matchType = document.getElementById('matchType')?.value || 'contains';
-    const caseSensitive = document.getElementById('caseSensitive')?.checked || false;
-    const searchSelectedOnly = document.getElementById('searchSelectedOnly')?.checked || false;
-    
-    if (searchTerm === '') {
-        clearSearchHighlights();
-        renderSelectionList();
-        return;
-    }
-    
-    let searchPool = questionBank;
-    if (searchSelectedOnly) {
-        searchPool = questionBank.filter(q => q.selected);
-    }
-    
-    const searchResults = smartSearchAlgorithm(searchTerm, searchPool, {
-        field: searchField,
-        matchType: matchType,
-        caseSensitive: caseSensitive
-    });
-    
-    highlightSearchResults(searchResults);
-    updateSearchStats(searchResults.length, searchPool.length);
-}
-
-function smartSearchAlgorithm(searchTerm, pool, options) {
-    const results = [];
-    const terms = parseSearchQuery(searchTerm);
-    
-    pool.forEach((q, index) => {
-        let matchScore = 0;
-        let maxPossibleScore = 0;
-        
-        // Parse search operators
-        if (terms.exact) {
-            // Exact phrase search
-            const text = getSearchText(q, options.field);
-            if (text.includes(terms.exact)) {
-                matchScore += 100;
-                maxPossibleScore += 100;
-            }
-        }
-        
-        if (terms.and.length > 0) {
-            // AND operator
-            maxPossibleScore += terms.and.length * 50;
-            terms.and.forEach(term => {
-                if (checkMatch(q, term, options)) {
-                    matchScore += 50;
-                }
-            });
-        }
-        
-        if (terms.or.length > 0) {
-            // OR operator
-            maxPossibleScore += 30;
-            let orMatched = false;
-            terms.or.forEach(term => {
-                if (checkMatch(q, term, options)) {
-                    orMatched = true;
-                }
-            });
-            if (orMatched) {
-                matchScore += 30;
-            }
-        }
-        
-        if (terms.not.length > 0) {
-            // NOT operator
-            maxPossibleScore += 20;
-            let notMatched = false;
-            terms.not.forEach(term => {
-                if (checkMatch(q, term, options)) {
-                    notMatched = true;
-                }
-            });
-            if (!notMatched) {
-                matchScore += 20;
-            }
-        }
-        
-        if (terms.wildcard.length > 0) {
-            // Wildcard search
-            maxPossibleScore += terms.wildcard.length * 40;
-            terms.wildcard.forEach(wildcard => {
-                if (wildcardMatch(q, wildcard, options)) {
-                    matchScore += 40;
-                }
-            });
-        }
-        
-        // If no operators, do simple search
-        if (terms.simple.length > 0 && terms.and.length === 0 && terms.or.length === 0) {
-            maxPossibleScore += terms.simple.length * 40;
-            terms.simple.forEach(term => {
-                if (checkMatch(q, term, options)) {
-                    matchScore += 40;
-                }
-            });
-        }
-        
-        // Calculate relevance percentage
-        const relevance = maxPossibleScore > 0 ? (matchScore / maxPossibleScore) * 100 : 0;
-        
-        if (relevance > 0) {
-            results.push({
-                index: index,
-                question: q,
-                relevance: relevance,
-                matchFields: findMatchFields(q, terms, options)
-            });
-        }
-    });
-    
-    // Sort by relevance
-    results.sort((a, b) => b.relevance - a.relevance);
-    
-    return results;
-}
-
-function parseSearchQuery(query) {
-    const result = {
-        exact: null,
-        and: [],
-        or: [],
-        not: [],
-        wildcard: [],
-        simple: []
-    };
-    
-    // Extract exact phrases (within quotes)
-    const exactMatch = query.match(/"([^"]+)"/);
-    if (exactMatch) {
-        result.exact = exactMatch[1];
-        query = query.replace(exactMatch[0], '');
-    }
-    
-    // Split by spaces but keep quoted phrases
-    const tokens = query.match(/(?:[^\s"]+|"[^"]*")+/g) || [];
-    
-    tokens.forEach(token => {
-        token = token.replace(/"/g, '').trim();
-        if (!token) return;
-        
-        if (token.toUpperCase() === 'AND') {
-            // AND operator
-            return;
-        } else if (token.toUpperCase() === 'OR') {
-            // OR operator
-            return;
-        } else if (token.startsWith('-')) {
-            // NOT operator
-            result.not.push(token.substring(1));
-        } else if (token.includes('*')) {
-            // Wildcard
-            result.wildcard.push(token);
-        } else if (token.includes('+')) {
-            // AND operator alternative
-            result.and.push(token.replace('+', ''));
-        } else if (token.includes('|')) {
-            // OR operator alternative
-            result.or.push(token.replace('|', ''));
-        } else {
-            // Simple term
-            result.simple.push(token);
-        }
-    });
-    
-    return result;
-}
-
-function checkMatch(question, term, options) {
-    const text = getSearchText(question, options.field);
-    const searchText = options.caseSensitive ? text : text.toLowerCase();
-    const searchTerm = options.caseSensitive ? term : term.toLowerCase();
-    
-    switch (options.matchType) {
-        case 'exact':
-            return searchText === searchTerm;
-        case 'start':
-            return searchText.startsWith(searchTerm);
-        case 'end':
-            return searchText.endsWith(searchTerm);
-        case 'contains':
-        default:
-            return searchText.includes(searchTerm);
-    }
-}
-
-function getSearchText(question, field) {
-    switch (field) {
-        case 'body':
-            return question.body || '';
-        case 'sub':
-            return question.sub || '';
-        case 'chap':
-            return question.chap || '';
-        case 'board':
-            return question.board || '';
-        case 'ans':
-            return question.ans || '';
-        case 'all':
-        default:
-            return [
-                question.body || '',
-                question.sub || '',
-                question.chap || '',
-                question.board || '',
-                question.ans || '',
-                question.a || '',
-                question.b || '',
-                question.c || '',
-                question.d || ''
-            ].join(' ');
-    }
-}
-
-function wildcardMatch(question, wildcard, options) {
-    const text = getSearchText(question, options.field);
-    const searchText = options.caseSensitive ? text : text.toLowerCase();
-    const pattern = wildcard.replace(/\*/g, '.*').replace(/\?/g, '.');
-    
-    try {
-        const regex = new RegExp(`^${pattern}$`, options.caseSensitive ? '' : 'i');
-        return regex.test(searchText);
-    } catch (e) {
-        return false;
-    }
-}
-
-function findMatchFields(question, terms, options) {
-    const fields = [];
-    const allTerms = [...terms.simple, ...terms.and, ...terms.or].filter(t => !terms.not.includes(t));
-    
-    if (terms.exact) {
-        allTerms.push(terms.exact);
-    }
-    
-    const fieldNames = {
-        'body': 'প্রশ্ন',
-        'sub': 'বিষয়',
-        'chap': 'অধ্যায়',
-        'board': 'বোর্ড',
-        'ans': 'উত্তর',
-        'type': 'ধরন'
-    };
-    
-    Object.keys(fieldNames).forEach(field => {
-        const fieldText = getSearchText(question, field);
-        allTerms.forEach(term => {
-            if (fieldText && fieldText.toLowerCase().includes(term.toLowerCase())) {
-                if (!fields.includes(fieldNames[field])) {
-                    fields.push(fieldNames[field]);
-                }
-            }
-        });
-    });
-    
-    return fields;
-}
-
-function highlightSearchResults(results) {
-    // Store search results in global variable for highlighting
-    window.currentSearchResults = results.map(r => r.index);
-    
-    // Re-render selection list with highlights
-    renderSelectionList();
-    
-    // Highlight search terms in rendered questions
-    setTimeout(() => {
-        const searchTerm = document.getElementById('smartSearchBox').value.trim();
-        if (searchTerm) {
-            highlightTextInElements('.q-card-body', searchTerm);
-            highlightTextInElements('.q-card-options', searchTerm);
-        }
-    }, 100);
-}
-
-function highlightTextInElements(selector, searchTerm) {
-    const elements = document.querySelectorAll(selector);
-    const terms = searchTerm.split(' ').filter(t => t.length > 2);
-    
-    elements.forEach(element => {
-        let html = element.innerHTML;
-        terms.forEach(term => {
-            if (term.length > 2) {
-                const regex = new RegExp(`(${term})`, 'gi');
-                html = html.replace(regex, '<mark style="background:#ffeb3b; padding:1px 3px; border-radius:2px;">$1</mark>');
-            }
-        });
-        element.innerHTML = html;
-    });
-}
-
-function clearSearchHighlights() {
-    window.currentSearchResults = null;
-    document.querySelectorAll('mark').forEach(mark => {
-        const parent = mark.parentNode;
-        parent.replaceChild(document.createTextNode(mark.textContent), mark);
-        parent.normalize();
-    });
-}
-
-function clearSmartSearch() {
-    document.getElementById('smartSearchBox').value = '';
-    clearSearchHighlights();
-    renderSelectionList();
-    document.getElementById('searchStats').style.display = 'none';
-}
-
-function updateSearchStats(found, total) {
-    let statsElement = document.getElementById('searchStats');
-    if (!statsElement) {
-        statsElement = document.createElement('div');
-        statsElement.id = 'searchStats';
-        statsElement.style.cssText = 'background:#e8f5e9; padding:8px; border-radius:5px; margin-top:10px; border:1px solid #c8e6c9; font-size:12px;';
-        document.getElementById('smartSearchBox').parentNode.parentNode.appendChild(statsElement);
-    }
-    
-    if (found === 0) {
-        statsElement.innerHTML = `<span style="color:#d32f2f;">❌ কোন প্রশ্ন পাওয়া যায়নি (${total}টি প্রশ্নে খুঁজেছে)</span>`;
-    } else {
-        statsElement.innerHTML = `<span style="color:#2e7d32;">✅ ${found}টি প্রশ্ন পাওয়া গেছে (${total}টি প্রশ্নে খুঁজেছে)</span> 
-        <button onclick="navigateToFirstResult()" style="margin-left:10px; background:var(--primary); color:white; border:none; padding:3px 8px; border-radius:3px; cursor:pointer; font-size:11px;">📌 প্রথম ফলাফলে যান</button>`;
-    }
-    
-    statsElement.style.display = 'block';
-}
-
-function navigateToFirstResult() {
-    if (window.currentSearchResults && window.currentSearchResults.length > 0) {
-        // Find which page contains the first result
-        const firstIndex = window.currentSearchResults[0];
-        const questionsPerPage = selectionPerPage;
-        const pageNumber = Math.floor(firstIndex / questionsPerPage) + 1;
-        
-        selectionCurrentPage = pageNumber;
-        renderSelectionList();
-        
-        // Scroll to the question
-        setTimeout(() => {
-            const firstCard = document.querySelector('.q-card');
-            if (firstCard) {
-                firstCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                firstCard.style.animation = 'highlight 1.5s';
-            }
-        }, 200);
-    }
-}
-
-function showSearchTips() {
-    alert(`🔍 স্মার্ট সার্চ টিপস:
-
-1. সাধারণ সার্চ: "বিজ্ঞান প্রথম অধ্যায়"
-2. হুবহু বাক্য: "কোশ বিভাজন প্রক্রিয়া"
-3. AND অপারেটর: "বিজ্ঞান AND গণিত"
-4. OR অপারেটর: "MCQ OR সৃজনশীল"
-5. NOT অপারেটর: "-বোর্ড"
-6. Wildcard: "প্রথম*" (প্রথম দিয়ে শুরু)
-7. ফিল্ড সার্চ: "বিষয়:বিজ্ঞান" (শীঘ্রই আসছে)
-
-উন্নত ফিল্টার থেকে আরো অপশন পাবেন!`);
-}
-
-// Modify renderSelectionList to highlight search results
-const originalRenderSelectionList = renderSelectionList;
-renderSelectionList = function() {
-    originalRenderSelectionList.call(this);
-    
-    // Highlight search result cards
-    if (window.currentSearchResults && window.currentSearchResults.length > 0) {
-        const qCards = document.querySelectorAll('.q-card');
-        qCards.forEach((card, index) => {
-            const qIndex = (selectionCurrentPage - 1) * selectionPerPage + index;
-            if (window.currentSearchResults.includes(qIndex)) {
-                card.style.border = '2px solid #4caf50';
-                card.style.boxShadow = '0 2px 8px rgba(76, 175, 80, 0.3)';
-                
-                // Add search result badge
-                const badge = document.createElement('div');
-                badge.innerHTML = '🔍';
-                badge.style.cssText = 'position:absolute; top:-8px; right:-8px; background:#4caf50; color:white; width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:10px;';
-                card.style.position = 'relative';
-                card.appendChild(badge);
-            }
-        });
-    }
-};
-
-// Initialize smart search when page loads
-setTimeout(initializeSmartSearch, 1500);
 </script>
 </body>
 </html>
