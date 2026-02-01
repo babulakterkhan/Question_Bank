@@ -1028,13 +1028,13 @@
                 <input type="checkbox" id="showOptionsToggle" checked style="width:auto; margin-right:8px;"> অপশনগুলো দেখান
             </label>
             <textarea id="qBody" rows="3" placeholder="প্রশ্ন..." class="input-group" oninput="checkDuplicateWhileTyping()"></textarea>
-            <input type="text" id="qAns" placeholder="সঠিক উত্তর" class="input-group" oninput="checkDuplicateWhileTyping()">
+            <input type="text" id="qAns" placeholder="সঠিক উত্তর" class="input-group" oninput="checkDuplicateWhileTyping()"></textarea>
             <input type="text" id="qBoard" placeholder="বোর্ড ও সাল" class="input-group">
             <div id="extraFields" style="display:none; background:#f5f5f5; padding:10px; border-radius:5px; margin-bottom:10px;">
-                <input type="text" id="qA" placeholder="ক" class="input-group" oninput="checkDuplicateWhileTyping()">
-                <input type="text" id="qB" placeholder="খ" class="input-group" oninput="checkDuplicateWhileTyping()">
-                <input type="text" id="qC" placeholder="গ" class="input-group" oninput="checkDuplicateWhileTyping()">
-                <input type="text" id="qD" placeholder="ঘ" class="input-group" oninput="checkDuplicateWhileTyping()">
+                <input type="text" id="qA" placeholder="ক" class="input-group" oninput="checkDuplicateWhileTyping()"></textarea>
+                <input type="text" id="qB" placeholder="খ" class="input-group" oninput="checkDuplicateWhileTyping()"></textarea>
+                <input type="text" id="qC" placeholder="গ" class="input-group" oninput="checkDuplicateWhileTyping()"></textarea>
+                <input type="text" id="qD" placeholder="ঘ" class="input-group" oninput="checkDuplicateWhileTyping()"></textarea>
             </div>
             <input type="file" id="qImg" accept="image/*" class="input-group" onchange="handleImage(event)">
             <div id="imgPreview" style="margin: 5px 0;"></div>
@@ -1285,6 +1285,64 @@
             </div>
         </div>
         
+        <!-- Subject-wise Question Count Control -->
+        <div class="pagination-settings" style="margin-top: 20px;">
+            <h4 style="color:var(--primary); margin-top:0; margin-bottom:10px;">📚 বিষয়ভিত্তিক প্রশ্ন সংখ্যা</h4>
+            <div id="subjectLimitContainer" style="max-height: 200px; overflow-y: auto; padding: 10px; background: #f8f9fa; border-radius: 5px; margin-bottom: 10px;">
+                <!-- Subject limits will be dynamically added here -->
+                <p style="text-align:center; color:#666; font-size:13px;">প্রথমে প্রশ্ন সিলেক্ট করুন, তারপর এখানে সেটিংস দেখাবে</p>
+            </div>
+            
+            <div style="display: flex; gap: 10px;">
+                <button onclick="updateSubjectLimitsFromSelected()" style="flex:1; background:#2196f3; color:white; border:none; padding:10px; border-radius:5px; cursor:pointer; font-weight:bold;">
+                    🔄 সিলেক্টেড থেকে লোড করুন
+                </button>
+                <button onclick="clearAllSubjectLimits()" style="flex:1; background:#f44336; color:white; border:none; padding:10px; border-radius:5px; cursor:pointer; font-weight:bold;">
+                    ❌ সব লিমিট ক্লিয়ার
+                </button>
+            </div>
+            
+            <div style="background: #e8f5e9; padding: 10px; border-radius: 5px; margin-top: 10px;">
+                <small style="color:#666; display:block;">
+                    <strong>ব্যবহার নির্দেশিকা:</strong><br>
+                    1. প্রথমে বাম পাশ থেকে প্রশ্ন সিলেক্ট করুন<br>
+                    2. "সিলেক্টেড থেকে লোড করুন" বাটনে ক্লিক করুন<br>
+                    3. প্রতিটি বিষয়ের জন্য কতটি প্রশ্ন চান তা নির্ধারণ করুন<br>
+                    4. সংখ্যা না দিলে সেই বিষয়ের সব সিলেক্টেড প্রশ্ন যাবে<br>
+                    5. প্রিন্ট/PDF করতে "প্রিন্ট" বাটনে ক্লিক করুন
+                </small>
+            </div>
+            
+            <label style="display:flex; align-items:center; cursor:pointer; font-weight:bold; margin-top:10px; font-size:13px;">
+                <input type="checkbox" id="enableSubjectLimits" checked onchange="toggleSubjectLimits(); saveData();" style="width:auto; margin-right:8px;"> 
+                বিষয়ভিত্তিক লিমিট সক্রিয় করুন
+            </label>
+        </div>
+        
+        <!-- Monthly Exam Settings -->
+        <div class="pagination-settings" style="margin-top: 20px;">
+            <h4 style="color:var(--primary); margin-top:0; margin-bottom:10px;">📅 মাসিক পরীক্ষা সেটিংস</h4>
+            
+            <label style="display:flex; align-items:center; cursor:pointer; font-weight:bold; margin-bottom:10px; font-size:13px;">
+                <input type="checkbox" id="showSubjectNames" checked onchange="saveData(); sync();" style="width:auto; margin-right:8px;"> 
+                মাসিক পরীক্ষায় বিষয়ের নাম দেখান
+            </label>
+            
+            <label style="display:flex; align-items:center; cursor:pointer; font-weight:bold; margin-bottom:10px; font-size:13px;">
+                <input type="checkbox" id="combineAllSubjects" onchange="saveData(); sync();" style="width:auto; margin-right:8px;"> 
+                সব বিষয় একত্রিত করুন (একটা বিষয়ের মত দেখাবে)
+            </label>
+            
+            <div style="background: #e8f5e9; padding: 10px; border-radius: 5px; margin-top: 10px;">
+                <small style="color:#666; display:block;">
+                    <strong>ব্যবহার নির্দেশিকা:</strong><br>
+                    ✅ <strong>বিষয়ের নাম দেখান</strong>: মাসিক পরীক্ষায় প্রতিটি বিষয় আলাদাভাবে দেখাবে<br>
+                    ❌ <strong>বিষয়ের নাম দেখান না</strong>: শুধু প্রশ্নগুলো দেখাবে, বিষয়ের নাম/সেপারেটর দেখাবে না<br>
+                    🔄 <strong>সব বিষয় একত্রিত করুন</strong>: সব প্রশ্ন একটাই সাবজেক্টের মত দেখাবে, ক্রমিক নম্বর একসাথে চলবে
+                </small>
+            </div>
+        </div>
+        
         <div class="input-group">
             <label style="color: blue;">প্রশ্নের গ্যাপ (Spacing)</label>
             <div class="slider-container">
@@ -1436,6 +1494,11 @@
     // Monthly Exam Variables
     let monthlySelectedQuestions = new Map(); // subject -> array of question indices
 
+    // Subject-wise question limits
+    let subjectLimits = {}; // Store subject limits: {subject: maxQuestions}
+    let showSubjectNames = true;
+    let combineAllSubjects = false;
+
     function checkLicense() { 
         const savedKey = localStorage.getItem('bcti_app_license'); 
         if (savedKey !== MASTER_KEY) { 
@@ -1450,6 +1513,11 @@
     function renderOutputPages() {
         const selected = questionBank.filter(q => q.selected);
         const showPageNumbers = document.getElementById('showPageNumbers').checked;
+        
+        // Get settings for monthly exam
+        showSubjectNames = document.getElementById('showSubjectNames').checked;
+        combineAllSubjects = document.getElementById('combineAllSubjects').checked;
+        const enableSubjectLimits = document.getElementById('enableSubjectLimits').checked;
         
         // Clear previous pages
         document.getElementById('outputPagesContainer').innerHTML = '';
@@ -1510,6 +1578,55 @@
             });
         });
         
+        // Apply subject limits if enabled
+        let finalGrouping = {};
+        if (enableSubjectLimits && Object.keys(subjectLimits).length > 0) {
+            Object.keys(groupedBySubject).forEach(subject => {
+                const limit = subjectLimits[subject];
+                const allQuestions = groupedBySubject[subject].questions;
+                
+                if (limit !== undefined && limit < allQuestions.length) {
+                    // Take only limited number of questions
+                    finalGrouping[subject] = {
+                        questions: allQuestions.slice(0, limit),
+                        serialStart: 1
+                    };
+                } else {
+                    // Take all questions (no limit or limit is >= total)
+                    finalGrouping[subject] = groupedBySubject[subject];
+                }
+            });
+        } else {
+            // No limits applied, take all questions
+            finalGrouping = groupedBySubject;
+        }
+        
+        // Remove subjects with 0 questions after limiting
+        Object.keys(finalGrouping).forEach(subject => {
+            if (finalGrouping[subject].questions.length === 0) {
+                delete finalGrouping[subject];
+            }
+        });
+        
+        // Apply combineAllSubjects setting
+        let displayGrouping;
+        if (combineAllSubjects) {
+            // Combine all subjects into one
+            displayGrouping = {
+                'সকল বিষয়': {
+                    questions: selected.map((q, index) => ({
+                        question: q,
+                        globalIndex: index,
+                        subjectSerial: index + 1
+                    })),
+                    serialStart: 1
+                }
+            };
+        } else {
+            // Keep subjects separate
+            displayGrouping = finalGrouping;
+        }
+        
         // Get output per page setting
         outputPerPage = parseInt(document.getElementById('outputPerPage').value) || 30;
         if (outputPerPage < 15) outputPerPage = 15;
@@ -1536,57 +1653,52 @@
         let isFirstSubjectOnPage = true;
         
         // Process each subject
-        Object.keys(groupedBySubject).forEach((subject, subjectIndex) => {
-            const subjectData = groupedBySubject[subject];
+        Object.keys(displayGrouping).forEach((subject, subjectIndex) => {
+            const subjectData = displayGrouping[subject];
             const subjectQuestions = subjectData.questions;
             
-            // বাংলা সংখ্যা কনভার্টার ফাংশন
-            function toBengaliNumber(num) {
-                if (!num && num !== 0) return '';
-                const bengaliDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
-                return num.toString().replace(/\d/g, function(match) {
-                    return bengaliDigits[match];
-                });
-            }
-            
-            // বাংলা সংখ্যায় রূপান্তর
-            const bengaliTotalQuestions = toBengaliNumber(subjectQuestions.length);
-            
-            // Add subject separator
+            // Add subject separator if showSubjectNames is true AND not combining subjects
             let subjectSeparator = '';
-            if (!isFirstSubjectOnPage) {
-                subjectSeparator = `<div class="subject-separator" style="font-size: ${currentFontSize}px !important; margin-top: 15px; margin-bottom: 8px;">📘 ${subject} (প্রশ্ন ১ থেকে ${bengaliTotalQuestions})</div>`;
-            } else {
-                subjectSeparator = `<div class="subject-separator" style="font-size: ${currentFontSize}px !important; margin-bottom: 8px;">📘 ${subject} (প্রশ্ন ১ থেকে ${bengaliTotalQuestions})</div>`;
+            if (showSubjectNames && !combineAllSubjects) {
+                if (!isFirstSubjectOnPage) {
+                    subjectSeparator = `<div class="subject-separator" style="font-size: ${currentFontSize}px !important; margin-top: 15px; margin-bottom: 8px;">📘 ${subject}</div>`;
+                } else {
+                    subjectSeparator = `<div class="subject-separator" style="font-size: ${currentFontSize}px !important; margin-bottom: 8px;">📘 ${subject}</div>`;
+                    isFirstSubjectOnPage = false;
+                }
+                
+                // Check if subject separator will fit on current page
+                if (questionsOnCurrentPage + 1 > outputPerPage && questionsOnCurrentPage > 0) {
+                    // Need to start a new page
+                    pagesHTML += createPageHTML(currentPage, currentPageContent, questionsOnCurrentPage, 
+                                               topMargin, rightMargin, bottomMargin, leftMargin, 
+                                               currentFontSize, currentLineHeight, showPageNumbers);
+                    currentPage++;
+                    questionsOnCurrentPage = 0;
+                    currentPageContent = '';
+                    isFirstSubjectOnPage = true;
+                    
+                    // Re-add subject separator for new page
+                    subjectSeparator = `<div class="subject-separator" style="font-size: ${currentFontSize}px !important; margin-bottom: 8px;">📘 ${subject}</div>`;
+                }
+                
+                // Add subject separator to current page
+                currentPageContent += subjectSeparator;
+                questionsOnCurrentPage++;
+            } else if (combineAllSubjects && subject === 'সকল বিষয়') {
+                // Don't add subject separator when combining all subjects
+                // Just add a small spacing
+                if (!isFirstSubjectOnPage) {
+                    currentPageContent += `<div style="margin-top: 15px;"></div>`;
+                }
                 isFirstSubjectOnPage = false;
             }
-            
-            // Check if subject separator plus all questions will fit on current page
-            const questionsNeeded = subjectQuestions.length;
-            const spaceNeeded = questionsNeeded + 1; // +1 for subject separator
-            
-            if (questionsOnCurrentPage + spaceNeeded > outputPerPage && questionsOnCurrentPage > 0) {
-                // Need to start a new page
-                pagesHTML += createPageHTML(currentPage, currentPageContent, questionsOnCurrentPage, 
-                                           topMargin, rightMargin, bottomMargin, leftMargin, 
-                                           currentFontSize, currentLineHeight, showPageNumbers);
-                currentPage++;
-                questionsOnCurrentPage = 0;
-                currentPageContent = '';
-                isFirstSubjectOnPage = true;
-                
-                // Re-add subject separator for new page
-                subjectSeparator = `<div class="subject-separator" style="font-size: ${currentFontSize}px !important; margin-bottom: 8px;">📘 ${subject} (প্রশ্ন ১ থেকে ${bengaliTotalQuestions})</div>`;
-            }
-            
-            // Add subject separator to current page
-            currentPageContent += subjectSeparator;
-            questionsOnCurrentPage++; // Count subject separator as an item
             
             // Add each question from this subject
             subjectQuestions.forEach((sq, questionIndex) => {
                 const q = sq.question;
-                const num = formatNum(sq.subjectSerial); // Use subject-wise serial number
+                // Use combined serial for combined mode, otherwise subject-wise serial
+                const num = combineAllSubjects ? formatNum(sq.subjectSerial) : formatNum(sq.subjectSerial);
                 const img = q.img ? `<img src="${q.img}" style="max-width:100%; display:block; margin:5px auto; max-height: 100px;">` : '';
                 const isEnglish = q.sub.toLowerCase().includes("english") || q.sub.includes("ইংরেজি");
                 const labels = isEnglish ? ["a", "b", "c", "d"] : ["ক", "খ", "গ", "ঘ"];
@@ -1672,8 +1784,8 @@
                     isFirstSubjectOnPage = true;
                     
                     // Add subject separator again for new page if this is the first question
-                    if (questionIndex === 0) {
-                        currentPageContent += `<div class="subject-separator" style="font-size: ${currentFontSize}px !important; margin-bottom: 8px;">📘 ${subject} (প্রশ্ন ১ থেকে ${bengaliTotalQuestions})</div>`;
+                    if (questionIndex === 0 && showSubjectNames && !combineAllSubjects) {
+                        currentPageContent += `<div class="subject-separator" style="font-size: ${currentFontSize}px !important; margin-bottom: 8px;">📘 ${subject}</div>`;
                         questionsOnCurrentPage++;
                         isFirstSubjectOnPage = false;
                     }
@@ -1696,19 +1808,34 @@
         // Set HTML to container
         document.getElementById('outputPagesContainer').innerHTML = pagesHTML;
         
-        // Update answer grid with subject-wise serial
+        // Update answer grid with appropriate serial
         let answerGridHTML = '';
         let answerSerial = 1;
-        Object.keys(groupedBySubject).forEach(subject => {
-            const subjectQuestions = groupedBySubject[subject].questions;
-            
-            subjectQuestions.forEach((sq, index) => {
-                const q = sq.question;
+        
+        if (combineAllSubjects) {
+            // Combined mode: all questions in one sequence
+            selected.forEach((q, index) => {
                 const cleanAns = (q.ans || '...').replace(/<b>/gi, '').replace(/<\/b>/gi, '').replace(/<strong>/gi, '').replace(/<\/strong>/gi, '');
-                answerGridHTML += `<div class="ans-box" style="font-size: ${currentFontSize}px !important; line-height: ${currentLineHeight} !important; text-align: center;"><span>${formatNum(answerSerial)}.</span> ${cleanAns}</div>`;
-                answerSerial++;
+                answerGridHTML += `<div class="ans-box" style="font-size: ${currentFontSize}px !important; line-height: ${currentLineHeight} !important; text-align: center;"><span>${formatNum(index + 1)}.</span> ${cleanAns}</div>`;
             });
-        });
+        } else {
+            // Subject-wise mode
+            Object.keys(displayGrouping).forEach(subject => {
+                const subjectQuestions = displayGrouping[subject].questions;
+                
+                // Add subject header to answer sheet if showing subject names
+                if (showSubjectNames) {
+                    answerGridHTML += `<div class="subject-separator" style="font-size: ${currentFontSize}px !important; margin: 10px 0 5px 0; text-align: center; background: #f5f5f5;">${subject}</div>`;
+                }
+                
+                subjectQuestions.forEach((sq, index) => {
+                    const q = sq.question;
+                    const cleanAns = (q.ans || '...').replace(/<b>/gi, '').replace(/<\/b>/gi, '').replace(/<strong>/gi, '').replace(/<\/strong>/gi, '');
+                    answerGridHTML += `<div class="ans-box" style="font-size: ${currentFontSize}px !important; line-height: ${currentLineHeight} !important; text-align: center;"><span>${formatNum(sq.subjectSerial)}.</span> ${cleanAns}</div>`;
+                    answerSerial++;
+                });
+            });
+        }
         
         document.getElementById('ansGrid').innerHTML = answerGridHTML;
         
@@ -1832,6 +1959,14 @@
     function sync() {
         document.getElementById('ansSheetArea').style.display = document.getElementById('showAnsKey').checked ? "block" : "none";
         
+        // Also update subject limits display if needed
+        const selectedCount = questionBank.filter(q => q.selected).length;
+        if (selectedCount > 0) {
+            setTimeout(() => {
+                updateSubjectLimitsFromSelected();
+            }, 100);
+        }
+        
         setTimeout(() => {
             renderOutputPages();
         }, 100);
@@ -1854,7 +1989,11 @@
             showPageNumbers: document.getElementById('showPageNumbers').checked,
             showOutputPagination: document.getElementById('showOutputPagination').checked,
             qGap: document.getElementById('qGapSlider').value,
-            monthlyExamName: document.getElementById('monthlyExamName').value
+            monthlyExamName: document.getElementById('monthlyExamName').value,
+            subjectLimits: subjectLimits,
+            enableSubjectLimits: document.getElementById('enableSubjectLimits').checked,
+            showSubjectNames: document.getElementById('showSubjectNames').checked,
+            combineAllSubjects: document.getElementById('combineAllSubjects').checked
         };
         localStorage.setItem(DB_KEY, JSON.stringify(d));
     }
@@ -1903,6 +2042,24 @@
             
             if (d.qGap) {
                 document.getElementById('qGapSlider').value = d.qGap;
+            }
+            
+            // Load subject limits
+            if (d.subjectLimits) {
+                subjectLimits = d.subjectLimits;
+            }
+            if (d.enableSubjectLimits !== undefined) {
+                document.getElementById('enableSubjectLimits').checked = d.enableSubjectLimits;
+            }
+            
+            // Load monthly exam settings
+            if (d.showSubjectNames !== undefined) {
+                document.getElementById('showSubjectNames').checked = d.showSubjectNames;
+                showSubjectNames = d.showSubjectNames;
+            }
+            if (d.combineAllSubjects !== undefined) {
+                document.getElementById('combineAllSubjects').checked = d.combineAllSubjects;
+                combineAllSubjects = d.combineAllSubjects;
             }
             
             // Update slider value displays
@@ -2979,9 +3136,15 @@
             document.getElementById('hClass').value = classFilter;
         }
         
-        // Update subject line to show it's a monthly exam
-        let subjectsList = Array.from(monthlySelectedQuestions.keys()).join(', ');
-        document.getElementById('h3').value = `বিষয়সমূহ: ${subjectsList}`;
+        // Update subject line based on settings
+        if (combineAllSubjects) {
+            // If combining all subjects, don't show subject names
+            document.getElementById('h3').value = "মাসিক পরীক্ষা - সকল বিষয়";
+        } else {
+            // Show subjects list
+            let subjectsList = Array.from(monthlySelectedQuestions.keys()).join(', ');
+            document.getElementById('h3').value = `বিষয়সমূহ: ${subjectsList}`;
+        }
         
         // Save and update UI
         saveData();
@@ -3258,6 +3421,140 @@
         saveData();
         renderSelectionList();
         alert("সকল ফিল্টার করা প্রশ্ন ডিসেলেক্ট করা হয়েছে!");
+    }
+    
+    // ==================== SUBJECT-WISE QUESTION LIMIT FUNCTIONS ====================
+    
+    function updateSubjectLimitsFromSelected() {
+        const selected = questionBank.filter(q => q.selected);
+        if (selected.length === 0) {
+            alert("প্রথমে কিছু প্রশ্ন সিলেক্ট করুন!");
+            return;
+        }
+        
+        // Group by subject
+        const subjects = {};
+        selected.forEach(q => {
+            const subject = q.sub || 'বিষয়হীন';
+            if (!subjects[subject]) {
+                subjects[subject] = 0;
+            }
+            subjects[subject]++;
+        });
+        
+        // Generate HTML for subject limits
+        let html = '';
+        Object.keys(subjects).forEach(subject => {
+            const currentCount = subjects[subject];
+            const currentLimit = subjectLimits[subject] || currentCount; // Default to all questions
+            
+            html += `
+            <div class="subject-limit-item" style="margin-bottom: 10px; padding: 10px; background: white; border-radius: 5px; border: 1px solid #ddd;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <div>
+                        <strong style="font-size: 14px;">${subject}</strong>
+                        <div style="font-size: 11px; color: #666;">
+                            সিলেক্টেড: ${currentCount}টি | লিমিট: 
+                            <input type="number" 
+                                   id="limit_${subject.replace(/\s+/g, '_')}" 
+                                   value="${currentLimit}"
+                                   min="0" 
+                                   max="${currentCount}"
+                                   style="width: 60px; padding: 3px; border: 1px solid #ccc; border-radius: 3px; text-align: center; margin: 0 5px;"
+                                   onchange="updateSubjectLimit('${subject}', this.value)">
+                            টি
+                        </div>
+                    </div>
+                    <div>
+                        <button onclick="setLimitToAll('${subject}', ${currentCount})" 
+                                style="background: #4caf50; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-size: 11px;">
+                            সব (${currentCount})
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Progress bar -->
+                <div style="width: 100%; height: 8px; background: #e0e0e0; border-radius: 4px; overflow: hidden; margin-top: 5px;">
+                    <div style="width: ${(currentLimit / currentCount) * 100}%; height: 100%; background: var(--primary); transition: 0.3s;"></div>
+                </div>
+                
+                <div style="font-size: 10px; color: #666; margin-top: 3px; display: flex; justify-content: space-between;">
+                    <span>০টি</span>
+                    <span>${Math.min(currentLimit, currentCount)}/${currentCount}টি যাবে</span>
+                    <span>${currentCount}টি</span>
+                </div>
+            </div>`;
+        });
+        
+        document.getElementById('subjectLimitContainer').innerHTML = html || '<p>কোন সিলেক্টেড প্রশ্ন নেই</p>';
+        
+        // Save to localStorage
+        saveSubjectLimits();
+        
+        // Re-render output with new limits
+        renderOutputPages();
+    }
+    
+    function updateSubjectLimit(subject, value) {
+        const maxQuestions = questionBank.filter(q => q.selected && q.sub === subject).length;
+        const limitValue = parseInt(value);
+        
+        if (isNaN(limitValue) || limitValue < 0) {
+            subjectLimits[subject] = maxQuestions; // Default to all
+        } else if (limitValue > maxQuestions) {
+            subjectLimits[subject] = maxQuestions;
+            alert(`⚠️ "${subject}" বিষয়ে সর্বোচ্চ ${maxQuestions}টি প্রশ্ন সিলেক্ট করা আছে!`);
+        } else {
+            subjectLimits[subject] = limitValue;
+        }
+        
+        // Update the input field
+        const inputId = `limit_${subject.replace(/\s+/g, '_')}`;
+        const inputElement = document.getElementById(inputId);
+        if (inputElement) {
+            inputElement.value = subjectLimits[subject];
+        }
+        
+        saveSubjectLimits();
+        renderOutputPages();
+    }
+    
+    function setLimitToAll(subject, maxCount) {
+        subjectLimits[subject] = maxCount;
+        
+        // Update the input field
+        const inputId = `limit_${subject.replace(/\s+/g, '_')}`;
+        const inputElement = document.getElementById(inputId);
+        if (inputElement) {
+            inputElement.value = maxCount;
+        }
+        
+        saveSubjectLimits();
+        renderOutputPages();
+    }
+    
+    function clearAllSubjectLimits() {
+        if (confirm("সব বিষয়ের লিমিট ক্লিয়ার করতে চান? সব সিলেক্টেড প্রশ্ন আউটপুটে যাবে।")) {
+            subjectLimits = {};
+            saveSubjectLimits();
+            updateSubjectLimitsFromSelected();
+            renderOutputPages();
+        }
+    }
+    
+    function toggleSubjectLimits() {
+        const isEnabled = document.getElementById('enableSubjectLimits').checked;
+        
+        // Re-render output with or without limits
+        renderOutputPages();
+    }
+    
+    function saveSubjectLimits() {
+        // Save to localStorage along with other data
+        const data = JSON.parse(localStorage.getItem(DB_KEY) || '{}');
+        data.subjectLimits = subjectLimits;
+        data.enableSubjectLimits = document.getElementById('enableSubjectLimits').checked;
+        localStorage.setItem(DB_KEY, JSON.stringify(data));
     }
     
     // ==================== TEMPORARY EDIT FUNCTIONS ====================
