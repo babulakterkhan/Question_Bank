@@ -88,6 +88,7 @@
             box-sizing: border-box; 
             overflow-wrap: break-word;
             text-align: left !important;
+            position: relative;
         }
         .q-card:hover { background: #f9f9f9 !important; }
         .q-card-body { 
@@ -448,23 +449,39 @@
             margin-top: 10px !important;
         }
         
-        /* Search Navigation Styles */
+        /* Search Navigation Styles - FIXED */
         .search-navigation-active {
-            border: 3px solid #ff9800 !important;
-            box-shadow: 0 4px 12px rgba(255, 152, 0, 0.4) !important;
-            animation: highlight 1.5s;
+            border: 3px solid #4caf50 !important;
+            box-shadow: 0 0 15px rgba(76, 175, 80, 0.5) !important;
+            position: relative;
+            z-index: 5;
+            animation: pulse-highlight 2s infinite;
         }
         
-        @keyframes highlight {
-            0% { background-color: rgba(255, 152, 0, 0.1); }
-            50% { background-color: rgba(255, 152, 0, 0.3); }
-            100% { background-color: transparent; }
+        /* Search result highlighting */
+        .search-highlight {
+            background-color: #fff9c4 !important;
+            border: 2px solid #ffd54f !important;
+        }
+
+        .search-match {
+            background-color: #ffeb3b;
+            color: #000;
+            padding: 1px 3px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+
+        @keyframes pulse-highlight {
+            0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(76, 175, 80, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
         }
         
         .search-result-badge {
             position: absolute;
-            top: -5px;
-            right: -5px;
+            top: -8px;
+            right: -8px;
             background: #4caf50;
             color: white;
             width: 20px;
@@ -475,6 +492,51 @@
             justify-content: center;
             font-size: 10px;
             z-index: 10;
+            font-weight: bold;
+        }
+        
+        /* সার্চ নেভিগেশন বাটন স্টাইল */
+        .search-nav-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        
+        .search-nav-buttons button {
+            flex: 1;
+            background: #2196f3;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        
+        .search-nav-buttons button:hover {
+            background: #1976d2;
+        }
+        
+        /* সার্চ ইনফো ডিসপ্লে */
+        .search-info-display {
+            background: #e8f5e9;
+            border: 1px solid #4caf50;
+            border-radius: 4px;
+            padding: 8px;
+            margin-top: 8px;
+            font-size: 12px;
+            color: #2e7d32;
+            text-align: center;
+            display: none;
+        }
+        
+        .search-info-display.active {
+            display: block;
         }
         
         /* মাসিক পরীক্ষা স্টাইল */
@@ -666,30 +728,35 @@
                 break-inside: avoid;
             }
             
-            /* Print optimization with smaller headers */
+            /* Print optimization with PROPER header sizes */
             .header h1 { 
-                font-size: 18px !important; 
+                font-size: 20px !important; 
                 margin: 3px 0 !important;
                 padding: 0 !important;
+                font-weight: bold !important;
             }
             .header h2 { 
-                font-size: 14px !important; 
+                font-size: 16px !important; 
                 margin: 2px 0 !important;
                 padding: 0 !important;
+                font-weight: bold !important;
             }
             .header-info { 
-                font-size: 10px !important; 
+                font-size: 12px !important; 
                 margin: 1px 0 !important;
-                line-height: 1.2 !important;
+                line-height: 1.3 !important;
+                font-weight: bold !important;
             }
             .marks-info { 
-                font-size: 10px !important; 
+                font-size: 11px !important; 
                 margin: 3px 0 !important;
                 padding-bottom: 1px !important;
+                font-weight: bold !important;
             }
             .instruction { 
-                font-size: 9px !important; 
+                font-size: 11px !important; 
                 margin: 3px 0 !important;
+                font-weight: bold !important;
             }
             .cq-box, .normal-q { 
                 margin-bottom: 8px !important; 
@@ -704,12 +771,17 @@
                 margin-top: 2px !important;
             }
             
-            /* Hide header on second page and beyond */
+            /* ✅ ২য় পাতার হেডারও দেখান (যদি প্রয়োজন হয়) */
             .output-page:not(:first-child) .header,
             .output-page:not(:first-child) .header-info,
             .output-page:not(:first-child) #outSubjectLine,
             .output-page:not(:first-child) .marks-info,
-            .output-page:not(:first-child) .instruction,
+            .output-page:not(:first-child) .instruction {
+                display: block !important;
+                font-size: 10px !important;
+            }
+            
+            /* ২য় পাতার সেট নম্বর লাইনের জন্য */
             .output-page:not(:first-child) #outSetLine {
                 display: none !important;
             }
@@ -922,7 +994,30 @@
         </div>
 
         <div id="filterGroup" style="background: #f0f0f0; padding: 10px; border-radius: 5px; margin-bottom: 10px; border:1px solid #ddd;">
-            <!-- Search Box will be inserted here by JavaScript -->
+            <!-- 🔍 স্মার্ট সার্চ বক্স -->
+            <div style="margin-bottom: 10px; position: relative;">
+                <input type="text" id="searchBox" placeholder="🔍 প্রশ্ন/অপশন/বিষয়/অধ্যায় সার্চ করুন..." 
+                       style="width: 100%; padding: 10px 40px 10px 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 13px;"
+                       oninput="performSearch()"
+                       onkeypress="handleSearchKeyPress(event)">
+                <button id="clearSearchBtn" onclick="clearSearch()" 
+                        style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: #f44336; color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; display: none; font-size: 12px; line-height: 1;">✕</button>
+            </div>
+            
+            <!-- সার্চ নেভিগেশন বাটন -->
+            <div id="searchNavButtons" class="search-nav-buttons" style="display: none;">
+                <button onclick="navigateToSearchResult(currentSearchIndex - 1)">
+                    ← পূর্বেরটি
+                </button>
+                <button onclick="navigateToSearchResult(currentSearchIndex + 1)">
+                    পরেরটি →
+                </button>
+            </div>
+            
+            <!-- সার্চ রেজাল্ট ইনফো -->
+            <div id="searchInfoDisplay" class="search-info-display">
+                <span id="searchResultCount">0</span>টি রেজাল্ট পাওয়া গেছে
+            </div>
             
             <div class="admin-only restriction-box">
                 <h4>🔒 সাবজেক্ট রেস্ট্রিকশন</h4>
@@ -1486,10 +1581,11 @@
     let temporaryEdits = new Map();
     let currentEditingIndex = 0;
 
-    // Search variables
+    // Search variables - FIXED
     let searchResults = [];
     let currentSearchIndex = 0;
     let searchTerm = '';
+    let isSearchActive = false;
 
     // Monthly Exam Variables
     let monthlySelectedQuestions = new Map(); // subject -> array of question indices
@@ -2183,8 +2279,14 @@
                     </div>`;
             }
             
+            // Check if this question is in search results
+            const isSearchResult = searchResults.includes(q.originalIndex);
+            const searchResultIndex = searchResults.indexOf(q.originalIndex) + 1;
+            const isActiveSearchResult = isSearchActive && isSearchResult && searchResultIndex === currentSearchIndex + 1;
+            
             outputHTML += `
-            <div class="q-card" onclick="toggleQ(${q.originalIndex})" style="border-left: ${q.selected ? '6px solid var(--primary)' : '1px solid #eee'}">
+            <div class="q-card ${isActiveSearchResult ? 'search-navigation-active' : ''}" onclick="toggleQ(${q.originalIndex})" style="border-left: ${q.selected ? '6px solid var(--primary)' : '1px solid #eee'}">
+                ${isSearchResult ? `<div class="search-result-badge">${searchResultIndex}</div>` : ''}
                 <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px; justify-content: space-between;">
                     <div style="display: flex; align-items: center; gap: 10px;">
                         <div class="chapter-serial-circle">
@@ -3803,29 +3905,159 @@
         }
     }
     
-    // ==================== INITIALIZATION ====================
+    // ==================== SEARCH FUNCTIONS - FIXED ====================
     
-    // Initialize the button when page loads
-    setTimeout(function() {
-        // Show temporary edit button
-        const selectionPanel = document.getElementById('select');
-        const printButton = selectionPanel.querySelector('.btn-action[style*="background:#2e7d32"]');
+    function performSearch() {
+        const searchInput = document.getElementById('searchBox');
+        const clearBtn = document.getElementById('clearSearchBtn');
+        const searchNavButtons = document.getElementById('searchNavButtons');
+        const searchInfoDisplay = document.getElementById('searchInfoDisplay');
         
-        if (printButton) {
-            // Make sure the button exists
-            const tempEditBtn = document.getElementById('tempEditBtn');
-            if (!tempEditBtn) {
-                const newTempEditBtn = document.createElement('button');
-                newTempEditBtn.id = 'tempEditBtn';
-                newTempEditBtn.className = 'btn-action';
-                newTempEditBtn.style.cssText = 'background:#ff9800 !important; color:white !important; margin-top:10px !important;';
-                newTempEditBtn.innerHTML = '🖊️ টেম্পোরারি এডিট';
-                newTempEditBtn.onclick = openTemporaryEditor;
+        searchTerm = searchInput.value.trim().toLowerCase();
+        
+        if (searchTerm === '') {
+            clearSearch();
+            return;
+        }
+        
+        // Show clear button
+        clearBtn.style.display = 'block';
+        
+        // Search in all fields
+        searchResults = [];
+        
+        questionBank.forEach((q, index) => {
+            let found = false;
+            
+            // Search in body
+            if (q.body && q.body.toLowerCase().includes(searchTerm)) {
+                found = true;
+            }
+            
+            // Search in subject
+            if (q.sub && q.sub.toLowerCase().includes(searchTerm)) {
+                found = true;
+            }
+            
+            // Search in chapter
+            if (q.chap && q.chap.toLowerCase().includes(searchTerm)) {
+                found = true;
+            }
+            
+            // Search in answer
+            if (q.ans && q.ans.toLowerCase().includes(searchTerm)) {
+                found = true;
+            }
+            
+            // Search in options
+            if (q.a && q.a.toLowerCase().includes(searchTerm)) found = true;
+            if (q.b && q.b.toLowerCase().includes(searchTerm)) found = true;
+            if (q.c && q.c.toLowerCase().includes(searchTerm)) found = true;
+            if (q.d && q.d.toLowerCase().includes(searchTerm)) found = true;
+            
+            if (found) {
+                searchResults.push(index);
+            }
+        });
+        
+        // Update search status
+        isSearchActive = searchResults.length > 0;
+        currentSearchIndex = 0;
+        
+        // Update search info
+        document.getElementById('searchResultCount').textContent = searchResults.length;
+        
+        if (searchResults.length > 0) {
+            searchInfoDisplay.classList.add('active');
+            searchNavButtons.style.display = 'flex';
+            
+            // Highlight first result
+            highlightCurrentSearchResult();
+        } else {
+            searchInfoDisplay.classList.remove('active');
+            searchNavButtons.style.display = 'none';
+            searchInput.style.background = '#ffebee';
+            searchInput.style.borderColor = '#f44336';
+        }
+        
+        // Re-render the list to show highlights
+        renderSelectionList();
+        
+        // Navigate to first result
+        if (searchResults.length > 0) {
+            navigateToSearchResult(0);
+        }
+    }
+    
+    function highlightCurrentSearchResult() {
+        // Remove all active highlights
+        document.querySelectorAll('.search-navigation-active').forEach(el => {
+            el.classList.remove('search-navigation-active');
+        });
+        
+        // Add highlight to current
+        if (searchResults.length > 0 && currentSearchIndex < searchResults.length) {
+            const resultIndex = searchResults[currentSearchIndex];
+            const questionElement = document.querySelector(`.q-card[onclick*="toggleQ(${resultIndex})"]`);
+            if (questionElement) {
+                questionElement.classList.add('search-navigation-active');
                 
-                printButton.parentNode.insertBefore(newTempEditBtn, printButton);
+                // Scroll into view
+                setTimeout(() => {
+                    questionElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 300);
             }
         }
-    }, 1000);
+    }
+    
+    function navigateToSearchResult(index) {
+        if (searchResults.length === 0) return;
+        
+        if (index < 0) index = searchResults.length - 1;
+        if (index >= searchResults.length) index = 0;
+        
+        currentSearchIndex = index;
+        
+        highlightCurrentSearchResult();
+        
+        // Update search info
+        document.getElementById('searchResultCount').textContent = searchResults.length;
+        document.getElementById('searchBox').title = `রেজাল্ট ${currentSearchIndex + 1}/${searchResults.length}`;
+    }
+    
+    function clearSearch() {
+        const searchInput = document.getElementById('searchBox');
+        const clearBtn = document.getElementById('clearSearchBtn');
+        const searchNavButtons = document.getElementById('searchNavButtons');
+        const searchInfoDisplay = document.getElementById('searchInfoDisplay');
+        
+        searchInput.value = '';
+        searchTerm = '';
+        searchResults = [];
+        currentSearchIndex = 0;
+        isSearchActive = false;
+        
+        // Hide clear button and navigation
+        clearBtn.style.display = 'none';
+        searchNavButtons.style.display = 'none';
+        searchInfoDisplay.classList.remove('active');
+        
+        // Reset search box styling
+        searchInput.style.background = '';
+        searchInput.style.borderColor = '#ccc';
+        searchInput.title = '';
+        
+        // Remove highlights and re-render
+        renderSelectionList();
+    }
+    
+    function handleSearchKeyPress(e) {
+        if (e.key === 'Enter' && searchResults.length > 0) {
+            navigateToSearchResult(currentSearchIndex + 1);
+        }
+    }
+    
+    // ==================== INITIALIZATION ====================
     
     // Initialize on load
     document.addEventListener('DOMContentLoaded', function() {
