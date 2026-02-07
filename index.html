@@ -10,10 +10,51 @@
     
     <!-- Cropper.js for image cropping -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+    
+    <!-- Google Fonts for Bengali -->
+    <link href="https://fonts.googleapis.com/css2?family=Kalpurush&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=SolaimanLipi&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=SiyamRupali&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;700&display=swap" rel="stylesheet">
 
     <style>
         :root { --primary: #1a237e; --bg: #f4f7f6; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); margin: 0; display: flex; height: 100vh; overflow: hidden; }
+        body { font-family: 'Kalpurush', 'Siyam Rupali', Arial, sans-serif; background: var(--bg); margin: 0; display: flex; height: 100vh; overflow: hidden; }
+        
+        /* ফন্ট ক্লাসসমূহ */
+        .font-kalpurush {
+            font-family: 'Kalpurush', 'Siyam Rupali', Arial, sans-serif !important;
+        }
+        
+        .font-solaimanlipi {
+            font-family: 'SolaimanLipi', 'Siyam Rupali', Arial, sans-serif !important;
+        }
+        
+        .font-siyamrupali {
+            font-family: 'Siyam Rupali', Arial, sans-serif !important;
+        }
+        
+        .font-notosans {
+            font-family: 'Noto Sans Bengali', 'Kalpurush', Arial, sans-serif !important;
+        }
+        
+        .font-roboto {
+            font-family: 'Roboto', 'SolaimanLipi', Arial, sans-serif !important;
+        }
+        
+        .font-times {
+            font-family: 'Times New Roman', Times, serif !important;
+        }
+        
+        .font-arial {
+            font-family: Arial, sans-serif !important;
+        }
+        
+        .font-custom {
+            /* Will be set dynamically */
+        }
+        
         .sidebar { width: 450px; background: #fff; border-right: 2px solid #ddd; display: flex; flex-direction: column; }
         .tab-btn-group { display: flex; background: #eee; }
         .tab-btn { flex: 1; padding: 12px; border: none; cursor: pointer; font-weight: bold; background: #eee; font-size: 13px; }
@@ -668,6 +709,61 @@
             color: var(--primary);
             text-align: left;
             break-inside: avoid;
+        }
+        
+        /* Font selection styles */
+        .font-option-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .font-option {
+            padding: 8px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: center;
+            font-size: 13px;
+            transition: all 0.3s;
+            background: white;
+        }
+        
+        .font-option:hover {
+            border-color: var(--primary);
+            background: #f0f4ff;
+        }
+        
+        .font-option.selected {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: white;
+            font-weight: bold;
+        }
+        
+        .font-preview {
+            font-size: 14px;
+            margin-top: 5px;
+            min-height: 40px;
+            padding: 8px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            background: #f9f9f9;
+            text-align: center;
+        }
+        
+        .custom-font-input {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .custom-font-input input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
         }
         
         @media print { 
@@ -1337,6 +1433,107 @@
             </div>
         </div>
         
+        <!-- Font Selection Section -->
+        <div class="pagination-settings" style="margin-top: 20px;">
+            <h4 style="color:var(--primary); margin-top:0; margin-bottom:10px;">🔤 ফন্ট সিলেকশন</h4>
+            
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #dee2e6;">
+                <!-- Font Preview -->
+                <div class="font-preview" id="fontPreview">
+                    বাংলা ফন্ট প্রিভিউ: অভ্র দিয়ে বাংলা লিখুন সহজেই। ১২৩৪ সংখ্যা এবং English text.
+                </div>
+                
+                <!-- Font Options Grid -->
+                <div class="font-option-grid">
+                    <div class="font-option font-kalpurush selected" onclick="selectFont('kalpurush', 'কলপুরুষ')">
+                        কলপুরুষ
+                    </div>
+                    <div class="font-option font-solaimanlipi" onclick="selectFont('solaimanlipi', 'সোলাইমানলিপি')">
+                        সোলাইমানলিপি
+                    </div>
+                    <div class="font-option font-siyamrupali" onclick="selectFont('siyamrupali', 'সিয়ামরুপালি')">
+                        সিয়ামরুপালি
+                    </div>
+                    <div class="font-option font-notosans" onclick="selectFont('notosans', 'নোটো সান্স')">
+                        নোটো সান্স
+                    </div>
+                    <div class="font-option font-roboto" onclick="selectFont('roboto', 'রোবোটো')">
+                        রোবোটো
+                    </div>
+                    <div class="font-option font-times" onclick="selectFont('times', 'টাইমস নিউ রোমান')">
+                        টাইমস
+                    </div>
+                    <div class="font-option font-arial" onclick="selectFont('arial', 'এরিয়াল')">
+                        এরিয়াল
+                    </div>
+                </div>
+                
+                <!-- Custom Font Input -->
+                <div style="margin-top: 15px;">
+                    <label style="display:block; margin-bottom:5px; font-weight:bold;">কাস্টম ফন্ট (Google Fonts নাম)</label>
+                    <div class="custom-font-input">
+                        <input type="text" id="customFontName" placeholder="উদা: 'Hind Siliguri', sans-serif" value="">
+                        <button onclick="applyCustomFont()" style="background:var(--primary); color:white; border:none; padding:8px 15px; border-radius:4px; cursor:pointer;">অ্যাপ্লাই</button>
+                    </div>
+                    <small style="color:#666; display:block; margin-top:5px;">Google Fonts থেকে ফন্ট নাম লিখুন</small>
+                </div>
+                
+                <!-- Font Size Control -->
+                <div style="margin-top: 15px;">
+                    <label style="display:block; margin-bottom:5px; font-weight:bold;">ফন্ট সাইজ (প্রশ্নের টেক্সট)</label>
+                    <div class="slider-container">
+                        <input type="range" id="questionFontSize" min="10" max="20" value="13" oninput="updateSliderValue('questionFontSize', this.value + 'px'); updateFontPreview(); sync()">
+                        <span class="slider-value" id="questionFontSizeValue">13px</span>
+                    </div>
+                    <div class="slider-label">
+                        <span>ছোট</span>
+                        <span>বড়</span>
+                    </div>
+                </div>
+                
+                <!-- Apply to sections -->
+                <div style="margin-top: 15px;">
+                    <label style="display:block; margin-bottom:5px; font-weight:bold;">যেসব অংশে ফন্ট অ্যাপ্লাই হবে:</label>
+                    <div style="display: flex; flex-direction: column; gap: 5px;">
+                        <label style="display:flex; align-items:center; cursor:pointer;">
+                            <input type="checkbox" id="applyToQuestions" checked onchange="saveData(); sync()" style="width:auto; margin-right:8px;">
+                            প্রশ্নের টেক্সট
+                        </label>
+                        <label style="display:flex; align-items:center; cursor:pointer;">
+                            <input type="checkbox" id="applyToOptions" checked onchange="saveData(); sync()" style="width:auto; margin-right:8px;">
+                            MCQ/CQ অপশন
+                        </label>
+                        <label style="display:flex; align-items:center; cursor:pointer;">
+                            <input type="checkbox" id="applyToHeaders" checked onchange="saveData(); sync()" style="width:auto; margin-right:8px;">
+                            হেডার/শিরোনাম
+                        </label>
+                        <label style="display:flex; align-items:center; cursor:pointer;">
+                            <input type="checkbox" id="applyToAnswerSheet" checked onchange="saveData(); sync()" style="width:auto; margin-right:8px;">
+                            উত্তরপত্র
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Reset Button -->
+                <div style="margin-top: 15px;">
+                    <button onclick="resetFontSettings()" style="width:100%; background:#f44336; color:white; border:none; padding:10px; border-radius:5px; cursor:pointer; font-weight:bold;">
+                        🔄 ফন্ট সেটিংস রিসেট করুন
+                    </button>
+                </div>
+            </div>
+            
+            <div style="background: #e8f5e9; padding: 10px; border-radius: 5px; margin-top: 10px;">
+                <small style="color:#666; display:block;">
+                    <strong>ব্যবহার নির্দেশিকা:</strong><br>
+                    1. ফন্ট নির্বাচন করুন (বাংলা ও ইংরেজি উভয়ের জন্য উপযুক্ত)<br>
+                    2. কাস্টম ফন্ট ব্যবহার করতে Google Fonts থেকে নাম লিখুন<br>
+                    3. ফন্ট সাইজ সামঞ্জস্য করুন<br>
+                    4. ফন্ট যেসব অংশে অ্যাপ্লাই হবে তা নির্ধারণ করুন<br>
+                    5. প্রিভিউ দেখতে "প্রিন্ট" ট্যাবে যান
+                </small>
+            </div>
+        </div>
+        
         <!-- Pagination Settings -->
         <div class="pagination-settings">
             <h4 style="color:var(--primary); margin-top:0; margin-bottom:10px;">📄 পেজিনেশন সেটিংস</h4>
@@ -1594,6 +1791,16 @@
     let subjectLimits = {}; // Store subject limits: {subject: maxQuestions}
     let showSubjectNames = true;
     let combineAllSubjects = false;
+    
+    // Font selection variables
+    let selectedFont = 'kalpurush';
+    let selectedFontName = 'কলপুরুষ';
+    let customFontFamily = '';
+    let questionFontSize = '13';
+    let applyToQuestions = true;
+    let applyToOptions = true;
+    let applyToHeaders = true;
+    let applyToAnswerSheet = true;
 
     function checkLicense() { 
         const savedKey = localStorage.getItem('bcti_app_license'); 
@@ -1861,7 +2068,7 @@
                 }
                 
                 const questionHTML = `
-                <div class="${q.type==='cq'?'cq-box':'normal-q'}" style="font-size: ${currentFontSize}px !important; line-height: ${currentLineHeight} !important; margin-bottom: ${document.getElementById('qGapSlider').value}px !important;">
+                <div class="${q.type==='cq'?'cq-box':'normal-q'} ${getFontClassForElement(q.type)}" style="font-size: ${currentFontSize}px !important; line-height: ${currentLineHeight} !important; margin-bottom: ${document.getElementById('qGapSlider').value}px !important;">
                     <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                         <div style="display:flex; gap:4px; width: 100%;"><span style="font-size: ${currentFontSize}px !important; flex-shrink: 0;">${num}.</span> <div style="font-size: ${currentFontSize}px !important; flex: 1; text-align: left;">${formattedBody}</div></div>
                     </div>
@@ -1881,7 +2088,7 @@
                     
                     // Add subject separator again for new page if this is the first question
                     if (questionIndex === 0 && showSubjectNames && !combineAllSubjects) {
-                        currentPageContent += `<div class="subject-separator" style="font-size: ${currentFontSize}px !important; margin-bottom: 8px;">📘 ${subject}</div>`;
+                        currentPageContent += `<div class="subject-separator ${getFontClassForElement('header')}" style="font-size: ${currentFontSize}px !important; margin-bottom: 8px;">📘 ${subject}</div>`;
                         questionsOnCurrentPage++;
                         isFirstSubjectOnPage = false;
                     }
@@ -1912,7 +2119,7 @@
             // Combined mode: all questions in one sequence
             selected.forEach((q, index) => {
                 const cleanAns = (q.ans || '...').replace(/<b>/gi, '').replace(/<\/b>/gi, '').replace(/<strong>/gi, '').replace(/<\/strong>/gi, '');
-                answerGridHTML += `<div class="ans-box" style="font-size: ${currentFontSize}px !important; line-height: ${currentLineHeight} !important; text-align: center;"><span>${formatNum(index + 1)}.</span> ${cleanAns}</div>`;
+                answerGridHTML += `<div class="ans-box ${getFontClassForElement('answer')}" style="font-size: ${currentFontSize}px !important; line-height: ${currentLineHeight} !important; text-align: center;"><span>${formatNum(index + 1)}.</span> ${cleanAns}</div>`;
             });
         } else {
             // Subject-wise mode
@@ -1921,13 +2128,13 @@
                 
                 // Add subject header to answer sheet if showing subject names
                 if (showSubjectNames) {
-                    answerGridHTML += `<div class="subject-separator" style="font-size: ${currentFontSize}px !important; margin: 10px 0 5px 0; text-align: center; background: #f5f5f5;">${subject}</div>`;
+                    answerGridHTML += `<div class="subject-separator ${getFontClassForElement('header')}" style="font-size: ${currentFontSize}px !important; margin: 10px 0 5px 0; text-align: center; background: #f5f5f5;">${subject}</div>`;
                 }
                 
                 subjectQuestions.forEach((sq, index) => {
                     const q = sq.question;
                     const cleanAns = (q.ans || '...').replace(/<b>/gi, '').replace(/<\/b>/gi, '').replace(/<strong>/gi, '').replace(/<\/strong>/gi, '');
-                    answerGridHTML += `<div class="ans-box" style="font-size: ${currentFontSize}px !important; line-height: ${currentLineHeight} !important; text-align: center;"><span>${formatNum(sq.subjectSerial)}.</span> ${cleanAns}</div>`;
+                    answerGridHTML += `<div class="ans-box ${getFontClassForElement('answer')}" style="font-size: ${currentFontSize}px !important; line-height: ${currentLineHeight} !important; text-align: center;"><span>${formatNum(sq.subjectSerial)}.</span> ${cleanAns}</div>`;
                     answerSerial++;
                 });
             });
@@ -1949,8 +2156,11 @@
         
         outputCurrentPage = 1;
         
-        // Render MathJax after content is loaded
-        setTimeout(renderMathJax, 200);
+        // Apply font settings
+        setTimeout(() => {
+            applyFontToOutput();
+            renderMathJax();
+        }, 200);
     }
     
     function createPageHTML(pageNum, content, questionCount, topMargin, rightMargin, bottomMargin, leftMargin, fontSize, lineHeight, showPageNumbers) {
@@ -1959,11 +2169,11 @@
         if (pageNum === 1) {
             pageHeader = `
             <div id="outSetLine"></div>
-            <div class="header"><h1 id="outH1"></h1><h2 id="outH2"></h2></div>
-            <div id="outClassLine" class="header-info"></div>
-            <div id="outSubjectLine" class="header-info" style="margin-bottom:8px;"></div>
-            <div class="marks-info"><span id="outTime"></span><span id="outMarks"></span></div>
-            <div id="outInst" class="instruction"></div>`;
+            <div class="header ${getFontClassForElement('header')}"><h1 id="outH1"></h1><h2 id="outH2"></h2></div>
+            <div id="outClassLine" class="header-info ${getFontClassForElement('header')}"></div>
+            <div id="outSubjectLine" class="header-info ${getFontClassForElement('header')}" style="margin-bottom:8px;"></div>
+            <div class="marks-info ${getFontClassForElement('header')}"><span id="outTime"></span><span id="outMarks"></span></div>
+            <div id="outInst" class="instruction ${getFontClassForElement('header')}"></div>`;
         }
         
         // ✅ মার্জিন সেট করুন: প্রথম পাতা স্লাইডার থেকে, ২য় পাতা ফিক্সড ১০mm
@@ -1974,14 +2184,14 @@
         // Page footer with page number
         let pageFooter = '';
         if (showPageNumbers) {
-            pageFooter = `<div class="page-number" style="font-size: 12px !important;">পৃষ্ঠা ${pageNum}/${totalOutputPages}</div>`;
+            pageFooter = `<div class="page-number ${getFontClassForElement('header')}" style="font-size: 12px !important;">পৃষ্ঠা ${pageNum}/${totalOutputPages}</div>`;
         }
         
         return `
         <div id="output-page-${pageNum}" class="output-page ${pageNum === outputCurrentPage ? 'active' : ''}" 
              style="font-size: ${fontSize}px !important; padding: ${pagePadding} !important;">
             ${pageHeader}
-            <div class="question-container" style="
+            <div class="question-container ${getFontClassForElement('question')}" style="
                 column-count: ${document.getElementById('colCount').value}; 
                 font-size: ${fontSize}px !important; 
                 line-height: ${lineHeight} !important; 
@@ -1996,6 +2206,18 @@
     }
     
     // ==================== END RENDER OUTPUT PAGES ====================
+    
+    function getFontClassForElement(elementType) {
+        if (!applyToHeaders && elementType === 'header') return '';
+        if (!applyToQuestions && elementType === 'question') return '';
+        if (!applyToOptions && (elementType === 'cq' || elementType === 'mcq')) return '';
+        if (!applyToAnswerSheet && elementType === 'answer') return '';
+        
+        if (selectedFont === 'custom' && customFontFamily) {
+            return 'font-custom';
+        }
+        return `font-${selectedFont}`;
+    }
     
     function updateHeaders() {
         document.getElementById('outH1').innerText = document.getElementById('h1').value;
@@ -2065,6 +2287,7 @@
         
         setTimeout(() => {
             renderOutputPages();
+            applyFontToOutput();
         }, 100);
         saveData();
     }
@@ -2089,7 +2312,17 @@
             subjectLimits: subjectLimits,
             enableSubjectLimits: document.getElementById('enableSubjectLimits').checked,
             showSubjectNames: document.getElementById('showSubjectNames').checked,
-            combineAllSubjects: document.getElementById('combineAllSubjects').checked
+            combineAllSubjects: document.getElementById('combineAllSubjects').checked,
+            fontSettings: {
+                selectedFont: selectedFont,
+                selectedFontName: selectedFontName,
+                customFontFamily: customFontFamily,
+                questionFontSize: document.getElementById('questionFontSize').value,
+                applyToQuestions: document.getElementById('applyToQuestions').checked,
+                applyToOptions: document.getElementById('applyToOptions').checked,
+                applyToHeaders: document.getElementById('applyToHeaders').checked,
+                applyToAnswerSheet: document.getElementById('applyToAnswerSheet').checked
+            }
         };
         localStorage.setItem(DB_KEY, JSON.stringify(d));
     }
@@ -2158,6 +2391,53 @@
                 combineAllSubjects = d.combineAllSubjects;
             }
             
+            // Load font settings
+            if (d.fontSettings) {
+                selectedFont = d.fontSettings.selectedFont || 'kalpurush';
+                selectedFontName = d.fontSettings.selectedFontName || 'কলপুরুষ';
+                customFontFamily = d.fontSettings.customFontFamily || '';
+                questionFontSize = d.fontSettings.questionFontSize || '13';
+                
+                // Update UI elements
+                document.getElementById('questionFontSize').value = questionFontSize;
+                document.getElementById('questionFontSizeValue').textContent = questionFontSize + 'px';
+                
+                if (d.fontSettings.applyToQuestions !== undefined) {
+                    document.getElementById('applyToQuestions').checked = d.fontSettings.applyToQuestions;
+                }
+                if (d.fontSettings.applyToOptions !== undefined) {
+                    document.getElementById('applyToOptions').checked = d.fontSettings.applyToOptions;
+                }
+                if (d.fontSettings.applyToHeaders !== undefined) {
+                    document.getElementById('applyToHeaders').checked = d.fontSettings.applyToHeaders;
+                }
+                if (d.fontSettings.applyToAnswerSheet !== undefined) {
+                    document.getElementById('applyToAnswerSheet').checked = d.fontSettings.applyToAnswerSheet;
+                }
+                
+                // Update font selection UI
+                document.querySelectorAll('.font-option').forEach(option => {
+                    option.classList.remove('selected');
+                    if (option.classList.contains(`font-${selectedFont}`)) {
+                        option.classList.add('selected');
+                    }
+                });
+                
+                // Update custom font input
+                if (selectedFont === 'custom' && customFontFamily) {
+                    document.getElementById('customFontName').value = customFontFamily;
+                }
+                
+                // Update apply variables
+                applyToQuestions = document.getElementById('applyToQuestions').checked;
+                applyToOptions = document.getElementById('applyToOptions').checked;
+                applyToHeaders = document.getElementById('applyToHeaders').checked;
+                applyToAnswerSheet = document.getElementById('applyToAnswerSheet').checked;
+                
+                // Update font preview
+                updateFontPreview();
+            }
+            
             // Update slider value displays
             updateSliderValue('fsH1', document.getElementById('fsH1').value + 'px');
             updateSliderValue('fsH2', document.getElementById('fsH2').value + 'px');
@@ -2170,6 +2450,7 @@
             updateSliderValue('mBottom', document.getElementById('mBottom').value + 'mm');
             updateSliderValue('mLeft', document.getElementById('mLeft').value + 'mm');
             updateSliderValue('mRight', document.getElementById('mRight').value + 'mm');
+            updateSliderValue('questionFontSize', document.getElementById('questionFontSize').value + 'px');
         }
         
         updateSubFilter(); 
@@ -2177,6 +2458,292 @@
         updateQuestionCount();
         sync(); 
         renderSelectionList();
+    }
+    
+    // ==================== FONT FUNCTIONS ====================
+    
+    function selectFont(fontId, fontName) {
+        // Remove selected class from all font options
+        document.querySelectorAll('.font-option').forEach(option => {
+            option.classList.remove('selected');
+        });
+        
+        // Add selected class to clicked option
+        const clickedOption = event.target.closest('.font-option');
+        if (clickedOption) {
+            clickedOption.classList.add('selected');
+        }
+        
+        // Update selected font
+        selectedFont = fontId;
+        selectedFontName = fontName;
+        customFontFamily = '';
+        
+        // Clear custom font input
+        document.getElementById('customFontName').value = '';
+        
+        // Update font preview
+        updateFontPreview();
+        
+        // Apply font to output
+        applyFontToOutput();
+        
+        // Save to localStorage
+        saveData();
+    }
+    
+    function applyCustomFont() {
+        const customFontInput = document.getElementById('customFontName').value.trim();
+        
+        if (!customFontInput) {
+            alert('কাস্টম ফন্টের নাম লিখুন!');
+            return;
+        }
+        
+        // Remove selected class from all font options
+        document.querySelectorAll('.font-option').forEach(option => {
+            option.classList.remove('selected');
+        });
+        
+        // Set custom font
+        selectedFont = 'custom';
+        selectedFontName = 'কাস্টম ফন্ট';
+        customFontFamily = customFontInput;
+        
+        // Update font preview
+        updateFontPreview();
+        
+        // Apply font to output
+        applyFontToOutput();
+        
+        // Save to localStorage
+        saveData();
+        
+        alert('কাস্টম ফন্ট অ্যাপ্লাই করা হয়েছে!');
+    }
+    
+    function updateFontPreview() {
+        const fontPreview = document.getElementById('fontPreview');
+        const fontSize = document.getElementById('questionFontSize').value + 'px';
+        
+        // Clear existing classes
+        fontPreview.className = 'font-preview';
+        
+        // Add appropriate font class
+        if (selectedFont === 'custom' && customFontFamily) {
+            fontPreview.style.fontFamily = customFontFamily;
+            fontPreview.classList.add('font-custom');
+        } else {
+            fontPreview.style.fontFamily = '';
+            fontPreview.classList.add(`font-${selectedFont}`);
+        }
+        
+        // Update font size
+        fontPreview.style.fontSize = fontSize;
+        
+        // Update preview text
+        let previewText = '';
+        switch(selectedFont) {
+            case 'kalpurush':
+                previewText = 'কলপুরুষ ফন্ট: বাংলা টাইপিং এর জন্য জনপ্রিয় ফন্ট। ১২৩৪ সংখ্যা এবং English text.';
+                break;
+            case 'solaimanlipi':
+                previewText = 'সোলাইমানলিপি ফন্ট: বাংলাদেশে ব্যাপকভাবে ব্যবহৃত। ১২৩৪ সংখ্যা এবং English text.';
+                break;
+            case 'siyamrupali':
+                previewText = 'সিয়ামরুপালি ফন্ট: ওয়েবে বাংলার জন্য উপযুক্ত। ১২৩৪ সংখ্যা এবং English text.';
+                break;
+            case 'notosans':
+                previewText = 'নোটো সান্স ফন্ট: Google-এর আধুনিক বাংলা ফন্ট। ১২৩৪ সংখ্যা এবং English text.';
+                break;
+            case 'roboto':
+                previewText = 'রোবোটো ফন্ট: আধুনিক এবং পড়তে সহজ। ১২৩৪ সংখ্যা এবং English text.';
+                break;
+            case 'times':
+                previewText = 'টাইমস নিউ রোমান ফন্ট: ক্লাসিক এবং ফরমাল। ১২৩৪ সংখ্যা এবং English text.';
+                break;
+            case 'arial':
+                previewText = 'এরিয়াল ফন্ট: সহজপাঠ্য এবং সার্বজনীন। ১২৩৪ সংখ্যা এবং English text.';
+                break;
+            case 'custom':
+                previewText = `কাস্টম ফন্ট: ${customFontFamily}. ১২৩৪ সংখ্যা এবং English text.`;
+                break;
+            default:
+                previewText = 'বাংলা ফন্ট প্রিভিউ: অভ্র দিয়ে বাংলা লিখুন সহজেই। ১২৩৪ সংখ্যা এবং English text.';
+        }
+        
+        fontPreview.textContent = previewText;
+    }
+    
+    function applyFontToOutput() {
+        // Get settings
+        const fontSize = document.getElementById('questionFontSize').value + 'px';
+        applyToQuestions = document.getElementById('applyToQuestions').checked;
+        applyToOptions = document.getElementById('applyToOptions').checked;
+        applyToHeaders = document.getElementById('applyToHeaders').checked;
+        applyToAnswerSheet = document.getElementById('applyToAnswerSheet').checked;
+        
+        // Determine font family
+        let fontFamily = '';
+        if (selectedFont === 'custom' && customFontFamily) {
+            fontFamily = customFontFamily;
+        } else {
+            // Get CSS class for selected font
+            switch(selectedFont) {
+                case 'kalpurush':
+                    fontFamily = "'Kalpurush', 'Siyam Rupali', Arial, sans-serif";
+                    break;
+                case 'solaimanlipi':
+                    fontFamily = "'SolaimanLipi', 'Siyam Rupali', Arial, sans-serif";
+                    break;
+                case 'siyamrupali':
+                    fontFamily = "'Siyam Rupali', Arial, sans-serif";
+                    break;
+                case 'notosans':
+                    fontFamily = "'Noto Sans Bengali', 'Kalpurush', Arial, sans-serif";
+                    break;
+                case 'roboto':
+                    fontFamily = "'Roboto', 'SolaimanLipi', Arial, sans-serif";
+                    break;
+                case 'times':
+                    fontFamily = "'Times New Roman', Times, serif";
+                    break;
+                case 'arial':
+                    fontFamily = "Arial, sans-serif";
+                    break;
+                default:
+                    fontFamily = "'Kalpurush', 'Siyam Rupali', Arial, sans-serif";
+            }
+        }
+        
+        // Apply font class to output pages
+        const outputPages = document.querySelectorAll('.output-page');
+        outputPages.forEach(page => {
+            // Remove all font classes first
+            page.classList.remove('font-kalpurush', 'font-solaimanlipi', 'font-siyamrupali', 
+                                 'font-notosans', 'font-roboto', 'font-times', 'font-arial', 'font-custom');
+            
+            // Add appropriate font class
+            if (selectedFont === 'custom' && customFontFamily) {
+                page.classList.add('font-custom');
+                page.style.fontFamily = fontFamily;
+            } else {
+                page.classList.add(`font-${selectedFont}`);
+                page.style.fontFamily = '';
+            }
+        });
+        
+        // Apply to answer sheet
+        const answerSheet = document.getElementById('ansSheetArea');
+        if (answerSheet) {
+            answerSheet.classList.remove('font-kalpurush', 'font-solaimanlipi', 'font-siyamrupali', 
+                                      'font-notosans', 'font-roboto', 'font-times', 'font-arial', 'font-custom');
+            
+            if (selectedFont === 'custom' && customFontFamily) {
+                answerSheet.classList.add('font-custom');
+                answerSheet.style.fontFamily = fontFamily;
+            } else {
+                answerSheet.classList.add(`font-${selectedFont}`);
+                answerSheet.style.fontFamily = '';
+            }
+        }
+        
+        // Apply to individual elements based on settings
+        applyFontToElements();
+        
+        // Update MathJax rendering
+        setTimeout(renderMathJax, 100);
+    }
+    
+    function applyFontToElements() {
+        // Get current font class
+        const fontClass = selectedFont === 'custom' ? 'font-custom' : `font-${selectedFont}`;
+        
+        // Apply to headers if enabled
+        if (applyToHeaders) {
+            const headerElements = document.querySelectorAll('.header, .header-info, .marks-info, .instruction, .subject-separator, .page-number');
+            headerElements.forEach(el => {
+                el.classList.remove('font-kalpurush', 'font-solaimanlipi', 'font-siyamrupali', 
+                                  'font-notosans', 'font-roboto', 'font-times', 'font-arial', 'font-custom');
+                el.classList.add(fontClass);
+            });
+        }
+        
+        // Apply to questions if enabled
+        if (applyToQuestions) {
+            const questionElements = document.querySelectorAll('.cq-box, .normal-q, .question-container');
+            questionElements.forEach(el => {
+                el.classList.remove('font-kalpurush', 'font-solaimanlipi', 'font-siyamrupali', 
+                                  'font-notosans', 'font-roboto', 'font-times', 'font-arial', 'font-custom');
+                el.classList.add(fontClass);
+            });
+        }
+        
+        // Apply to options if enabled
+        if (applyToOptions) {
+            const optionElements = document.querySelectorAll('.mcq-grid, .sub-q, .q-card-options');
+            optionElements.forEach(el => {
+                el.classList.remove('font-kalpurush', 'font-solaimanlipi', 'font-siyamrupali', 
+                                  'font-notosans', 'font-roboto', 'font-times', 'font-arial', 'font-custom');
+                el.classList.add(fontClass);
+            });
+        }
+        
+        // Apply to answer sheet if enabled
+        if (applyToAnswerSheet) {
+            const answerElements = document.querySelectorAll('.ans-box, .ans-grid');
+            answerElements.forEach(el => {
+                el.classList.remove('font-kalpurush', 'font-solaimanlipi', 'font-siyamrupali', 
+                                  'font-notosans', 'font-roboto', 'font-times', 'font-arial', 'font-custom');
+                el.classList.add(fontClass);
+            });
+        }
+        
+        // Also apply to selection list
+        const qCards = document.querySelectorAll('.q-card');
+        qCards.forEach(card => {
+            card.classList.remove('font-kalpurush', 'font-solaimanlipi', 'font-siyamrupali', 
+                               'font-notosans', 'font-roboto', 'font-times', 'font-arial', 'font-custom');
+            card.classList.add(fontClass);
+        });
+    }
+    
+    function resetFontSettings() {
+        if (confirm('ফন্ট সেটিংস ডিফল্টে রিসেট করতে চান?')) {
+            // Reset to default values
+            selectedFont = 'kalpurush';
+            selectedFontName = 'কলপুরুষ';
+            customFontFamily = '';
+            questionFontSize = '13';
+            
+            // Update UI
+            document.getElementById('questionFontSize').value = questionFontSize;
+            document.getElementById('questionFontSizeValue').textContent = questionFontSize + 'px';
+            document.getElementById('customFontName').value = '';
+            document.getElementById('applyToQuestions').checked = true;
+            document.getElementById('applyToOptions').checked = true;
+            document.getElementById('applyToHeaders').checked = true;
+            document.getElementById('applyToAnswerSheet').checked = true;
+            
+            // Update font selection
+            document.querySelectorAll('.font-option').forEach(option => {
+                option.classList.remove('selected');
+                if (option.classList.contains('font-kalpurush')) {
+                    option.classList.add('selected');
+                }
+            });
+            
+            // Update preview
+            updateFontPreview();
+            
+            // Apply to output
+            applyFontToOutput();
+            
+            // Save settings
+            saveData();
+            
+            alert('ফন্ট সেটিংস রিসেট করা হয়েছে!');
+        }
     }
     
     // ==================== SELECTION LIST FUNCTIONS ====================
@@ -2241,7 +2808,7 @@
                 const bengaliTotal = toBengaliNumber(totalInChapter);
                 
                 outputHTML += `
-                    <div class="chapter-header">
+                    <div class="chapter-header ${getFontClassForElement('header')}">
                         <div style="text-align: left;">
                             <strong>📚 ${chapter}</strong>
                             <small style="display: block;">মোট প্রশ্ন: ${bengaliTotal}টি</small>
@@ -2267,7 +2834,7 @@
                 ];
                 
                 optHtml = `
-                    <div class="q-card-options">
+                    <div class="q-card-options ${getFontClassForElement(q.type)}">
                         ${options.map(opt => `
                             <div style="text-align: left; padding-left: 0; margin-bottom: 8px; display: flex; align-items: flex-start; flex-direction: column;">
                                 <div style="display: flex; align-items: flex-start; width: 100%;">
@@ -2285,7 +2852,7 @@
             const isActiveSearchResult = isSearchActive && isSearchResult && searchResultIndex === currentSearchIndex + 1;
             
             outputHTML += `
-            <div class="q-card ${isActiveSearchResult ? 'search-navigation-active' : ''}" onclick="toggleQ(${q.originalIndex})" style="border-left: ${q.selected ? '6px solid var(--primary)' : '1px solid #eee'}">
+            <div class="q-card ${getFontClassForElement('question')} ${isActiveSearchResult ? 'search-navigation-active' : ''}" onclick="toggleQ(${q.originalIndex})" style="border-left: ${q.selected ? '6px solid var(--primary)' : '1px solid #eee'}">
                 ${isSearchResult ? `<div class="search-result-badge">${searchResultIndex}</div>` : ''}
                 <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px; justify-content: space-between;">
                     <div style="display: flex; align-items: center; gap: 10px;">
@@ -2300,7 +2867,7 @@
                     ${q.board ? `<div class="board-tag" style="color: #d32f2f; font-weight: bold; font-size: 11px; background: #ffebee; padding: 2px 8px; border-radius: 3px; border: 1px solid #ffcdd2;">${q.board}</div>` : ''}
                 </div>
                 
-                <div class="q-card-body" style="text-align: left; padding-left: 0; margin-left: 0; padding-right: 0;">
+                <div class="q-card-body ${getFontClassForElement('question')}" style="text-align: left; padding-left: 0; margin-left: 0; padding-right: 0;">
                     <div style="display: flex; align-items: flex-start; gap: 4px; text-align: left;">
                         <b style="flex-shrink: 0;">${bengaliSerial}.</b>
                         <div style="text-align: left; width: 100%;">${processMathInText(q.body)}</div>
@@ -2628,6 +3195,13 @@
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); 
         document.getElementById(id).classList.add('active'); 
         if(event) event.currentTarget.classList.add('active'); 
+    }
+    
+    function updateSliderValue(sliderId, value) {
+        const valueElement = document.getElementById(sliderId + 'Value');
+        if (valueElement) {
+            valueElement.textContent = value;
+        }
     }
     
     // ==================== DUPLICATE FUNCTIONS ====================
@@ -3012,13 +3586,6 @@
             document.getElementById('outputPagination').style.display = 'flex';
         } else {
             document.getElementById('outputPagination').style.display = 'none';
-        }
-    }
-    
-    function updateSliderValue(sliderId, value) {
-        const valueElement = document.getElementById(sliderId + 'Value');
-        if (valueElement) {
-            valueElement.textContent = value;
         }
     }
     
