@@ -23,37 +23,14 @@
         body { font-family: 'Kalpurush', 'Siyam Rupali', Arial, sans-serif; background: var(--bg); margin: 0; display: flex; height: 100vh; overflow: hidden; }
         
         /* ফন্ট ক্লাসসমূহ */
-        .font-kalpurush {
-            font-family: 'Kalpurush', 'Siyam Rupali', Arial, sans-serif !important;
-        }
-        
-        .font-solaimanlipi {
-            font-family: 'SolaimanLipi', 'Siyam Rupali', Arial, sans-serif !important;
-        }
-        
-        .font-siyamrupali {
-            font-family: 'Siyam Rupali', Arial, sans-serif !important;
-        }
-        
-        .font-notosans {
-            font-family: 'Noto Sans Bengali', 'Kalpurush', Arial, sans-serif !important;
-        }
-        
-        .font-roboto {
-            font-family: 'Roboto', 'SolaimanLipi', Arial, sans-serif !important;
-        }
-        
-        .font-times {
-            font-family: 'Times New Roman', Times, serif !important;
-        }
-        
-        .font-arial {
-            font-family: Arial, sans-serif !important;
-        }
-        
-        .font-custom {
-            /* Will be set dynamically */
-        }
+        .font-kalpurush { font-family: 'Kalpurush', 'Siyam Rupali', Arial, sans-serif !important; }
+        .font-solaimanlipi { font-family: 'SolaimanLipi', 'Siyam Rupali', Arial, sans-serif !important; }
+        .font-siyamrupali { font-family: 'Siyam Rupali', Arial, sans-serif !important; }
+        .font-notosans { font-family: 'Noto Sans Bengali', 'Kalpurush', Arial, sans-serif !important; }
+        .font-roboto { font-family: 'Roboto', 'SolaimanLipi', Arial, sans-serif !important; }
+        .font-times { font-family: 'Times New Roman', Times, serif !important; }
+        .font-arial { font-family: Arial, sans-serif !important; }
+        .font-custom { /* Will be set dynamically */ }
         
         .sidebar { width: 450px; background: #fff; border-right: 2px solid #ddd; display: flex; flex-direction: column; }
         .tab-btn-group { display: flex; background: #eee; }
@@ -1015,6 +992,41 @@
     </div>
 </div>
 
+<!-- JSON Paste Modal - নতুন ফিচার -->
+<div id="jsonPasteModal" style="display:none; position:fixed; z-index:10000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.8);">
+    <div style="background:white; width:90%; max-width:600px; margin:50px auto; padding:25px; border-radius:12px; box-shadow:0 5px 20px rgba(0,0,0,0.3);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:2px solid var(--primary); padding-bottom:10px;">
+            <h3 style="margin:0; color:var(--primary); display:flex; align-items:center; gap:8px;">
+                <span style="font-size:24px;">📋</span> AI থেকে JSON পেস্ট করুন
+            </h3>
+            <button onclick="closeJsonPasteModal()" style="background:#f44336; color:white; border:none; width:30px; height:30px; border-radius:50%; cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center;">✕</button>
+        </div>
+        
+        <div style="background:#f5f5f5; padding:15px; border-radius:8px; margin-bottom:15px;">
+            <p style="margin:0 0 5px 0; font-size:13px; color:#666;">
+                <strong>📌 নির্দেশিকা:</strong> ChatGPT/Claude থেকে পাওয়া JSON টেক্সট নিচের বক্সে পেস্ট করুন (Ctrl+V)
+            </p>
+        </div>
+        
+        <textarea id="jsonPasteArea" rows="10" style="width:100%; padding:12px; border:2px solid #e0e0e0; border-radius:8px; font-family:monospace; font-size:13px; box-sizing:border-box;" placeholder='যেমন: {"qs": [{"sub": "পদার্থবিজ্ঞান", "chap": "চাপ", "type": "mcq", "body": "প্রশ্ন...", "a": "ক", "b": "খ", "c": "গ", "d": "ঘ", "ans": "ক"}]}'></textarea>
+        
+        <div style="display:flex; gap:10px; margin-top:15px;">
+            <button onclick="processJsonPaste()" style="flex:2; background:#4caf50; color:white; border:none; padding:14px; border-radius:8px; cursor:pointer; font-weight:bold; font-size:14px;">
+                ✅ ইম্পোর্ট করুন
+            </button>
+            <button onclick="clearJsonPasteArea()" style="flex:1; background:#ff9800; color:white; border:none; padding:14px; border-radius:8px; cursor:pointer; font-weight:bold; font-size:14px;">
+                🧹 ক্লিয়ার
+            </button>
+        </div>
+        
+        <div id="jsonPasteStatus" style="margin-top:12px; padding:10px; border-radius:6px; font-size:13px; text-align:center; display:none;"></div>
+        
+        <div style="margin-top:15px; background:#e8f5e9; padding:10px; border-radius:6px; font-size:12px; color:#2e7d32;">
+            <strong>⚠️ নোট:</strong> ডুপ্লিকেট প্রশ্ন স্বয়ংক্রিয়ভাবে বাদ দেওয়া হবে।
+        </div>
+    </div>
+</div>
+
 <!-- Sidebar -->
 <div class="sidebar" id="sidebarMain">
     <div class="lock-status">
@@ -1631,6 +1643,27 @@
                     ✅ <strong>বিষয়ের নাম দেখান</strong>: মাসিক পরীক্ষায় প্রতিটি বিষয় আলাদাভাবে দেখাবে<br>
                     ❌ <strong>বিষয়ের নাম দেখান না</strong>: শুধু প্রশ্নগুলো দেখাবে, বিষয়ের নাম/সেপারেটর দেখাবে না<br>
                     🔄 <strong>সব বিষয় একত্রিত করুন</strong>: সব প্রশ্ন একটাই সাবজেক্টের মত দেখাবে, ক্রমিক নম্বর একসাথে চলবে
+                </small>
+            </div>
+        </div>
+        
+        <!-- AI JSON Paste Button - নতুন ফিচার -->
+        <div class="pagination-settings" style="margin-top: 20px; background: #f3e5f5; border: 2px solid #7b1fa2;">
+            <h4 style="color: #7b1fa2; margin-top:0; margin-bottom:10px; display:flex; align-items:center; gap:8px;">
+                <span style="font-size:24px;">🤖</span> AI ইন্টিগ্রেশন
+            </h4>
+            
+            <button class="btn-action" style="background: #7b1fa2; color: white; margin-top:10px;" onclick="showJsonPasteBox()">
+                📋 AI থেকে JSON পেস্ট করুন
+            </button>
+            
+            <div style="background: #e8f5e9; padding: 10px; border-radius: 5px; margin-top: 10px;">
+                <small style="color:#666; display:block;">
+                    <strong>ব্যবহারবিধি:</strong><br>
+                    1. ChatGPT/Claude-এ PDF আপলোড করুন<br>
+                    2. AI থেকে JSON আউটপুট কপি করুন<br>
+                    3. উপরের বাটনে ক্লিক করে JSON পেস্ট করুন<br>
+                    4. ইম্পোর্ট বাটনে ক্লিক করুন
                 </small>
             </div>
         </div>
@@ -4621,6 +4654,103 @@
     function handleSearchKeyPress(e) {
         if (e.key === 'Enter' && searchResults.length > 0) {
             navigateToSearchResult(currentSearchIndex + 1);
+        }
+    }
+    
+    // ==================== NEW JSON PASTE FUNCTIONS ====================
+    
+    function showJsonPasteBox() {
+        document.getElementById('jsonPasteModal').style.display = 'block';
+        document.getElementById('jsonPasteArea').value = '';
+        document.getElementById('jsonPasteStatus').style.display = 'none';
+    }
+    
+    function closeJsonPasteModal() {
+        document.getElementById('jsonPasteModal').style.display = 'none';
+    }
+    
+    function clearJsonPasteArea() {
+        document.getElementById('jsonPasteArea').value = '';
+    }
+    
+    function processJsonPaste() {
+        const jsonText = document.getElementById('jsonPasteArea').value.trim();
+        const statusDiv = document.getElementById('jsonPasteStatus');
+        
+        if (!jsonText) {
+            statusDiv.style.display = 'block';
+            statusDiv.innerHTML = '<span style="color:#f44336;">❌ কিছুই পেস্ট করা হয়নি!</span>';
+            return;
+        }
+        
+        try {
+            const data = JSON.parse(jsonText);
+            
+            // চেক করুন সঠিক ফরম্যাট কিনা
+            if (!data.qs || !Array.isArray(data.qs)) {
+                statusDiv.style.display = 'block';
+                statusDiv.innerHTML = '<span style="color:#f44336;">❌ ভুল JSON ফরম্যাট! "qs" অ্যারে থাকতে হবে।</span>';
+                return;
+            }
+            
+            let added = 0;
+            let duplicates = 0;
+            let errors = 0;
+            
+            data.qs.forEach((newQ, idx) => {
+                try {
+                    // ডিফল্ট ভ্যালু সেট করুন
+                    if (!newQ.sub) newQ.sub = "সাধারণ জ্ঞান";
+                    if (!newQ.chap) newQ.chap = "অধ্যায় ১";
+                    if (!newQ.type) newQ.type = "normal";
+                    newQ.selected = false;
+                    
+                    // ডুপ্লিকেট চেক
+                    const exists = questionBank.some(existing => 
+                        normalizeText(existing.body) === normalizeText(newQ.body)
+                    );
+                    
+                    if (!exists) {
+                        questionBank.push(newQ);
+                        added++;
+                    } else {
+                        duplicates++;
+                    }
+                } catch (e) {
+                    errors++;
+                    console.log(`প্রশ্ন ${idx + 1} ইম্পোর্ট করতে সমস্যা:`, e);
+                }
+            });
+            
+            saveData();
+            updateSubFilter();
+            updateChapterFilter();
+            updateQuestionCount();
+            renderSelectionList();
+            
+            statusDiv.style.display = 'block';
+            
+            let statusMessage = '';
+            if (added > 0) {
+                statusMessage += `✅ ${added}টি নতুন প্রশ্ন যোগ হয়েছে! `;
+            }
+            if (duplicates > 0) {
+                statusMessage += `⚠️ ${duplicates}টি ডুপ্লিকেট বাদ দেওয়া হয়েছে। `;
+            }
+            if (errors > 0) {
+                statusMessage += `❌ ${errors}টি প্রশ্নে সমস্যা ছিল।`;
+            }
+            
+            statusDiv.innerHTML = `<span style="color:${added > 0 ? '#4caf50' : '#ff9800'};">${statusMessage}</span>`;
+            
+            // ৩ সেকেন্ড পরে মডাল বন্ধ করুন (যদি কমপক্ষে ১টি প্রশ্ন যোগ হয়)
+            if (added > 0) {
+                setTimeout(closeJsonPasteModal, 3000);
+            }
+            
+        } catch (error) {
+            statusDiv.style.display = 'block';
+            statusDiv.innerHTML = `<span style="color:#f44336;">❌ JSON পার্স করতে সমস্যা: ${error.message}</span>`;
         }
     }
     
