@@ -1805,22 +1805,36 @@
     }
 
     // This function will be called from Firebase module when ready
-    window.loadFirebaseData = function() {
-        console.log("Firebase module loaded, attempting to connect...");
-        updateFirebaseStatus('connecting', 'Firebase সংযোগ হচ্ছে...');
+   // This function will be called from Firebase module when ready
+window.loadFirebaseData = function() {
+    console.log("Firebase module loaded, attempting to connect...");
+    updateFirebaseStatus('connecting', 'Firebase সংযোগ হচ্ছে...');
+    
+    // Check if Firebase is available
+    if (window.firebaseDB) {
+        // 🔐 প্রথমে Anonymous Login করার চেষ্টা করুন
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        const auth = getAuth();
+        signInAnonymously(auth)
+            .then(() => {
+                console.log("✅ Signed in anonymously!");
+                updateFirebaseStatus('connected', 'Firebase সংযুক্ত (লগইন সফল)');
+                firebaseConnected = true;
+                
+                // ✅ লগইন成功后 ডাটা লোড করুন
+                loadFromFirebase();
+            })
+            .catch((error) => {
+                console.error("❌ Anonymous login failed:", error);
+                updateFirebaseStatus('disconnected', 'Firebase লগইন ব্যর্থ');
+                firebaseConnected = false;
+            });
         
-        // Check if Firebase is available
-        if (window.firebaseDB) {
-            updateFirebaseStatus('connected', 'Firebase সংযুক্ত');
-            firebaseConnected = true;
-            
-            // Load data from Firebase
-            loadFromFirebase();
-        } else {
-            updateFirebaseStatus('disconnected', 'Firebase সংযোগ নেই');
-            firebaseConnected = false;
-        }
-    };
+    } else {
+        updateFirebaseStatus('disconnected', 'Firebase সংযোগ নেই');
+        firebaseConnected = false;
+    }
+};
 
     function updateFirebaseStatus(status, message) {
         const indicator = document.getElementById('firebaseStatusIndicator');
