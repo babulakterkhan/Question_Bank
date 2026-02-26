@@ -2,7 +2,7 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <title>BCTI - Advanced Exam Maker (Firebase Connected)</title>
+    <title>BCTI - Advanced Exam Maker (AI + Firebase)</title>
     
     <!-- Firebase SDK (Compat version) -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -22,7 +22,8 @@
         body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); margin: 0; display: flex; height: 100vh; overflow: hidden; }
         .sidebar { width: 450px; background: #fff; border-right: 2px solid #ddd; display: flex; flex-direction: column; }
         .tab-btn-group { display: flex; background: #eee; }
-        .tab-btn { flex: 1; padding: 12px; border: none; cursor: pointer; font-weight: bold; background: #eee; font-size: 13px; }
+        .tab-btn { flex: 1; padding: 12px; border: none; cursor: pointer; font-weight: bold; background: #eee; font-size: 13px; transition: 0.3s; }
+        .tab-btn:hover { background: #ddd; }
         .tab-btn.active { background: #fff; border-bottom: 2px solid var(--primary); color: var(--primary); }
         .panel { padding: 15px; flex: 1; overflow-y: auto; display: none; box-sizing: border-box; }
         .panel.active { display: block; }
@@ -77,8 +78,10 @@
         #ansSheetArea { margin-top: 25px; border-top: 2px dashed #333; padding-top: 15px; break-before: page; }
         .ans-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px; }
         .ans-box { border: 1px solid #ccc; padding: 5px; border-radius: 3px; }
-        .btn-action { border: none; padding: 12px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 5px; }
-        .btn-mini { padding: 4px 10px; border: none; border-radius: 3px; color: white; cursor: pointer; font-size: 11px; margin-right: 5px; }
+        .btn-action { border: none; padding: 12px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 5px; transition: 0.3s; }
+        .btn-action:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .btn-mini { padding: 4px 10px; border: none; border-radius: 3px; color: white; cursor: pointer; font-size: 11px; margin-right: 5px; transition: 0.3s; }
+        .btn-mini:hover { opacity: 0.8; }
         .lock-status { padding: 10px; background: #1a237e; color: white; display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
         
         /* Firebase Connection Status Bar */
@@ -96,13 +99,20 @@
             height: 12px;
             border-radius: 50%;
             display: inline-block;
+            transition: 0.3s;
         }
-        .status-connected { background-color: #4caf50; }
-        .status-disconnected { background-color: #f44336; }
-        .status-connecting { background-color: #ff9800; }
+        .status-connected { background-color: #4caf50; box-shadow: 0 0 5px #4caf50; }
+        .status-disconnected { background-color: #f44336; box-shadow: 0 0 5px #f44336; }
+        .status-connecting { background-color: #ff9800; animation: pulse 1s infinite; }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
         
         .q-card { 
-            transition: 0.2s; 
+            transition: 0.3s; 
             border: 1px solid #eee; 
             margin-bottom: 8px; 
             border-radius: 8px; 
@@ -115,7 +125,11 @@
             text-align: left !important;
             position: relative;
         }
-        .q-card:hover { background: #f9f9f9 !important; }
+        .q-card:hover { 
+            background: #f9f9f9 !important; 
+            transform: translateX(-2px);
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+        }
         .q-card-body { 
             white-space: pre-wrap; 
             color: #333; 
@@ -171,7 +185,9 @@
             cursor: pointer;
             font-weight: bold;
             min-width: 80px;
+            transition: 0.3s;
         }
+        .selection-pagination button:hover:not(:disabled) { opacity: 0.9; transform: translateY(-2px); }
         .selection-pagination button:disabled {
             background: #ccc;
             cursor: not-allowed;
@@ -196,6 +212,7 @@
             gap: 15px;
             z-index: 1000;
             border: 2px solid var(--primary);
+            backdrop-filter: blur(5px);
         }
         .page-btn {
             background: var(--primary);
@@ -206,7 +223,9 @@
             cursor: pointer;
             font-weight: bold;
             min-width: 80px;
+            transition: 0.3s;
         }
+        .page-btn:hover:not(:disabled) { opacity: 0.9; transform: translateY(-2px); }
         .page-btn:disabled {
             background: #ccc;
             cursor: not-allowed;
@@ -318,7 +337,9 @@
             cursor: pointer;
             border: 2px solid white;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: 0.3s;
         }
+        .slider-container input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
         
         .slider-container input[type="range"]::-moz-range-thumb {
             width: 18px;
@@ -394,7 +415,9 @@
             font-weight: bold;
             font-size: 13px;
             flex-shrink: 0;
+            transition: 0.3s;
         }
+        .q-card:hover .chapter-serial-circle { transform: scale(1.1); }
         
         /* MathJax Equation Styling */
         .MathJax_Display {
@@ -467,9 +490,17 @@
             font-weight: bold !important;
             width: 100% !important;
             margin-top: 10px !important;
+            transition: 0.3s !important;
         }
+        #tempEditBtn:hover { opacity: 0.9 !important; transform: translateY(-2px) !important; }
         
-        /* Search Navigation Styles */
+        /* ================== উন্নত সার্চ স্টাইল ================== */
+        .search-highlight {
+            background-color: #fff9c4 !important;
+            border: 2px solid #ffd54f !important;
+            transition: 0.3s;
+        }
+
         .search-navigation-active {
             border: 3px solid #4caf50 !important;
             box-shadow: 0 0 15px rgba(76, 175, 80, 0.5) !important;
@@ -477,45 +508,80 @@
             z-index: 5;
             animation: pulse-highlight 2s infinite;
         }
-        
-        /* Search result highlighting */
-        .search-highlight {
-            background-color: #fff9c4 !important;
-            border: 2px solid #ffd54f !important;
-        }
-
-        .search-match {
-            background-color: #ffeb3b;
-            color: #000;
-            padding: 1px 3px;
-            border-radius: 3px;
-            font-weight: bold;
-        }
 
         @keyframes pulse-highlight {
             0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7); }
             70% { box-shadow: 0 0 0 10px rgba(76, 175, 80, 0); }
             100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
         }
-        
+
         .search-result-badge {
             position: absolute;
             top: -8px;
             right: -8px;
             background: #4caf50;
             color: white;
-            width: 20px;
-            height: 20px;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 10px;
-            z-index: 10;
+            font-size: 12px;
             font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 10;
+            animation: popIn 0.3s;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); }
+            80% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        /* সার্চ ইনফো ডিসপ্লে */
+        .search-info-display {
+            transition: 0.3s;
+        }
+
+        /* অটো-সাজেশন ড্রপডাউন */
+        #suggestionDropdown {
+            position: absolute;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* সার্চ বক্স ফোকাস স্টাইল */
+        #searchBox:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(26, 35, 126, 0.1);
+        }
+
+        /* সার্চ বাটন হোভার */
+        #clearSearchBtn:hover {
+            background: #d32f2f !important;
+            transform: translateY(-50%) scale(1.1);
         }
         
-        /* সার্চ নেভিগেশন বাটন স্টাইল */
         .search-nav-buttons {
             display: flex;
             gap: 8px;
@@ -527,37 +593,14 @@
             background: #2196f3;
             color: white;
             border: none;
-            padding: 8px 12px;
+            padding: 8px;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 12px;
             font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
+            transition: 0.3s;
         }
-        
-        .search-nav-buttons button:hover {
-            background: #1976d2;
-        }
-        
-        /* সার্চ ইনফো ডিসপ্লে */
-        .search-info-display {
-            background: #e8f5e9;
-            border: 1px solid #4caf50;
-            border-radius: 4px;
-            padding: 8px;
-            margin-top: 8px;
-            font-size: 12px;
-            color: #2e7d32;
-            text-align: center;
-            display: none;
-        }
-        
-        .search-info-display.active {
-            display: block;
-        }
+        .search-nav-buttons button:hover { opacity: 0.9; transform: translateY(-2px); }
+        /* ================== END উন্নত সার্চ স্টাইল ================== */
         
         /* মাসিক পরীক্ষা স্টাইল */
         .monthly-exam-section {
@@ -585,7 +628,9 @@
             margin-bottom: 15px;
             border: 1px solid #ffcc80;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: 0.3s;
         }
+        .subject-group:hover { box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         
         .subject-group-header {
             display: flex;
@@ -627,6 +672,7 @@
         .question-item:hover {
             background: #fff8e1;
             border-color: #ffb74d;
+            transform: translateX(-2px);
         }
         
         .question-item.selected {
@@ -663,7 +709,9 @@
             cursor: pointer;
             font-weight: bold;
             font-size: 13px;
+            transition: 0.3s;
         }
+        .monthly-controls button:hover { opacity: 0.9; transform: translateY(-2px); }
         
         .monthly-stats {
             background: #e8f5e9;
@@ -770,7 +818,9 @@
             border-radius: 4px;
             cursor: pointer;
             font-weight: bold;
+            transition: 0.3s;
         }
+        .duplicate-buttons button:hover { opacity: 0.9; transform: translateY(-2px); }
         
         /* Firebase Sync Button */
         .firebase-sync-btn {
@@ -785,12 +835,106 @@
             display: flex;
             align-items: center;
             gap: 5px;
+            transition: 0.3s;
         }
         .firebase-sync-btn:hover {
             background: #3367d6;
+            transform: translateY(-2px);
         }
         .firebase-sync-btn i {
             font-size: 14px;
+        }
+
+        /* AI Panel Styles (Bank এর ভিতরে) */
+        .ai-section {
+            margin-top: 30px;
+            border-top: 2px dashed var(--primary);
+            padding-top: 20px;
+        }
+        .ai-header {
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        .ai-container {
+            background: #f3e5f5;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #ce93d8;
+        }
+        .ai-json-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 13px;
+            background: #fff;
+            transition: 0.3s;
+        }
+        .ai-json-input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(26, 35, 126, 0.1);
+        }
+        .ai-upload-btn {
+            flex: 2;
+            background: #7b1fa2;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .ai-upload-btn:hover {
+            background: #6a1b9a;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .ai-clear-btn {
+            flex: 1;
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .ai-clear-btn:hover {
+            background: #d32f2f;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .ai-sample-box {
+            background: #fff;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+        .ai-sample-summary {
+            cursor: pointer;
+            color: #7b1fa2;
+            font-weight: bold;
+            font-size:13px;
+        }
+        .ai-instruction-box {
+            background: #f3f3f3;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+        }
+        .ai-status {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+            transition: 0.3s;
         }
     </style>
 
@@ -825,8 +969,8 @@
         <div id="cropImageWrap" style="max-height:400px; overflow:hidden;">
             <img id="cropImage" src="">
         </div>
-        <button onclick="finishCrop()" style="background:var(--primary); color:white; padding:10px 30px; border:none; border-radius:5px; margin:10px;">ক্রপ সম্পন্ন করুন</button>
-        <button onclick="closeCropper()" style="background:#777; color:white; padding:10px 30px; border:none; border-radius:5px;">বাতিল</button>
+        <button onclick="finishCrop()" style="background:var(--primary); color:white; padding:10px 30px; border:none; border-radius:5px; margin:10px; transition:0.3s;">ক্রপ সম্পন্ন করুন</button>
+        <button onclick="closeCropper()" style="background:#777; color:white; padding:10px 30px; border:none; border-radius:5px; transition:0.3s;">বাতিল</button>
     </div>
 </div>
 
@@ -875,17 +1019,17 @@
 
         <!-- সকল সিলেক্ট/ডিসেলেক্ট বাটন -->
         <div style="margin-bottom: 15px; display: flex; gap: 5px;">
-            <button onclick="selectAllQuestions()" style="flex:1; background:#1a237e; color:white; border:none; border-radius:4px; padding:10px; cursor:pointer; font-weight:bold;">সব সিলেক্ট করুন</button>
-            <button onclick="deselectAllQuestions()" style="flex:1; background:#d32f2f; color:white; border:none; border-radius:4px; padding:10px; cursor:pointer; font-weight:bold;">সব ডিসেলেক্ট করুন</button>
+            <button onclick="selectAllQuestions()" style="flex:1; background:#1a237e; color:white; border:none; border-radius:4px; padding:10px; cursor:pointer; font-weight:bold; transition:0.3s;">সব সিলেক্ট করুন</button>
+            <button onclick="deselectAllQuestions()" style="flex:1; background:#d32f2f; color:white; border:none; border-radius:4px; padding:10px; cursor:pointer; font-weight:bold; transition:0.3s;">সব ডিসেলেক্ট করুন</button>
         </div>
 
         <div class="magic-tools">
             <label style="font-size: 12px; font-weight: bold;">🎲 অটো জেনারেটর</label>
             <div style="display: flex; gap: 5px; margin-top: 5px;">
                 <input type="number" id="randomCount" placeholder="কয়টি?" style="width: 70px; padding: 5px;">
-                <button onclick="autoSelectRandom()" style="flex:1; background:#673ab7; color:white; border:none; border-radius:4px; cursor:pointer;">প্রশ্ন বাছাই করো</button>
+                <button onclick="autoSelectRandom()" style="flex:1; background:#673ab7; color:white; border:none; border-radius:4px; cursor:pointer; transition:0.3s;">প্রশ্ন বাছাই করো</button>
             </div>
-            <button onclick="shuffleSelectedQuestions()" style="width:100%; margin-top:5px; background:#ff9800; color:white; border:none; border-radius:4px; padding:8px; cursor:pointer; font-weight:bold;">🔀 প্রশ্ন উলট-পালট করো</button>
+            <button onclick="shuffleSelectedQuestions()" style="width:100%; margin-top:5px; background:#ff9800; color:white; border:none; border-radius:4px; padding:8px; cursor:pointer; font-weight:bold; transition:0.3s;">🔀 প্রশ্ন উলট-পালট করো</button>
             
             <!-- উন্নত অটো জেনারেটর -->
             <div style="margin-top: 15px; padding: 10px; background: #f3e5f5; border-radius: 5px; border: 1px solid #ce93d8;">
@@ -907,12 +1051,12 @@
                 
                 <div style="display: flex; gap: 5px; margin-top: 8px;">
                     <button onclick="advancedAutoSelect()" 
-                            style="flex: 1; background: #7b1fa2; color: white; border: none; border-radius: 4px; padding: 8px; cursor: pointer; font-weight: bold;">
+                            style="flex: 1; background: #7b1fa2; color: white; border: none; border-radius: 4px; padding: 8px; cursor: pointer; font-weight: bold; transition:0.3s;">
                         🎲 অটো সিলেক্ট
                     </button>
                     
                     <button onclick="autoDeselectRandom()" 
-                            style="flex: 1; background: #f44336; color: white; border: none; border-radius: 4px; padding: 8px; cursor: pointer; font-weight: bold;">
+                            style="flex: 1; background: #f44336; color: white; border: none; border-radius: 4px; padding: 8px; cursor: pointer; font-weight: bold; transition:0.3s;">
                         🗑️ অটো ডিসেলেক্ট
                     </button>
                 </div>
@@ -921,29 +1065,30 @@
             </div>
         </div>
 
-        <div id="filterGroup" style="background: #f0f0f0; padding: 10px; border-radius: 5px; margin-bottom: 10px; border:1px solid #ddd;">
-            <!-- 🔍 স্মার্ট সার্চ বক্স -->
+        <div id="filterGroup" style="background: #f0f0f0; padding: 10px; border-radius: 5px; margin-bottom: 10px; border:1px solid #ddd; position: relative;">
+            <!-- 🔍 উন্নত সার্চ বক্স -->
             <div style="margin-bottom: 10px; position: relative;">
-                <input type="text" id="searchBox" placeholder="🔍 প্রশ্ন/অপশন/বিষয়/অধ্যায় সার্চ করুন..." 
-                       style="width: 100%; padding: 10px 40px 10px 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 13px;"
+                <input type="text" id="searchBox" placeholder="🔍 প্রশ্ন/অপশন/বিষয়/অধ্যায় সার্চ করুন... (টাইপ করুন)" 
+                       style="width: 100%; padding: 12px 40px 12px 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 13px; transition: 0.3s;"
                        oninput="performSearch()"
-                       onkeypress="handleSearchKeyPress(event)">
+                       onkeyup="handleSearchKeyUp(event)"
+                       onfocus="this.style.borderColor='var(--primary)'"
+                       onblur="this.style.borderColor='#e0e0e0'">
                 <button id="clearSearchBtn" onclick="clearSearch()" 
-                        style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: #f44336; color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; display: none; font-size: 12px; line-height: 1;">✕</button>
+                        style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: #f44336; color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; display: none; font-size: 12px; line-height: 1; transition: 0.3s;">✕</button>
             </div>
-            
+
+            <!-- অটো-সাজেশন ড্রপডাউন -->
+            <div id="suggestionDropdown" style="display: none; position: absolute; background: white; border: 1px solid #ddd; border-radius: 8px; max-height: 200px; overflow-y: auto; width: calc(100% - 30px); z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.2);"></div>
+
             <!-- সার্চ নেভিগেশন বাটন -->
             <div id="searchNavButtons" class="search-nav-buttons" style="display: none;">
-                <button onclick="navigateToSearchResult(currentSearchIndex - 1)">
-                    ← পূর্বেরটি
-                </button>
-                <button onclick="navigateToSearchResult(currentSearchIndex + 1)">
-                    পরেরটি →
-                </button>
+                <button onclick="navigateToSearchResult(currentSearchIndex - 1)">← পূর্বেরটি</button>
+                <button onclick="navigateToSearchResult(currentSearchIndex + 1)">পরেরটি →</button>
             </div>
-            
+
             <!-- সার্চ রেজাল্ট ইনফো -->
-            <div id="searchInfoDisplay" class="search-info-display">
+            <div id="searchInfoDisplay" class="search-info-display" style="display: none; background: #e8f5e9; border: 1px solid #4caf50; border-radius: 4px; padding: 8px; margin-top: 8px; font-size: 12px; color: #2e7d32; text-align: center;">
                 <span id="searchResultCount">0</span>টি রেজাল্ট পাওয়া গেছে
             </div>
             
@@ -1003,12 +1148,12 @@
         </div>
         
         <!-- Temporary Edit Button -->
-        <button id="tempEditBtn" class="btn-action" style="background:#ff9800; color:white; margin-top:10px;" onclick="openTemporaryEditor()">🖊️ টেম্পোরারি এডিট</button>
+        <button id="tempEditBtn" class="btn-action" onclick="openTemporaryEditor()">🖊️ টেম্পোরারি এডিট</button>
         
         <button class="btn-action" style="background:#2e7d32; color:white; margin-top:15px;" onclick="window.print()">🖨️ প্রিন্ট / PDF</button>
     </div>
 
-    <!-- Bank Panel -->
+    <!-- Bank Panel (AI সেকশন সহ) -->
     <div id="bank" class="panel">
         <div class="admin-only">
             <h3>প্রশ্ন যোগ/এডিট</h3>
@@ -1086,6 +1231,90 @@
                     </div>
                 </div>
             </div>
+
+            <!-- ===== AI সেকশন (শুধু এডমিন দেখবে) ===== -->
+            <div class="ai-section">
+                <h4 class="ai-header">
+                    <span>🤖</span> AI প্রশ্ন জেনারেটর (এডমিন)
+                </h4>
+                
+                <div class="ai-container">
+                    <p style="margin-top:0; margin-bottom:15px; font-size:13px; color:#666;">AI দিয়ে JSON তৈরি করে পেস্ট করুন, প্রশ্ন অটো আপলোড হবে</p>
+
+                    <!-- JSON Input Area -->
+                    <div style="margin-bottom: 15px;">
+                        <label style="font-weight: bold; display: block; margin-bottom: 8px; color: #7b1fa2;">
+                            📋 আপনার JSON পেস্ট করুন:
+                        </label>
+                        <textarea id="aiJsonInput" rows="8" class="ai-json-input"
+                            placeholder='[{ "sub": "পদার্থবিজ্ঞান", "qClass": "HSC", "qDiv": "বিজ্ঞান", "chap": "১ম অধ্যায়", "type": "mcq", "body": "আলোর বেগ কত?", "ans": "৩×10⁸ m/s", "board": "কু.বো’২৩", "a": "৩×10⁶", "b": "৩×10⁸", "c": "৩×10¹⁰", "d": "৩×10⁴" }]'></textarea>
+                        <small style="color:#666; display:block; margin-top:5px;">একটি অ্যারে আকারে JSON দিন, একাধিক প্রশ্ন একসাথে দেওয়া যাবে</small>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <button onclick="importAIPaste()" class="ai-upload-btn">
+                            📤 আপলোড করুন
+                        </button>
+                        <button onclick="clearAIPanel()" class="ai-clear-btn">
+                            🗑️ মুছুন
+                        </button>
+                    </div>
+
+                    <!-- Sample JSON (Collapsible) -->
+                    <details class="ai-sample-box">
+                        <summary class="ai-sample-summary">📝 নমুনা JSON দেখুন</summary>
+                        <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px; font-size: 11px; overflow-x: auto; margin:10px 0 0 0;">
+[
+  {
+    "sub": "জীববিজ্ঞান ১ম পত্র",
+    "qClass": "HSC",
+    "qDiv": "বিজ্ঞান",
+    "chap": "কোষ ও এর গঠন",
+    "type": "mcq",
+    "body": "কোষপ্রাচীরের ক্ষুদ্রতম গাঠনিক একক কোনটি?",
+    "ans": "খ",
+    "board": "কু.বো’২০২৩",
+    "a": "সেলুলোজ",
+    "b": "মাইসেলি",
+    "c": "মাইক্রোফাইব্রিল",
+    "d": "লিগনিন"
+  },
+  {
+    "sub": "জীববিজ্ঞান ১ম পত্র",
+    "qClass": "HSC",
+    "qDiv": "বিজ্ঞান",
+    "chap": "কোষ বিভাজন",
+    "type": "cq",
+    "body": "জীববিজ্ঞান ক্লাসে শিক্ষক কোষ বিভাজনের একটি উপধাপের মডেল দেখালেন যেখানে প্রতিটি বাইভ্যালেন্টে চারটি ক্রোমাটিড থাকে এবং এদের মধ্যে ক্রসিং ওভার শুরু হয়।",
+    "ans": "",
+    "board": "[কু. বো. ২২]",
+    "a": "অ্যামাইটোসিস কী?",
+    "b": "অনিয়ন্ত্রিত মাইটোসিস বলতে কী বোঝায়?",
+    "c": "উদ্দীপকে শিক্ষকের দেখানো উপধাপের চিহ্নিত চিত্র আঁক।",
+    "d": "জীবজগতে উদ্দীপকের শেষে উল্লিখিত প্রক্রিয়ার গুরুত্ব বিশ্লেষণ করো।"
+  }
+]
+                        </pre>
+                    </details>
+
+                    <!-- Instructions -->
+                    <div class="ai-instruction-box">
+                        <strong style="color:#7b1fa2;">⚠️ নির্দেশিকা:</strong>
+                        <ul style="margin:5px 0 0 20px; color:#666;">
+                            <li>JSON অবশ্যই অ্যারে [] আকারে হতে হবে</li>
+                            <li>sub (বিষয়) এবং body (প্রশ্ন) আবশ্যক</li>
+                            <li>অন্যান্য ফিল্ড অপশনাল (qClass, qDiv, chap, type, ans, board, a, b, c, d)</li>
+                            <li>ডুপ্লিকেট প্রশ্ন স্বয়ংক্রিয়ভাবে বাদ যাবে</li>
+                            <li>সফলভাবে আপলোডের পর সংখ্যা দেখাবে</li>
+                        </ul>
+                    </div>
+
+                    <!-- Status Display -->
+                    <div id="aiStatus" class="ai-status"></div>
+                </div>
+            </div>
+            <!-- ===== AI সেকশন শেষ ===== -->
             
             <!-- Equation Help Text -->
             <div style="background:#e3f2fd; padding:10px; border-radius:5px; margin-top:15px; font-size:12px;">
@@ -1312,15 +1541,14 @@
         <div class="pagination-settings" style="margin-top: 20px;">
             <h4 style="color:var(--primary); margin-top:0; margin-bottom:10px;">📚 বিষয়ভিত্তিক প্রশ্ন সংখ্যা</h4>
             <div id="subjectLimitContainer" style="max-height: 200px; overflow-y: auto; padding: 10px; background: #f8f9fa; border-radius: 5px; margin-bottom: 10px;">
-                <!-- Subject limits will be dynamically added here -->
                 <p style="text-align:center; color:#666; font-size:13px;">প্রথমে প্রশ্ন সিলেক্ট করুন, তারপর এখানে সেটিংস দেখাবে</p>
             </div>
             
             <div style="display: flex; gap: 10px;">
-                <button onclick="updateSubjectLimitsFromSelected()" style="flex:1; background:#2196f3; color:white; border:none; padding:10px; border-radius:5px; cursor:pointer; font-weight:bold;">
+                <button onclick="updateSubjectLimitsFromSelected()" style="flex:1; background:#2196f3; color:white; border:none; padding:10px; border-radius:5px; cursor:pointer; font-weight:bold; transition:0.3s;">
                     🔄 সিলেক্টেড থেকে লোড করুন
                 </button>
-                <button onclick="clearAllSubjectLimits()" style="flex:1; background:#f44336; color:white; border:none; padding:10px; border-radius:5px; cursor:pointer; font-weight:bold;">
+                <button onclick="clearAllSubjectLimits()" style="flex:1; background:#f44336; color:white; border:none; padding:10px; border-radius:5px; cursor:pointer; font-weight:bold; transition:0.3s;">
                     ❌ সব লিমিট ক্লিয়ার
                 </button>
             </div>
@@ -1515,11 +1743,13 @@ let totalOutputPages = 1;
 let temporaryEdits = new Map();
 let currentEditingIndex = 0;
 
-// Search variables
+// উন্নত সার্চ ভেরিয়েবল
 let searchResults = [];
 let currentSearchIndex = 0;
 let searchTerm = '';
 let isSearchActive = false;
+let searchTimeout = null;
+let suggestions = [];
 
 // Monthly Exam Variables
 let monthlySelectedQuestions = new Map();
@@ -1748,7 +1978,6 @@ function loadData() {
             combineAllSubjects = d.combineAllSubjects;
         }
         
-        // Update slider value displays
         updateSliderValue('fsH1', document.getElementById('fsH1').value + 'px');
         updateSliderValue('fsH2', document.getElementById('fsH2').value + 'px');
         updateSliderValue('fsH3', document.getElementById('fsH3').value + 'px');
@@ -1789,15 +2018,6 @@ function renderSelectionList() {
                (!chapF || q.chap === chapF);
     });
     
-    const chapterGroups = {};
-    filtered.forEach(q => {
-        const chapter = q.chap || 'অধ্যায়হীন';
-        if (!chapterGroups[chapter]) {
-            chapterGroups[chapter] = [];
-        }
-        chapterGroups[chapter].push(q);
-    });
-    
     selectionPerPage = parseInt(document.getElementById('selectionPerPage').value) || 10;
     totalSelectionPages = Math.ceil(filtered.length / selectionPerPage);
     if (totalSelectionPages < 1) totalSelectionPages = 1;
@@ -1806,8 +2026,6 @@ function renderSelectionList() {
     const startIndex = (selectionCurrentPage - 1) * selectionPerPage;
     const endIndex = startIndex + selectionPerPage;
     const pagedQuestions = filtered.slice(startIndex, endIndex);
-    
-    const chapterCounters = {};
     
     function toBengaliNumber(num) {
         if (!num && num !== 0) return '';
@@ -1818,33 +2036,9 @@ function renderSelectionList() {
     }
     
     let outputHTML = '';
-    let currentChapter = null;
     
     pagedQuestions.forEach((q, localIndex) => {
-        const chapter = q.chap || 'অধ্যায়হীন';
-        
-        if (chapter !== currentChapter) {
-            currentChapter = chapter;
-            
-            const totalInChapter = filtered.filter(item => item.chap === chapter).length;
-            const bengaliTotal = toBengaliNumber(totalInChapter);
-            
-            outputHTML += `
-                <div class="chapter-header">
-                    <div style="text-align: left;">
-                        <strong>📚 ${chapter}</strong>
-                        <small style="display: block;">মোট প্রশ্ন: ${bengaliTotal}টি</small>
-                    </div>
-                    <div style="text-align: left;">
-                        <small>${q.sub} | ${q.type === 'cq' ? 'সৃজনশীল' : q.type === 'mcq' ? 'MCQ' : 'সাধারণ'}</small>
-                    </div>
-                </div>
-            `;
-        }
-        
-        chapterCounters[chapter] = (chapterCounters[chapter] || 0) + 1;
-        const chapterSerialNumber = chapterCounters[chapter];
-        const bengaliSerial = toBengaliNumber(chapterSerialNumber);
+        const bengaliSerial = toBengaliNumber(localIndex + 1);
         
         let optHtml = "";
         if (q.type !== 'normal') {
@@ -1873,7 +2067,7 @@ function renderSelectionList() {
         const isActiveSearchResult = isSearchActive && isSearchResult && searchResultIndex === currentSearchIndex + 1;
         
         outputHTML += `
-        <div class="q-card ${isActiveSearchResult ? 'search-navigation-active' : ''}" onclick="toggleQ(${q.originalIndex})" style="border-left: ${q.selected ? '6px solid var(--primary)' : '1px solid #eee'}">
+        <div class="q-card ${isActiveSearchResult ? 'search-navigation-active' : ''} ${isSearchResult ? 'search-highlight' : ''}" onclick="toggleQ(${q.originalIndex})" style="border-left: ${q.selected ? '6px solid var(--primary)' : '1px solid #eee'}">
             ${isSearchResult ? `<div class="search-result-badge">${searchResultIndex}</div>` : ''}
             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px; justify-content: space-between;">
                 <div style="display: flex; align-items: center; gap: 10px;">
@@ -2206,7 +2400,7 @@ function importJSON(e) {
         
         saveData();
         updateQuestionCount();
-        location.reload();
+        renderSelectionList();
     }; 
     r.readAsText(e.target.files[0]); 
 }
@@ -2693,7 +2887,7 @@ function renderOutputPages() {
             const q = sq.question;
             const num = combineAllSubjects ? formatNum(sq.subjectSerial) : formatNum(sq.subjectSerial);
             const img = q.img ? `<img src="${q.img}" style="max-width:100%; display:block; margin:5px auto; max-height: 100px;">` : '';
-            const isEnglish = q.sub.toLowerCase().includes("english") || q.sub.includes("ইংরেজি");
+            const isEnglish = q.sub && (q.sub.toLowerCase().includes("english") || q.sub.includes("ইংরেজি"));
             const labels = isEnglish ? ["a", "b", "c", "d"] : ["ক", "খ", "গ", "ঘ"];
             
             let cleanBody = q.body || '';
@@ -3035,6 +3229,297 @@ function updateSliderValue(sliderId, value) {
     }
 }
 
+// ==================== উন্নত সার্চ ফাংশন ====================
+
+function performSearch() {
+    const searchInput = document.getElementById('searchBox');
+    const clearBtn = document.getElementById('clearSearchBtn');
+    
+    searchTerm = searchInput.value.trim().toLowerCase();
+    
+    if (searchTerm === '') {
+        clearSearch();
+        document.getElementById('suggestionDropdown').style.display = 'none';
+        return;
+    }
+    
+    clearBtn.style.display = 'block';
+    
+    if (searchTimeout) clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+        performActualSearch();
+    }, 300);
+    
+    showSuggestions();
+}
+
+function showSuggestions() {
+    const searchInput = document.getElementById('searchBox');
+    const suggestionDropdown = document.getElementById('suggestionDropdown');
+    const term = searchInput.value.trim().toLowerCase();
+    
+    if (term.length < 2) {
+        suggestionDropdown.style.display = 'none';
+        return;
+    }
+    
+    suggestions = [];
+    const suggestionSet = new Set();
+    
+    questionBank.forEach(q => {
+        if (q.sub && q.sub.toLowerCase().includes(term) && !suggestionSet.has(q.sub)) {
+            suggestionSet.add(q.sub);
+            suggestions.push({
+                type: 'subject',
+                text: q.sub,
+                icon: '📚'
+            });
+        }
+        
+        if (q.chap && q.chap.toLowerCase().includes(term) && !suggestionSet.has(q.chap)) {
+            suggestionSet.add(q.chap);
+            suggestions.push({
+                type: 'chapter',
+                text: q.chap,
+                icon: '📖'
+            });
+        }
+        
+        if (q.body && q.body.toLowerCase().includes(term)) {
+            const preview = q.body.length > 30 ? q.body.substring(0, 30) + '...' : q.body;
+            if (!suggestionSet.has(preview)) {
+                suggestionSet.add(preview);
+                suggestions.push({
+                    type: 'question',
+                    text: preview,
+                    fullText: q.body,
+                    icon: '❓'
+                });
+            }
+        }
+    });
+    
+    suggestions = suggestions.slice(0, 5);
+    
+    if (suggestions.length > 0) {
+        let suggestionHTML = '';
+        suggestions.forEach((s, index) => {
+            suggestionHTML += `
+                <div onclick="selectSuggestion('${s.text.replace(/'/g, "\\'")}')" 
+                     style="padding: 10px; cursor: pointer; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 8px; transition: 0.2s;"
+                     onmouseover="this.style.backgroundColor='#f5f5f5'"
+                     onmouseout="this.style.backgroundColor='white'">
+                    <span style="font-size: 16px;">${s.icon}</span>
+                    <div style="flex:1;">
+                        <div style="font-weight: bold; font-size: 12px; color: #666;">${s.type === 'subject' ? 'বিষয়' : s.type === 'chapter' ? 'অধ্যায়' : 'প্রশ্ন'}</div>
+                        <div style="font-size: 13px;">${s.text}</div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        const inputRect = searchInput.getBoundingClientRect();
+        suggestionDropdown.innerHTML = suggestionHTML;
+        suggestionDropdown.style.display = 'block';
+        suggestionDropdown.style.top = (inputRect.bottom + window.scrollY) + 'px';
+        suggestionDropdown.style.left = inputRect.left + 'px';
+        suggestionDropdown.style.width = inputRect.width + 'px';
+    } else {
+        suggestionDropdown.style.display = 'none';
+    }
+}
+
+function selectSuggestion(text) {
+    document.getElementById('searchBox').value = text;
+    document.getElementById('suggestionDropdown').style.display = 'none';
+    performActualSearch();
+}
+
+function performActualSearch() {
+    const searchInput = document.getElementById('searchBox');
+    const searchNavButtons = document.getElementById('searchNavButtons');
+    const searchInfoDisplay = document.getElementById('searchInfoDisplay');
+    
+    searchTerm = searchInput.value.trim().toLowerCase();
+    
+    if (searchTerm === '') {
+        clearSearch();
+        return;
+    }
+    
+    searchResults = [];
+    const relevanceScores = [];
+    
+    questionBank.forEach((q, index) => {
+        let score = 0;
+        let found = false;
+        
+        if (q.body && q.body.toLowerCase().includes(searchTerm)) {
+            found = true;
+            score += 10;
+            const matches = (q.body.toLowerCase().match(new RegExp(searchTerm, 'g')) || []).length;
+            score += matches * 2;
+        }
+        
+        if (q.sub && q.sub.toLowerCase().includes(searchTerm)) {
+            found = true;
+            score += 8;
+        }
+        
+        if (q.chap && q.chap.toLowerCase().includes(searchTerm)) {
+            found = true;
+            score += 8;
+        }
+        
+        if (q.ans && q.ans.toLowerCase().includes(searchTerm)) {
+            found = true;
+            score += 5;
+        }
+        
+        if (q.a && q.a.toLowerCase().includes(searchTerm)) {
+            found = true;
+            score += 3;
+        }
+        if (q.b && q.b.toLowerCase().includes(searchTerm)) {
+            found = true;
+            score += 3;
+        }
+        if (q.c && q.c.toLowerCase().includes(searchTerm)) {
+            found = true;
+            score += 3;
+        }
+        if (q.d && q.d.toLowerCase().includes(searchTerm)) {
+            found = true;
+            score += 3;
+        }
+        
+        if (q.board && q.board.toLowerCase().includes(searchTerm)) {
+            found = true;
+            score += 4;
+        }
+        
+        if (found) {
+            searchResults.push(index);
+            relevanceScores.push({ index, score });
+        }
+    });
+    
+    relevanceScores.sort((a, b) => b.score - a.score);
+    searchResults = relevanceScores.map(item => item.index);
+    
+    isSearchActive = searchResults.length > 0;
+    currentSearchIndex = 0;
+    
+    document.getElementById('searchResultCount').textContent = searchResults.length;
+    
+    if (searchResults.length > 0) {
+        searchInfoDisplay.style.display = 'block';
+        searchInfoDisplay.style.background = '#e8f5e9';
+        searchInfoDisplay.style.color = '#2e7d32';
+        searchInfoDisplay.style.borderColor = '#4caf50';
+        searchInfoDisplay.innerHTML = `<span id="searchResultCount">${searchResults.length}</span>টি রেজাল্ট পাওয়া গেছে`;
+        searchNavButtons.style.display = 'flex';
+        
+        setTimeout(() => {
+            navigateToSearchResult(0);
+        }, 100);
+    } else {
+        searchInfoDisplay.style.display = 'block';
+        searchInfoDisplay.style.background = '#ffebee';
+        searchInfoDisplay.style.color = '#c62828';
+        searchInfoDisplay.style.borderColor = '#ef5350';
+        searchInfoDisplay.innerHTML = '❌ কোন রেজাল্ট পাওয়া যায়নি';
+        searchNavButtons.style.display = 'none';
+    }
+    
+    renderSelectionList();
+}
+
+function navigateToSearchResult(index) {
+    if (searchResults.length === 0) return;
+    
+    if (index < 0) index = searchResults.length - 1;
+    if (index >= searchResults.length) index = 0;
+    
+    currentSearchIndex = index;
+    
+    document.querySelectorAll('.search-navigation-active').forEach(el => {
+        el.classList.remove('search-navigation-active');
+    });
+    
+    const resultIndex = searchResults[currentSearchIndex];
+    const questionElement = document.querySelector(`.q-card[onclick*="toggleQ(${resultIndex})"]`);
+    
+    if (questionElement) {
+        questionElement.classList.add('search-navigation-active');
+        
+        setTimeout(() => {
+            questionElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
+        
+        questionElement.style.transition = '0.3s';
+        questionElement.style.backgroundColor = '#fff9c4';
+        setTimeout(() => {
+            questionElement.style.backgroundColor = '';
+        }, 500);
+    }
+    
+    document.getElementById('searchResultCount').textContent = searchResults.length;
+    document.getElementById('searchBox').title = `রেজাল্ট ${currentSearchIndex + 1}/${searchResults.length}`;
+    
+    const searchInfoDisplay = document.getElementById('searchInfoDisplay');
+    searchInfoDisplay.innerHTML = `<span id="searchResultCount">${searchResults.length}</span>টি রেজাল্ট পাওয়া গেছে - দেখছেন: ${currentSearchIndex + 1} নং`;
+}
+
+function clearSearch() {
+    const searchInput = document.getElementById('searchBox');
+    const clearBtn = document.getElementById('clearSearchBtn');
+    const searchNavButtons = document.getElementById('searchNavButtons');
+    const searchInfoDisplay = document.getElementById('searchInfoDisplay');
+    const suggestionDropdown = document.getElementById('suggestionDropdown');
+    
+    searchInput.value = '';
+    searchTerm = '';
+    searchResults = [];
+    currentSearchIndex = 0;
+    isSearchActive = false;
+    
+    clearBtn.style.display = 'none';
+    searchNavButtons.style.display = 'none';
+    searchInfoDisplay.style.display = 'none';
+    suggestionDropdown.style.display = 'none';
+    
+    searchInput.style.background = '';
+    searchInput.style.borderColor = '#e0e0e0';
+    searchInput.title = '';
+    
+    renderSelectionList();
+}
+
+function handleSearchKeyUp(e) {
+    if (e.key === 'Enter') {
+        document.getElementById('suggestionDropdown').style.display = 'none';
+        if (searchResults.length > 0) {
+            navigateToSearchResult(currentSearchIndex + 1);
+        } else {
+            performActualSearch();
+        }
+    } else if (e.key === 'Escape') {
+        document.getElementById('suggestionDropdown').style.display = 'none';
+    }
+}
+
+document.addEventListener('click', function(e) {
+    const dropdown = document.getElementById('suggestionDropdown');
+    const searchBox = document.getElementById('searchBox');
+    
+    if (dropdown && searchBox) {
+        if (!dropdown.contains(e.target) && e.target !== searchBox) {
+            dropdown.style.display = 'none';
+        }
+    }
+});
+
 // ==================== Monthly Exam Functions ====================
 
 function loadSubjectsForMonthly() {
@@ -3089,10 +3574,10 @@ function loadSubjectsForMonthly() {
         html += `
                 </div>
                 <div style="margin-top:10px; display:flex; gap:5px;">
-                    <button onclick="selectRandomFromSubject('${subject}', ${questionsPerSubject})" style="flex:1; background:#2196f3; color:white; border:none; padding:6px; border-radius:4px; cursor:pointer; font-size:12px;">
+                    <button onclick="selectRandomFromSubject('${subject}', ${questionsPerSubject})" style="flex:1; background:#2196f3; color:white; border:none; padding:6px; border-radius:4px; cursor:pointer; font-size:12px; transition:0.3s;">
                         🎲 ${questionsPerSubject}টি র‍্যান্ডম সিলেক্ট
                     </button>
-                    <button onclick="deselectAllFromSubject('${subject}')" style="flex:1; background:#f44336; color:white; border:none; padding:6px; border-radius:4px; cursor:pointer; font-size:12px;">
+                    <button onclick="deselectAllFromSubject('${subject}')" style="flex:1; background:#f44336; color:white; border:none; padding:6px; border-radius:4px; cursor:pointer; font-size:12px; transition:0.3s;">
                         ❌ সব ডিসেলেক্ট
                     </button>
                 </div>
@@ -3364,7 +3849,7 @@ function advancedAutoSelect() {
     }
     
     if(count > pool.length) {
-        statusDiv.innerHTML = `<span style="color:#ff9800;">⚠️ শুধুমাত্র ${pool.length}টি প্রশ্ন পাওয়া গেছে। সবগুলো সিলেক্ট করা হবে।</span>`;
+        statusDiv.innerHTML = `<span style="color:#ff9800;">⚠️ শুধুমাত্র ${pool.length}টি প্রশ্ন পাওয়া গেছে। সবগুলো সিলেক্ট করা হবে。</span>`;
         statusDiv.style.display = 'block';
         count = pool.length;
     }
@@ -3537,7 +4022,7 @@ function updateSubjectLimitsFromSelected() {
                 </div>
                 <div>
                     <button onclick="setLimitToAll('${subject}', ${currentCount})" 
-                            style="background: #4caf50; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-size: 11px;">
+                            style="background: #4caf50; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-size: 11px; transition:0.3s;">
                         সব (${currentCount})
                     </button>
                 </div>
@@ -3634,7 +4119,7 @@ function openTemporaryEditor() {
         <div style="background:white; width:90%; max-width:800px; height:80vh; border-radius:10px; padding:20px; display:flex; flex-direction:column;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:2px solid var(--primary); padding-bottom:10px;">
                 <h3 style="margin:0; color:var(--primary);">🖊️ টেম্পোরারি এডিট</h3>
-                <button onclick="closeTempEditor()" style="background:#f44336; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">✖ বন্ধ করুন</button>
+                <button onclick="closeTempEditor()" style="background:#f44336; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer; transition:0.3s;">✖ বন্ধ করুন</button>
             </div>
             
             <div style="display:flex; gap:20px; flex:1; overflow:hidden;">
@@ -3676,9 +4161,9 @@ function openTemporaryEditor() {
                     </div>
                     
                     <div style="display:flex; gap:10px; margin-top:auto;">
-                        <button onclick="saveTempEdit()" style="flex:1; background:#4caf50; color:white; border:none; padding:12px; border-radius:5px; cursor:pointer; font-weight:bold;">💾 পরিবর্তন সংরক্ষণ করুন</button>
-                        <button onclick="loadPrevQuestion()" style="width:50px; background:#2196f3; color:white; border:none; padding:12px; border-radius:5px; cursor:pointer;">←</button>
-                        <button onclick="loadNextQuestion()" style="width:50px; background:#2196f3; color:white; border:none; padding:12px; border-radius:5px; cursor:pointer;">→</button>
+                        <button onclick="saveTempEdit()" style="flex:1; background:#4caf50; color:white; border:none; padding:12px; border-radius:5px; cursor:pointer; font-weight:bold; transition:0.3s;">💾 পরিবর্তন সংরক্ষণ করুন</button>
+                        <button onclick="loadPrevQuestion()" style="width:50px; background:#2196f3; color:white; border:none; padding:12px; border-radius:5px; cursor:pointer; transition:0.3s;">←</button>
+                        <button onclick="loadNextQuestion()" style="width:50px; background:#2196f3; color:white; border:none; padding:12px; border-radius:5px; cursor:pointer; transition:0.3s;">→</button>
                     </div>
                     
                     <div style="margin-top:15px; background:#f5f5f5; padding:10px; border-radius:5px; font-size:12px;">
@@ -3846,136 +4331,153 @@ function closeTempEditor() {
     }
 }
 
-// ==================== Search Functions ====================
+// ==================== AI Panel Functions (Bank এর ভিতরে) ====================
 
-function performSearch() {
-    const searchInput = document.getElementById('searchBox');
-    const clearBtn = document.getElementById('clearSearchBtn');
-    const searchNavButtons = document.getElementById('searchNavButtons');
-    const searchInfoDisplay = document.getElementById('searchInfoDisplay');
+function importAIPaste() {
+    const jsonInput = document.getElementById('aiJsonInput').value.trim();
+    const statusDiv = document.getElementById('aiStatus');
     
-    searchTerm = searchInput.value.trim().toLowerCase();
-    
-    if (searchTerm === '') {
-        clearSearch();
+    if (!jsonInput) {
+        showAIStatus('❌ দয়া করে JSON পেস্ট করুন!', 'error');
         return;
     }
     
-    clearBtn.style.display = 'block';
-    
-    searchResults = [];
-    
-    questionBank.forEach((q, index) => {
-        let found = false;
+    try {
+        // JSON পার্স করুন
+        const importedData = JSON.parse(jsonInput);
         
-        if (q.body && q.body.toLowerCase().includes(searchTerm)) {
-            found = true;
+        // চেক করুন এটি অ্যারে কিনা
+        let questionsArray = [];
+        if (Array.isArray(importedData)) {
+            questionsArray = importedData;
+        } else if (importedData.qs && Array.isArray(importedData.qs)) {
+            questionsArray = importedData.qs;
+        } else {
+            showAIStatus('❌ JSON ফরম্যাট সঠিক নয়! অ্যারে প্রয়োজন।', 'error');
+            return;
         }
         
-        if (q.sub && q.sub.toLowerCase().includes(searchTerm)) {
-            found = true;
-        }
+        let duplicates = 0;
+        let added = 0;
+        let invalidCount = 0;
+        const seen = new Set();
         
-        if (q.chap && q.chap.toLowerCase().includes(searchTerm)) {
-            found = true;
-        }
+        // বিদ্যমান প্রশ্নগুলোর জন্য seen সেট তৈরি করুন
+        questionBank.forEach(q => {
+            const normalizedBody = normalizeText(q.body);
+            const questionKey = `${q.sub}|${q.chap}|${normalizedBody}`;
+            seen.add(questionKey);
+        });
         
-        if (q.ans && q.ans.toLowerCase().includes(searchTerm)) {
-            found = true;
-        }
-        
-        if (q.a && q.a.toLowerCase().includes(searchTerm)) found = true;
-        if (q.b && q.b.toLowerCase().includes(searchTerm)) found = true;
-        if (q.c && q.c.toLowerCase().includes(searchTerm)) found = true;
-        if (q.d && q.d.toLowerCase().includes(searchTerm)) found = true;
-        
-        if (found) {
-            searchResults.push(index);
-        }
-    });
-    
-    isSearchActive = searchResults.length > 0;
-    currentSearchIndex = 0;
-    
-    document.getElementById('searchResultCount').textContent = searchResults.length;
-    
-    if (searchResults.length > 0) {
-        searchInfoDisplay.classList.add('active');
-        searchNavButtons.style.display = 'flex';
-        
-        highlightCurrentSearchResult();
-    } else {
-        searchInfoDisplay.classList.remove('active');
-        searchNavButtons.style.display = 'none';
-        searchInput.style.background = '#ffebee';
-        searchInput.style.borderColor = '#f44336';
-    }
-    
-    renderSelectionList();
-    
-    if (searchResults.length > 0) {
-        navigateToSearchResult(0);
-    }
-}
-
-function highlightCurrentSearchResult() {
-    document.querySelectorAll('.search-navigation-active').forEach(el => {
-        el.classList.remove('search-navigation-active');
-    });
-    
-    if (searchResults.length > 0 && currentSearchIndex < searchResults.length) {
-        const resultIndex = searchResults[currentSearchIndex];
-        const questionElement = document.querySelector(`.q-card[onclick*="toggleQ(${resultIndex})"]`);
-        if (questionElement) {
-            questionElement.classList.add('search-navigation-active');
+        // প্রতিটি ইম্পোর্টেড প্রশ্ন চেক করুন
+        questionsArray.forEach((newQ, index) => {
+            // প্রয়োজনীয় ফিল্ড চেক করুন
+            if (!newQ.sub || !newQ.body) {
+                invalidCount++;
+                console.warn(`Question ${index + 1} missing required fields:`, newQ);
+                return;
+            }
             
-            setTimeout(() => {
-                questionElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 300);
+            // ডিফল্ট ভ্যালু সেট করুন
+            const question = {
+                sub: newQ.sub,
+                chap: newQ.chap || 'অধ্যায়হীন',
+                type: newQ.type || 'normal',
+                body: newQ.body,
+                ans: newQ.ans || '',
+                a: newQ.a || '',
+                b: newQ.b || '',
+                c: newQ.c || '',
+                d: newQ.d || '',
+                board: newQ.board || '',
+                qClass: newQ.qClass || '',
+                qDiv: newQ.qDiv || '',
+                img: newQ.img || '',
+                selected: false,
+                showOptions: newQ.showOptions !== false
+            };
+            
+            const normalizedBody = normalizeText(question.body);
+            const questionKey = `${question.sub}|${question.chap}|${normalizedBody}`;
+            
+            if (seen.has(questionKey)) {
+                duplicates++;
+            } else {
+                seen.add(questionKey);
+                questionBank.push(question);
+                added++;
+            }
+        });
+        
+        if (added > 0) {
+            saveData();
+            updateSubFilter();
+            updateChapterFilter();
+            updateQuestionCount();
+            renderSelectionList();
+            
+            let message = `✅ ${added}টি নতুন প্রশ্ন যোগ হয়েছে।`;
+            if (duplicates > 0) {
+                message += `\n⚠️ ${duplicates}টি ডুপ্লিকেট বাদ দেওয়া হয়েছে।`;
+            }
+            if (invalidCount > 0) {
+                message += `\n❌ ${invalidCount}টি প্রশ্ন ফরম্যাট ঠিক নেই (বাদ)।`;
+            }
+            showAIStatus(message, 'success');
+            
+            // সাফল্যের পর JSON ফিল্ড খালি করার অপশন
+            if (confirm(`${added}টি প্রশ্ন যোগ হয়েছে। JSON ফিল্ড খালি করবেন?`)) {
+                document.getElementById('aiJsonInput').value = '';
+            }
+        } else {
+            if (duplicates > 0) {
+                showAIStatus(`⚠️ সবকটি প্রশ্ন (${duplicates}টি) ডুপ্লিকেট। কোন নতুন প্রশ্ন যোগ হয়নি।`, 'warning');
+            } else if (invalidCount > 0) {
+                showAIStatus(`❌ ${invalidCount}টি প্রশ্ন ফরম্যাট ঠিক নেই।`, 'error');
+            } else {
+                showAIStatus(`❌ কোন বৈধ প্রশ্ন পাওয়া যায়নি।`, 'error');
+            }
         }
+        
+    } catch (error) {
+        console.error('JSON parse error:', error);
+        showAIStatus(`❌ JSON পার্স করতে সমস্যা: ${error.message}`, 'error');
     }
 }
 
-function navigateToSearchResult(index) {
-    if (searchResults.length === 0) return;
+function showAIStatus(message, type) {
+    const statusDiv = document.getElementById('aiStatus');
+    const colors = {
+        success: '#d4edda',
+        error: '#f8d7da',
+        warning: '#fff3cd',
+        info: '#d1ecf1'
+    };
+    const textColors = {
+        success: '#155724',
+        error: '#721c24',
+        warning: '#856404',
+        info: '#0c5460'
+    };
     
-    if (index < 0) index = searchResults.length - 1;
-    if (index >= searchResults.length) index = 0;
+    statusDiv.style.display = 'block';
+    statusDiv.style.backgroundColor = colors[type] || '#e2e3e5';
+    statusDiv.style.color = textColors[type] || '#383d41';
+    statusDiv.style.border = '1px solid ' + (type === 'success' ? '#c3e6cb' : type === 'error' ? '#f5c6cb' : '#ffeeba');
+    statusDiv.style.padding = '10px';
+    statusDiv.style.borderRadius = '5px';
+    statusDiv.innerHTML = message.replace(/\n/g, '<br>');
     
-    currentSearchIndex = index;
-    
-    highlightCurrentSearchResult();
-    
-    document.getElementById('searchResultCount').textContent = searchResults.length;
-    document.getElementById('searchBox').title = `রেজাল্ট ${currentSearchIndex + 1}/${searchResults.length}`;
+    // 5 সেকেন্ড পরে স্ট্যাটাস হাইড করুন
+    setTimeout(() => {
+        statusDiv.style.display = 'none';
+    }, 5000);
 }
 
-function clearSearch() {
-    const searchInput = document.getElementById('searchBox');
-    const clearBtn = document.getElementById('clearSearchBtn');
-    const searchNavButtons = document.getElementById('searchNavButtons');
-    const searchInfoDisplay = document.getElementById('searchInfoDisplay');
-    
-    searchInput.value = '';
-    searchTerm = '';
-    searchResults = [];
-    currentSearchIndex = 0;
-    isSearchActive = false;
-    
-    clearBtn.style.display = 'none';
-    searchNavButtons.style.display = 'none';
-    searchInfoDisplay.classList.remove('active');
-    
-    searchInput.style.background = '';
-    searchInput.style.borderColor = '#ccc';
-    searchInput.title = '';
-    
-    renderSelectionList();
-}
-
-function handleSearchKeyPress(e) {
-    if (e.key === 'Enter' && searchResults.length > 0) {
-        navigateToSearchResult(currentSearchIndex + 1);
+function clearAIPanel() {
+    if (confirm('JSON ফিল্ড খালি করবেন?')) {
+        document.getElementById('aiJsonInput').value = '';
+        document.getElementById('aiStatus').style.display = 'none';
     }
 }
 
